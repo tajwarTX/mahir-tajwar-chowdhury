@@ -1,7 +1,7 @@
 {
   "name": "3d_portfolio",
   "private": true,
-  "homepage": "https://tajwarTX.github.io/mahir-tajwar-chowdhury",
+  "homepage": "https://tajwartx.github.io/mahir-tajwar-chowdhury/",
   "version": "0.0.0",
   "type": "module",
   "scripts": {
@@ -10,7 +10,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build"
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "@react-spring/three": "^10.0.3",

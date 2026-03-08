@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from "react";
-import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
 
 import Navbar from "./components/Navbar";
 import { Home, About, Projects, Contact } from "./pages";
@@ -14,7 +15,7 @@ const App = () => {
 
   // Check if device is mobile on load & on resize
   useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    const checkMobile = () => setIsMobile(window.innerWidth < 480);
     checkMobile();
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
@@ -54,7 +55,7 @@ const App = () => {
 
       {/* Show main site only when not loading */}
       {!loading && (
-        <Router>
+        <Router basename="/mahir-tajwar-chowdhury/">
           <Navbar />
           <Routes>
             <Route path="/" element={<Home />} />
