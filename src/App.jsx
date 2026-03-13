@@ -1,12 +1,25 @@
 import { useRef, useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-
+import StaggeredMenu from "./components/StaggeredMenu";
 import Navbar from "./components/Navbar";
 import { Home, About, Projects, Contact } from "./pages";
 import Dither from "./components/Dither";
 import TargetCursor from "./components/TargetCursor";
 import Loader from "./components/Loader";
+
+const menuItems = [
+  { label: 'Home', ariaLabel: 'Go to home page', link: '/' },
+  { label: 'About', ariaLabel: 'Learn about us', link: '/about' },
+  { label: 'Services', ariaLabel: 'View our services', link: '/services' },
+  { label: 'Contact', ariaLabel: 'Get in touch', link: '/contact' }
+];
+
+const socialItems = [
+  { label: 'Twitter', link: 'https://twitter.com' },
+  { label: 'GitHub', link: 'https://github.com' },
+  { label: 'LinkedIn', link: 'https://linkedin.com' }
+];
 
 const App = () => {
   const [loading, setLoading] = useState(true);
@@ -52,11 +65,26 @@ const App = () => {
           waveSpeed={0.05}
         />
       </div>
-
       {/* Show main site only when not loading */}
       {!loading && (
         <Router basename="/mahir-tajwar-chowdhury/">
           <Navbar />
+          <div className="fixed inset-0 z-20 pointer-events-auto">
+            <StaggeredMenu
+              position="right"
+              items={menuItems}
+              socialItems={socialItems}
+              displaySocials
+              displayItemNumbering={true}
+              menuButtonColor="#ffffff"
+              openMenuButtonColor="#fff"
+              changeMenuColorOnOpen={true}
+              colors={['#B19EEF', '#5227FF']}
+              accentColor="#a600ff"
+              onMenuOpen={() => console.log('Menu opened')}
+              onMenuClose={() => console.log('Menu closed')}
+            />
+          </div>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/about" element={<About />} />

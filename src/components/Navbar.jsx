@@ -1,6 +1,7 @@
-import logo from '../assets/Logo.png';
+import logo from '../assets/logo.png';
 import { NavLink } from 'react-router-dom';
 import ScrollLetterRevealDelayed from "./ScrollLetterRevealDelayed";
+
 const Navbar = () => {
   return (
     <>
@@ -40,38 +41,38 @@ const Navbar = () => {
         </NavLink>
       </div>
 
-      <header className="fixed top-0 right-0 left-0 z-40 flex justify-end items-start px-6 py-4 bg-transparent">
-  <nav className="flex flex-col sm:flex-row items-end sm:items-center text-sm gap-2 sm:gap-5 font-light">
+      {/* <header className="fixed top-0 right-0 left-0 z-20 flex justify-end items-start px-6 py-4 bg-transparent">
+        <nav className="flex flex-col sm:flex-row items-end sm:items-center text-sm gap-2 sm:gap-5 font-light">
 
-    <NavLink
-      to="/about"
-      className={({ isActive }) =>
-        isActive ? "text-purple-500" : "text-white"
-      }
-    >
-      <div className="cursor-target px-4 mt-1 w-fit">ABOUT</div>
-    </NavLink>
+          <NavLink
+            to="/about"
+            className={({ isActive }) =>
+              isActive ? "text-purple-500" : "text-white"
+            }
+          >
+            <div className="cursor-target px-4 mt-1 w-fit">ABOUT</div>
+          </NavLink>
 
-    <NavLink
-      to="/projects"
-      className={({ isActive }) =>
-        isActive ? "text-purple-500" : "text-white"
-      }
-    >
-      <div className="cursor-target px-4 mt-1 w-fit">PROJECTS</div>
-    </NavLink>
+          <NavLink
+            to="/projects"
+            className={({ isActive }) =>
+              isActive ? "text-purple-500" : "text-white"
+            }
+          >
+            <div className="cursor-target px-4 mt-1 w-fit">PROJECTS</div>
+          </NavLink>
 
-    <NavLink
-      to="/contact"
-      className={({ isActive }) =>
-        isActive ? "text-purple-500" : "text-white"
-      }
-    >
-      <div className="cursor-target px-4 mt-1 w-fit">CONTACT</div>
-    </NavLink>
+          <NavLink
+            to="/contact"
+            className={({ isActive }) =>
+              isActive ? "text-purple-500" : "text-white"
+            }
+          >
+            <div className="cursor-target px-4 mt-1 w-fit">CONTACT</div>
+          </NavLink>
 
-  </nav>
-</header>
+        </nav>
+      </header> */}
     </>
   );
 };

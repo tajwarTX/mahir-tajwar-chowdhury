@@ -153,7 +153,7 @@ export default function Home() {
   return (
     <div className="w-full relative">
       <section ref={introRef} className="relative w-full h-screen flex justify-center items-center flex-col">
-        <div className="relative flex flex-col items-center">
+        <div className="relative flex flex-col z-20 items-center">
           <IntroBlock />
           <div
             className={`absolute flex items-center gap-3 transition-opacity duration-1000`}
