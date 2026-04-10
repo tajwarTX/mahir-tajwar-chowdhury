@@ -12,28 +12,32 @@ const MOBILE_POSITION = { x: -2, y: 24, z: -60 }; // Your requested mobile Y cha
 const BASE_ROTATION_DEG = { x: -8, y: 124, z: 0 };
 const degToRad = (deg) => (deg * Math.PI) / 180;
 
-// Infinite scroll text component
-const InfiniteScrollText = () => (
-  <div className="absolute left-0 top-[40%] w-full overflow-hidden pointer-events-none z-0">
-    <div className="marquee whitespace-nowrap">
-      <span className="text-[200px] font-orbitron font-outline text-white">
-        ROBOTICS • CREATIVE DEVELOPER • 3D DESIGNING • CINEMATIC • ROBOTICS • CREATIVE DEVELOPER • 3D DESIGNING • CINEMATIC •
-      </span>
+// High-performance Infinite scroll text component
+const InfiniteScrollText = () => {
+  const text = "ROBOTICS • CREATIVE DEVELOPER • 3D DESIGNING • CINEMATIC • ";
+  
+  return (
+    <div className="absolute left-0 top-[45%] w-full overflow-hidden pointer-events-none z-0 select-none">
+      <div className="marquee-container flex whitespace-nowrap">
+        <div className="marquee-content flex shrink-0 items-center min-w-full">
+           <span className="text-[200px] font-orbitron font-outline text-white uppercase">{text}</span>
+           <span className="text-[200px] font-orbitron font-outline text-white uppercase">{text}</span>
+        </div>
+      </div>
+      <style>{`
+        .marquee-content {
+          animation: scrollLeft 30s linear infinite;
+          will-change: transform;
+          transform: translate3d(0, 0, 0);
+        }
+        @keyframes scrollLeft {
+          from { transform: translate3d(0, 0, 0); }
+          to { transform: translate3d(-50%, 0, 0); }
+        }
+      `}</style>
     </div>
-    <style>{`
-      .marquee {
-        display: flex;
-        width: max-content;
-        animation: scrollLeft 25s linear infinite;
-        will-change: transform;
-      }
-      @keyframes scrollLeft {
-        0% { transform: translateX(0%); }
-        100% { transform: translateX(-50%); }
-      }
-    `}</style>
-  </div>
-);
+  );
+};
 
 // Custom hook for drag rotation (Desktop + Mobile)
 function useDragRotation(targetRef, rotateSpeed = 0.005) {
@@ -152,21 +156,9 @@ export default function Home() {
 
   return (
     <div className="w-full relative">
-      <section ref={introRef} className="relative w-full h-screen flex justify-center items-center flex-col">
+      <section ref={introRef} className="relative w-full h-screen flex justify-start items-center flex-col pt-[28vh] md:pt-[32vh]">
         <div className="relative flex flex-col z-20 items-center">
           <IntroBlock />
-          <div
-            className={`absolute flex items-center gap-3 transition-opacity duration-1000`}
-            style={{
-              top: "80%",
-              left: "26%",
-              transform: "translateX(-50%)",
-              opacity: showArrowScroll ? 0.4 : 0,
-            }}
-          >
-            <img src={arrow} alt="arrow" className="w-12 h-16" />
-            <span className="text-white text-sm tracking-wide relative top-7">switch_languages_</span>
-          </div>
         </div>
         <img
           src={scrollDown}
@@ -179,29 +171,37 @@ export default function Home() {
       <section className="relative w-full min-h-screen flex items-center justify-center px-10 md:px-24 py-20 z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 w-full max-w-7xl items-center gap-12">
           <div className="flex flex-col">
-            <h2 className="text-[100px] md:text-[180px] lg:text-[220px] font-orbitron font-extrabold leading-[0.8] text-white uppercase tracking-tighter">
-              <ScrollLetterRevealDelayed text="WHO" duration={200} delay={0} />
+            <h2 className="text-[60px] md:text-[100px] lg:text-[130px] font-orbitron font-extrabold leading-[0.8] text-white uppercase tracking-tighter">
+              <ScrollLetterRevealDelayed text="THE" duration={200} delay={0} />
               <br />
-              <ScrollLetterRevealDelayed text="AM I?" duration={200} delay={0} />
+              <span className="text-[#a600ff]">
+                <ScrollLetterRevealDelayed text="IDENTITY" duration={200} delay={0.1} />
+              </span>
             </h2>
+            <div className="mt-6 flex items-center gap-4">
+               <div className="h-[1px] w-10 bg-[#a600ff]" />
+               <span className="font-geist text-[9px] md:text-[11px] text-white/40 uppercase tracking-[0.4em] font-medium">
+                 ARCHIVE_001 // PERSONAL_SPEC
+               </span>
+            </div>
           </div>
           <div className="flex flex-col items-end text-right self-center space-y-6">
-            <div className="max-w-md md:max-w-lg">
+            <div className="max-w-md md:max-w-lg lg:max-w-xl">
               <ScrollLetterRevealDelayed
-                text="HI! I'M A CREATIVE DEVELOPER WHO BELIEVES THAT EVERY INTERACTION HAS A STORY WORTH HEARING."
+                text="CREATIVE DEVELOPER OPERATING AT THE INTERSECTION OF ELECTRICAL ENGINEERING AND CINEMATIC VISUALS."
                 duration={100}
-                delay={0}
-                className="block text-white text-lg md:text-xl font-geist font-medium uppercase tracking-[0.2em] leading-tight"
+                delay={0.2}
+                className="block text-white text-base md:text-lg lg:text-xl font-geist font-medium uppercase tracking-[0.2em] leading-tight"
               />
               <ScrollLetterRevealDelayed
-                text="WITH A TECHNICAL APPROACH AND ORGANIC STRATEGY, I HELP BRANDS AND INDIVIDUALS TO BE AUTHENTIC, RELEVANT AND ENGAGING IN THE DIGITAL WORLD."
+                text="SYNCHRONIZING TECHNICAL ARCHITECTURE WITH ORGANIC STRATEGY TO BUILD AUTHENTIC DIGITAL EXPERIENCES."
                 duration={100}
-                delay={0}
-                className="block text-white text-sm md:text-base font-geist font-light opacity-70 uppercase tracking-widest leading-relaxed"
+                delay={0.3}
+                className="block text-white/40 text-[11px] md:text-xs lg:text-sm font-geist font-light uppercase tracking-widest leading-relaxed mt-4"
               />
-              <div className="mt-16 flex flex-col items-end">
-                <div className="w-[1.5px] h-24 bg-white opacity-30 mb-4"></div>
-                <span className="text-white text-5xl font-orbitron font-bold">(1)</span>
+              <div className="mt-12 flex flex-col items-end">
+                <div className="w-[1.5px] h-16 bg-[#a600ff] opacity-40 mb-4"></div>
+                <span className="text-[#a600ff] text-2xl md:text-3xl font-orbitron font-bold">(01)</span>
               </div>
             </div>
           </div>
@@ -209,12 +209,45 @@ export default function Home() {
       </section>
 
       <section ref={canvasSectionRef} className="relative w-full -mt-[70px] overflow-hidden flex items-center" style={{ height: "120vh" }}>
-        <div className="absolute left-9 md:left-24 max-w-lg z-20 top-1/2 -translate-y-[140%] flex flex-col space-y-0.5">
-          <ScrollLetterRevealDelayed text="EXPLORE EVERYTHING ABOUT ME..." duration={100} delay={0} className="text-white text-lg md:text-xl font-geist font-medium uppercase tracking-wide leading-snug" />
-          <ScrollLetterRevealDelayed text="STEP INTO AN OPEN 3D WORLD, DISCOVER MY WORK, PASSIONS, AND IDEAS." duration={100} delay={0} className="text-white text-lg md:text-xl font-geist font-medium uppercase tracking-wide leading-snug opacity-80" />
-          <ScrollLetterRevealDelayed text="DRAG SIDEWAYS, INTERACT WITH ELEMENTS, DISCOVER HIDDEN STORIES, AND CLICK THE ANNOTATIONS TO DIVE DEEPER." duration={100} delay={0} className="text-white text-sm md:text-base font-geist font-light uppercase tracking-widest leading-relaxed opacity-60" />
+        <div className="absolute left-9 md:left-24 max-w-lg z-20 top-1/2 -translate-y-[104%] flex flex-col space-y-4">
+          <div className="flex flex-col gap-1">
+            <ScrollLetterRevealDelayed 
+              text="OPEN_WORLD_MODULE // v2.0" 
+              duration={100} 
+              delay={0} 
+              className="text-[#a600ff] font-geist text-[9px] md:text-[10px] uppercase tracking-[0.5em] font-bold" 
+            />
+            <h3 className="text-white text-3xl md:text-5xl font-orbitron font-black uppercase tracking-tighter leading-none border-none outline-none">
+              <ScrollLetterRevealDelayed text="EXPLORE THE " duration={200} delay={0.1} />
+              <span className="text-[#a600ff]">
+                <ScrollLetterRevealDelayed text="MATRIX" duration={200} delay={0.2} />
+              </span>
+            </h3>
+          </div>
+          
+          <div className="space-y-1 max-w-sm lg:max-w-md">
+            <ScrollLetterRevealDelayed 
+              text="DISCOVER PROJECTS, MILESTONES, AND MY ENGINEERING LIFE." 
+              duration={100} 
+              delay={0} 
+              className="text-white text-sm md:text-base font-geist font-medium uppercase tracking-[0.2em] leading-relaxed" 
+            />
+            <div className="space-y-2">
+              <ScrollLetterRevealDelayed 
+                text="INTERACT WITH ANNOTATIONS AND DRAG TO ROTATE." 
+                duration={100} 
+                delay={0.1} 
+                className="text-white/40 text-[10px] md:text-xs font-geist uppercase tracking-[0.3em] font-medium block" 
+              />
+            </div>
+          </div>
         </div>
-        <img src={scrollSide} alt="scroll side" className="absolute opacity-40 bottom-10 left-1/2 -translate-x-1/2 w-32 z-10 pointer-events-none" />
+        <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-10 pointer-events-none origin-center p-2 mb-2">
+          <img src={scrollSide} alt="scroll side" className="opacity-30 w-32" />
+          <p className="font-geist text-[8px] md:text-[9px] text-white/10 uppercase tracking-[0.3em] whitespace-nowrap">
+            MODEL // DINNER WITH CATS BY @EDIEDIEDI SKETCHFAB
+          </p>
+        </div>
         <InfiniteScrollText />
         <Canvas
           ref={cameraRef}

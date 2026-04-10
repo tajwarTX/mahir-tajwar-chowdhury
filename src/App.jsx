@@ -1,18 +1,18 @@
 import { useRef, useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 
 import StaggeredMenu from "./components/StaggeredMenu";
 import Navbar from "./components/Navbar";
-import { Home, About, Projects, Contact } from "./pages";
+import { Home, About, Projects, Contact, Resume } from "./pages";
 import Dither from "./components/Dither";
 import TargetCursor from "./components/TargetCursor";
 import Loader from "./components/Loader";
 
 const menuItems = [
   { label: 'Home', ariaLabel: 'Go to home page', link: '/' },
-  { label: 'About', ariaLabel: 'Learn about us', link: '/about' },
-  { label: 'Services', ariaLabel: 'View our services', link: '/services' },
-  { label: 'Contact', ariaLabel: 'Get in touch', link: '/contact' }
+  { label: 'About', ariaLabel: 'Learn more about me', link: '/about' },
+  { label: 'Projects', ariaLabel: 'View my engineering projects', link: '/projects' },
+  { label: 'Contact', ariaLabel: 'Get in touch for collaboration', link: '/contact' }
 ];
 
 const socialItems = [
@@ -21,9 +21,27 @@ const socialItems = [
   { label: 'LinkedIn', link: 'https://linkedin.com' }
 ];
 
+// Component to handle triggering loader on route change
+const LocationWatcher = ({ setLoading }) => {
+  const location = useLocation();
+  const isFirstMount = useRef(true);
+
+  useEffect(() => {
+    // Skip the very first mount since the initial loading state handles it
+    if (isFirstMount.current) {
+      isFirstMount.current = false;
+      return;
+    }
+    setLoading(true);
+  }, [location.pathname, setLoading]);
+
+  return null;
+};
+
 const App = () => {
   const [loading, setLoading] = useState(true);
-  const [isMobile, setIsMobile] = useState(false); // Track mobile
+  const [isMobile, setIsMobile] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const ditherRef = useRef(null);
 
   // Check if device is mobile on load & on resize
@@ -35,41 +53,43 @@ const App = () => {
   }, []);
 
   return (
-    <main className="relative w-full h-full">
-      {/* Show loader if loading */}
-      {loading && <Loader onFinish={() => setLoading(false)} />}
+    <Router>
+      <main className="relative w-full h-full bg-black">
+        <LocationWatcher setLoading={setLoading} />
 
-      {/* Global Cursor (only on non-mobile) */}
-      {!isMobile && (
-        <div className="fixed inset-0 z-50 pointer-events-none">
-          <TargetCursor
-            spinDuration={4.1}
-            hideDefaultCursor
-            parallaxOn
-            hoverDuration={0.5}
-            containerRef={ditherRef}
+        {/* Global Loader (triggered every page change) */}
+        {loading && <Loader onFinish={() => setLoading(false)} />}
+
+        {/* Global Cursor (only on non-mobile) */}
+        {!isMobile && (
+          <div className="fixed inset-0 z-[9999] pointer-events-none">
+            <TargetCursor
+              spinDuration={4.1}
+              hideDefaultCursor
+              parallaxOn
+              hoverDuration={0.5}
+              containerRef={ditherRef}
+            />
+          </div>
+        )}
+
+        <div ref={ditherRef} className={`fixed inset-0 w-full h-full pointer-events-none z-0 transition-opacity duration-300 ${menuOpen ? 'opacity-0' : 'opacity-100'}`}>
+          <Dither
+            waveColor={[0.3, 0.1, 0.4]}
+            disableAnimation={false}
+            enableMouseInteraction={false}
+            mouseRadius={0}
+            colorNum={6}
+            waveAmplitude={0.3}
+            waveFrequency={3}
+            waveSpeed={0.05}
           />
         </div>
-      )}
 
-      {/* Global Dither Background */}
-      <div ref={ditherRef} className="fixed inset-0 w-full h-full pointer-events-none -z-10">
-        <Dither
-          waveColor={[0.3, 0.1, 0.4]}
-          disableAnimation={false}
-          enableMouseInteraction={false}
-          mouseRadius={0}
-          colorNum={6}
-          waveAmplitude={0.3}
-          waveFrequency={3}
-          waveSpeed={0.05}
-        />
-      </div>
-      {/* Show main site only when not loading */}
-      {!loading && (
-        <Router basename="/mahir-tajwar-chowdhury/">
+        {/* Home content visibility linked to loading state */}
+        <div className={loading ? "hidden" : "block"}>
           <Navbar />
-          <div className="fixed inset-0 z-20 pointer-events-auto">
+          <div className="fixed inset-0 z-[1010] pointer-events-none">
             <StaggeredMenu
               position="right"
               items={menuItems}
@@ -79,21 +99,24 @@ const App = () => {
               menuButtonColor="#ffffff"
               openMenuButtonColor="#fff"
               changeMenuColorOnOpen={true}
-              colors={['#B19EEF', '#5227FF']}
+              colors={['#B19EEF', '#a600ff']}
               accentColor="#a600ff"
-              onMenuOpen={() => console.log('Menu opened')}
-              onMenuClose={() => console.log('Menu closed')}
+              onMenuOpen={() => setMenuOpen(true)}
+              onMenuClose={() => setMenuOpen(false)}
             />
           </div>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/projects" element={<Projects />} />
-            <Route path="/contact" element={<Contact />} />
-          </Routes>
-        </Router>
-      )}
-    </main>
+          <div className={`transition-all duration-300 ${menuOpen ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-auto'}`}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/projects" element={<Projects />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/resume" element={<Resume />} />
+            </Routes>
+          </div>
+        </div>
+      </main>
+    </Router>
   );
 };
 
