@@ -5,8 +5,8 @@ const IntroBlock = ({ className = "" }) => {
   const [geoData, setGeoData] = useState({
     city: "FETCHING...",
     country: "LOCATING...",
-    lat: "0.00",
-    lon: "0.00",
+    lat: null,
+    lon: null,
     timezone: "UTC"
   });
 
@@ -40,27 +40,40 @@ const IntroBlock = ({ className = "" }) => {
     const formattedGMT = `GMT${gmtPrefix}${offsetHours.toString().padStart(1, '0')}:00`;
 
     // 2. Fetch Geolocation via IP (Zero-permission)
-    fetch("https://ipapi.co/json/")
-      .then(res => res.json())
-      .then(data => {
-        setGeoData({
-          city: data.city || "UNKNOWN",
-          country: data.country_name || "UNKNOWN",
-          lat: data.latitude?.toFixed(2) || "SECURE",
-          lon: data.longitude?.toFixed(2) || "SECURE",
-          timezone: formattedGMT
-        });
-      })
-      .catch(() => {
-        // High-end fallback if the API is blocked on a local or corporate network
+    // Primary: ip-api.com (reliable, no key needed, HTTPS allowed on vercel)
+    const tryFetch = (url, parser) =>
+      fetch(url).then(r => r.json()).then(parser);
+
+    const applyGeo = (city, country, lat, lon) => {
+      setGeoData({
+        city: city || "UNKNOWN",
+        country: country || "UNKNOWN",
+        lat: typeof lat === "number" ? lat.toFixed(2) : "SECURE",
+        lon: typeof lon === "number" ? lon.toFixed(2) : "SECURE",
+        timezone: formattedGMT
+      });
+    };
+
+    tryFetch(
+      "https://ipwho.is/",
+      d => applyGeo(d.city, d.country, d.latitude, d.longitude)
+    ).catch(() =>
+      tryFetch(
+        "https://ipapi.co/json/",
+        d => applyGeo(d.city, d.country_name, d.latitude, d.longitude)
+      ).catch(() => {
         setGeoData(prev => ({
           ...prev,
           city: "SECURE",
           country: "ENCRYPTED",
-          timezone: formattedGMT // Time info is still accurate as it's browser-native
+          lat: "SECURE",
+          lon: "SECURE",
+          timezone: formattedGMT
         }));
-      });
+      })
+    );
   }, []);
+
 
   const nextFirst = () =>
     setFirstIndex((prev) => (prev + 1) % firstNames.length);
@@ -78,7 +91,7 @@ const IntroBlock = ({ className = "" }) => {
          </span>
          <div className="w-[1px] h-3 bg-white/30" />
          <span className="font-geist text-[8px] md:text-[9px] uppercase tracking-[0.4em] whitespace-nowrap">
-           {isNaN(geoData.lat) ? geoData.lat : `${geoData.lat}° N`} // {isNaN(geoData.lon) ? geoData.lon : `${geoData.lon}° E`}
+           {geoData.lat === null ? "SYNCING..." : isNaN(Number(geoData.lat)) ? geoData.lat : `${geoData.lat}° N`} // {geoData.lon === null ? "..." : isNaN(Number(geoData.lon)) ? geoData.lon : `${geoData.lon}° E`}
          </span>
       </div>
 
