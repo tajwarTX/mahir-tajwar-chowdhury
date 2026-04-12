@@ -1,16 +1,98 @@
-# React + Vite
+# Mahir Tajwar Chowdhury - Portfolio
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A cinematic 3D interactive portfolio website showcasing creative development, electrical engineering, and digital design excellence.
 
-Currently, two official plugins are available:
+## 🌐 Live Site
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+**Portfolio:** [https://tajwartx.vercel.app](https://tajwartx.vercel.app)
 
-## React Compiler
+## ✨ Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **3D Interactive Island Model** - Rotating 3D scene with annotations using Three.js & React Three Fiber
+- **Real-Time Geolocation** - Live latitude/longitude and local time display
+- **Cinematic Animations** - Smooth transitions and letter reveal effects powered by Framer Motion
+- **Responsive Design** - Optimized for desktop, tablet, and mobile devices
+- **High-Performance Rendering** - DRACO compressed GLB models and optimized WebGL pipeline
+- **Custom Cursor Effects** - Interactive target cursor with parallax effects
 
-## Expanding the ESLint configuration
+## 🛠 Tech Stack
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- **Frontend:** React 19, Vite, Tailwind CSS
+- **3D Graphics:** Three.js, React Three Fiber (@react-three)
+- **Animations:** Framer Motion, GSAP, React Spring
+- **Routing:** React Router v7
+- **Deployment:** Vercel
+
+## 📦 Project Structure
+
+```
+src/
+├── components/       # Reusable UI components
+├── pages/           # Route pages (Home, About, Projects, Contact, Resume)
+├── models/          # 3D models and assets
+├── lib/             # Utility functions
+└── assets/          # Images, videos, 3D files
+```
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js 18+ 
+- npm or yarn
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/tajwarTX/mahir-tajwar-chowdhury.git
+cd mahir-tajwar-chowdhury
+
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
+
+# Preview production build
+npm preview
+```
+
+## 📋 Pages
+
+- **Home** - Landing page with 3D interactive island
+- **About** - Professional background and skills
+- **Projects** - Engineering and design project showcase
+- **Contact** - Get in touch for collaboration
+- **Resume** - Digital resume request and download
+
+## 🎨 Customization
+
+- **Colors:** Update accent color in `tailwind.config.js`
+- **3D Model:** Replace `src/assets/3d/island.glb` with your own GLB file
+- **Content:** Edit individual page components in `src/pages/`
+- **Fonts:** System fonts (Geist, Orbitron) configured in Tailwind
+
+## 📊 Performance
+
+- Optimized bundle size: ~1.2MB (gzipped: ~430KB)
+- Core Web Vitals optimized
+- DRACO compression for 3D assets
+- Lazy loading and code splitting enabled
+
+## 🔗 Links
+
+- **GitHub:** https://github.com/tajwarTX/mahir-tajwar-chowdhury
+- **LinkedIn:** [Connect on LinkedIn]
+- **Twitter:** [@mahir_tajwar_chowdhury]
+- **Email:** tajwar185@gmail.com
+
+## 📄 License
+
+MIT License - feel free to use this portfolio as inspiration for your own
+
+---
+
+**Built with creativity and precision by Mahir Tajwar Chowdhury**
