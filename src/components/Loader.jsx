@@ -11,10 +11,26 @@ const Loader = ({ onFinish }) => {
     };
 
     const videoEl = videoRef.current;
-    videoEl.addEventListener("ended", handleEnded);
+    if (videoEl) {
+      videoEl.addEventListener("ended", handleEnded);
+      
+      // Force play on mobile and ensure autoplay works
+      const playPromise = videoEl.play();
+      if (playPromise !== undefined) {
+        playPromise.catch((error) => {
+          console.error("Autoplay failed:", error);
+          // Retry play after a short delay
+          setTimeout(() => {
+            videoEl.play().catch(() => console.log("Play retry failed"));
+          }, 100);
+        });
+      }
+    }
 
     return () => {
-      videoEl.removeEventListener("ended", handleEnded);
+      if (videoEl) {
+        videoEl.removeEventListener("ended", handleEnded);
+      }
     };
   }, [onFinish]);
 
@@ -26,7 +42,9 @@ const Loader = ({ onFinish }) => {
         autoPlay
         muted
         playsInline
+        controls={false}
         className="w-full h-full object-cover"
+        style={{ display: "block" }}
       />
     </div>
   );

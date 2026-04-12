@@ -1,0 +1,10 @@
+# robots.txt for Mahir Tajwar Chowdhury Portfolio
+
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://tajwartx.vercel.app/sitemap.xml
+
+# Disallow none - all content is indexable

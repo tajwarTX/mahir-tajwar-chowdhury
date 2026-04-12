@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { Analytics } from "@vercel/analytics/react";
 
 import StaggeredMenu from "./components/StaggeredMenu";
 import Navbar from "./components/Navbar";
@@ -116,6 +117,7 @@ const App = () => {
           </div>
         </div>
       </main>
+      <Analytics />
     </Router>
   );
 };

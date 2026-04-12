@@ -7,7 +7,8 @@ const IntroBlock = ({ className = "" }) => {
     country: "LOCATING...",
     lat: null,
     lon: null,
-    timezone: "UTC"
+    timezone: "UTC",
+    ip: "CONNECTING..."
   });
 
   const firstNames = [
@@ -30,49 +31,103 @@ const IntroBlock = ({ className = "" }) => {
 
   const [firstIndex, setFirstIndex] = useState(0);
   const [lastIndex, setLastIndex] = useState(0);
+  const [localTime, setLocalTime] = useState("");
+  const [gmtOffset, setGmtOffset] = useState("GMT");
 
   useEffect(() => {
-    // 1. Get accurate Timezone & GMT Offset directly from the browser (Zero-permission)
-    const tzString = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const offsetMinutes = new Date().getTimezoneOffset();
-    const offsetHours = -offsetMinutes / 60;
-    const gmtPrefix = offsetHours >= 0 ? "+" : "";
-    const formattedGMT = `GMT${gmtPrefix}${offsetHours.toString().padStart(1, '0')}:00`;
+    // Update local time and GMT every second
+    const updateTime = () => {
+      const now = new Date();
+      const formatted = now.toLocaleTimeString('en-US', { 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        second: '2-digit',
+        hour12: false
+      });
+      setLocalTime(formatted);
+      
+      // Calculate GMT offset
+      const rawOffset = -now.getTimezoneOffset(); // in minutes, positive = ahead of UTC
+      const absH = Math.floor(Math.abs(rawOffset) / 60);
+      const absM = Math.abs(rawOffset) % 60;
+      const sign = rawOffset >= 0 ? "+" : "-";
+      const formattedGMT = `GMT${sign}${String(absH).padStart(2, "0")}:${String(absM).padStart(2, "0")}`;
+      setGmtOffset(formattedGMT);
+    };
+    updateTime();
+    const timer = setInterval(updateTime, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
-    // 2. Fetch Geolocation via IP (Zero-permission)
-    // Primary: ip-api.com (reliable, no key needed, HTTPS allowed on vercel)
-    const tryFetch = (url, parser) =>
-      fetch(url).then(r => r.json()).then(parser);
-
-    const applyGeo = (city, country, lat, lon) => {
+  useEffect(() => {
+    const applyGeo = (city, country, lat, lon, ip) => {
+      const latNum = parseFloat(lat);
+      const lonNum = parseFloat(lon);
+      const validCoords = !isNaN(latNum) && !isNaN(lonNum);
       setGeoData({
         city: city || "UNKNOWN",
         country: country || "UNKNOWN",
-        lat: typeof lat === "number" ? lat.toFixed(2) : "SECURE",
-        lon: typeof lon === "number" ? lon.toFixed(2) : "SECURE",
-        timezone: formattedGMT
+        lat: validCoords ? latNum.toFixed(2) : null,
+        lon: validCoords ? lonNum.toFixed(2) : null,
+        timezone: "LOCAL_TIME",
+        ip: ip || "N/A",
       });
+      return validCoords; // return true if we got good data
     };
 
-    tryFetch(
-      "https://ipwho.is/",
-      d => applyGeo(d.city, d.country, d.latitude, d.longitude)
-    ).catch(() =>
-      tryFetch(
-        "https://ipapi.co/json/",
-        d => applyGeo(d.city, d.country_name, d.latitude, d.longitude)
-      ).catch(() => {
-        setGeoData(prev => ({
-          ...prev,
-          city: "SECURE",
-          country: "ENCRYPTED",
-          lat: "SECURE",
-          lon: "SECURE",
-          timezone: formattedGMT
-        }));
+    // Primary: ipinfo.io — very reliable, no key needed, loc = "lat,lon"
+    fetch("https://ipinfo.io/json", { method: "GET" })
+      .then(r => r.json())
+      .then(d => {
+        const [lat, lon] = (d.loc || "").split(",");
+        const ok = applyGeo(d.city, d.country, lat, lon, d.ip);
+        if (!ok) throw new Error("no coords");
       })
-    );
+      .catch(() =>
+        // Secondary: freeipapi.com — direct numeric lat/lon
+        fetch("https://freeipapi.com/api/json", { method: "GET" })
+          .then(r => r.json())
+          .then(d => {
+            const ok = applyGeo(d.cityName, d.countryName, d.latitude, d.longitude, d.ipAddress);
+            if (!ok) throw new Error("no coords");
+          })
+          .catch(() =>
+            // Tertiary: ipapi.co — alternative with IP display
+            fetch("https://ipapi.co/json/", { method: "GET" })
+              .then(r => r.json())
+              .then(d => applyGeo(d.city, d.country_name, d.latitude, d.longitude, d.ip))
+              .catch(() => {
+                // All failed — fetch just IP as fallback
+                fetch("https://api.ipify.org?format=json", { method: "GET" })
+                  .then(r => r.json())
+                  .then(d => {
+                    setGeoData(prev => ({
+                      ...prev,
+                      city: "LOCATION",
+                      country: "BLOCKED",
+                      lat: null,
+                      lon: null,
+                      timezone: "LOCAL_TIME",
+                      ip: d.ip,
+                    }));
+                  })
+                  .catch(() => {
+                    // Complete fallback if all APIs fail
+                    setGeoData(prev => ({
+                      ...prev,
+                      city: "LOCATION",
+                      country: "BLOCKED",
+                      lat: null,
+                      lon: null,
+                      timezone: "LOCAL_TIME",
+                      ip: "N/A",
+                    }));
+                  });
+              })
+          )
+      );
   }, []);
+
 
 
   const nextFirst = () =>
@@ -87,11 +142,11 @@ const IntroBlock = ({ className = "" }) => {
       {/* Top Metadata Row */}
       <div className="flex items-center gap-4 mb-8 opacity-40">
          <span className="font-geist text-[8px] md:text-[9px] uppercase tracking-[0.4em] whitespace-nowrap">
-           {geoData.timezone} // UTC_OFFSET
+           {localTime || "SYNCING..."} // {gmtOffset}
          </span>
          <div className="w-[1px] h-3 bg-white/30" />
          <span className="font-geist text-[8px] md:text-[9px] uppercase tracking-[0.4em] whitespace-nowrap">
-           {geoData.lat === null ? "SYNCING..." : isNaN(Number(geoData.lat)) ? geoData.lat : `${geoData.lat}° N`} // {geoData.lon === null ? "..." : isNaN(Number(geoData.lon)) ? geoData.lon : `${geoData.lon}° E`}
+           {geoData.lat === null ? "SYNCING..." : `${geoData.lat}° N`} // {geoData.lon === null ? "..." : `${geoData.lon}° E`}
          </span>
       </div>
 
