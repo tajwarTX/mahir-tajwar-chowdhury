@@ -12,6 +12,12 @@ const Loader = ({ onFinish }) => {
 
     const videoEl = videoRef.current;
     if (videoEl) {
+      // Rigorously enforce muted and playsinline to satisfy iOS Safari autoplay strictly.
+      videoEl.muted = true;
+      videoEl.defaultMuted = true;
+      videoEl.setAttribute("playsinline", "");
+      videoEl.setAttribute("webkit-playsinline", "");
+      
       videoEl.addEventListener("ended", handleEnded);
       
       // Force play on mobile and ensure autoplay works
@@ -41,8 +47,9 @@ const Loader = ({ onFinish }) => {
         autoPlay
         muted
         playsInline
+        webkit-playsinline="true"
         controls={false}
-        className="w-full h-full object-cover"
+        className="w-full h-full object-cover pointer-events-none"
         style={{ display: "block" }}
       />
     </div>
