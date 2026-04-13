@@ -19,10 +19,9 @@ const Loader = ({ onFinish }) => {
       if (playPromise !== undefined) {
         playPromise.catch((error) => {
           console.error("Autoplay failed:", error);
-          // Retry play after a short delay
-          setTimeout(() => {
-            videoEl.play().catch(() => console.log("Play retry failed"));
-          }, 100);
+          // If autoplay is blocked (like in Safari Low Power Mode), 
+          // skip the loader completely to avoid getting stuck on a play button.
+          onFinish();
         });
       }
     }
