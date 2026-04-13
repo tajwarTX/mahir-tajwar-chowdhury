@@ -6,10 +6,10 @@ const Loader = ({ onFinish }) => {
   useEffect(() => {
     // Because GIFs do not have an "ended" event like videos do, 
     // we use a timeout to remove the loader. 
-    // You can adjust this '3000' (3 seconds) to perfectly match your GIF's length.
+    // You can adjust this '3670' (3.67 seconds) to perfectly match your GIF's length.
     const timer = setTimeout(() => {
       onFinish();
-    }, 3000); 
+    }, 3670); 
 
     return () => clearTimeout(timer);
   }, [onFinish]);
