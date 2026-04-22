@@ -1,4 +1,4 @@
-import React, { useRef, useMemo, useState, forwardRef, useEffect } from "react";
+import React, { useRef, useMemo, forwardRef, useEffect } from "react";
 import { useGLTF, Center, Html } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { a } from "@react-spring/three";
@@ -14,7 +14,17 @@ const PARALLAX_STRENGTH = 0.03;
 const MAX_ROTATION_SPEED = -0.2;
 
 const Island = forwardRef(
-  ({ isIntersecting, position = [0, 0, 0], annotations = [], activeAnnotation = null, onAnnotationClick = () => {}, onResetView = () => {}, ...props }, ref) => {
+  (
+    {
+      isIntersecting,
+      position = [0, 0, 0],
+      annotations = [],
+      activeAnnotation = null,
+      onAnnotationClick = () => {},
+      ...props
+    },
+    ref
+  ) => {
     const islandRef = ref || useRef();
     const { scene } = useGLTF(islandscene, dracoLoader);
     const baseY = position[1];
@@ -23,12 +33,29 @@ const Island = forwardRef(
     const targetSpeed = useRef(0);
     const baseRotationY = props.rotation ? props.rotation[1] : 0;
 
+    // Log bounding box on load for debugging
+    useEffect(() => {
+      if (scene) {
+        const box = new THREE.Box3().setFromObject(scene);
+        const size = box.getSize(new THREE.Vector3());
+        const center = box.getCenter(new THREE.Vector3());
+        console.log("[Island] Bounding Box Size:", size);
+        console.log("[Island] Bounding Box Center:", center);
+        console.log("[Island] Bounding Box Min:", box.min);
+        console.log("[Island] Bounding Box Max:", box.max);
+      }
+    }, [scene]);
+
     useEffect(() => {
       let rampTimeout;
-      if (isIntersecting) {
+      if (isIntersecting && activeAnnotation === null) {
         rampTimeout = setTimeout(() => {
           targetSpeed.current = MAX_ROTATION_SPEED;
         }, 1000);
+      } else if (activeAnnotation !== null) {
+        // Stop rotation when annotation is active
+        targetSpeed.current = 0;
+        currentSpeed.current = 0;
       } else {
         targetSpeed.current = 0;
         currentSpeed.current = 0;
@@ -37,7 +64,7 @@ const Island = forwardRef(
         }
       }
       return () => clearTimeout(rampTimeout);
-    }, [isIntersecting, baseRotationY]);
+    }, [isIntersecting, baseRotationY, activeAnnotation]);
 
     const optimizedScene = useMemo(() => {
       scene.traverse((child) => {
@@ -55,92 +82,78 @@ const Island = forwardRef(
     useFrame((state, delta) => {
       if (!islandRef.current) return;
 
-      // 1. Parallax (Desktop focus, subtle on mobile)
+      // Parallax
       const scrollY = window.scrollY;
       islandRef.current.position.y = baseY - scrollY * PARALLAX_STRENGTH;
 
-      // 2. Speed Ramping
-      currentSpeed.current = THREE.MathUtils.lerp(
-        currentSpeed.current,
-        targetSpeed.current,
-        0.01
-      );
+      // Only auto-rotate when no annotation is active
+      if (activeAnnotation === null) {
+        currentSpeed.current = THREE.MathUtils.lerp(
+          currentSpeed.current,
+          targetSpeed.current,
+          0.01
+        );
 
-      // 3. Apply Rotation (Block auto-rotate while dragging)
-      if (!islandRef.current.userData.dragging) {
-        islandRef.current.rotation.y += delta * currentSpeed.current;
+        if (!islandRef.current.userData.dragging) {
+          islandRef.current.rotation.y += delta * currentSpeed.current;
+        }
       }
     });
+
+    const onModelClick = (e) => {
+      e.stopPropagation();
+      if (e.point) {
+        // Log the clicked point in local coordinates relative to the island group
+        const localPoint = islandRef.current.worldToLocal(e.point.clone());
+        console.log(`[Surface Click] localPosition: [${localPoint.x.toFixed(2)}, ${localPoint.y.toFixed(2)}, ${localPoint.z.toFixed(2)}]`);
+      }
+    };
 
     return (
       <a.group ref={islandRef} position={position} {...props}>
         <Center>
-          <primitive object={optimizedScene} />
+          <primitive 
+            object={optimizedScene} 
+            onClick={onModelClick}
+          />
         </Center>
 
-        {annotations.map((ann) => (
-          <Html
-            key={ann.id}
-            position={ann.position}
-            center
-            distanceFactor={1200}
-            occlude={false}
-          >
-            <div
-              className={`touch-none cursor-pointer transition-all duration-300 select-none transform ${
-                activeAnnotation === ann.id ? "scale-125" : "scale-100 hover:scale-110"
-              }`}
-              onClick={(e) => {
-                e.stopPropagation();
-                onAnnotationClick(ann);
+        {/* 3D Annotation Markers - Optimized for Depth & Performance */}
+        <group name="annotations-container">
+          {annotations.map((ann) => (
+            <Html
+              key={ann.id}
+              position={ann.localPosition}
+              center
+              distanceFactor={90} /* Slightly larger base size */
+              occlude /* Enable depth hiding */
+              zIndexRange={[10, 0]}
+              style={{ 
+                pointerEvents: "auto",
+                userSelect: "none",
+                willChange: "transform, opacity"
               }}
             >
-              {/* Annotation Dot */}
               <div
-                className={`w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center backdrop-blur-sm transition-all duration-300 border-2 ${
-                  activeAnnotation === ann.id
-                    ? "bg-[#a600ff] border-[#a600ff] shadow-lg shadow-[#a600ff]"
-                    : "bg-white/30 border-white/60 hover:bg-white/50"
-                }`}
+                className="annotation-marker-wrapper"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAnnotationClick(ann);
+                }}
               >
-                <span className="text-white text-xs md:text-sm font-bold">{ann.id}</span>
+                <div
+                  className={`annotation-dot ${
+                    activeAnnotation === ann.id ? "active" : ""
+                  }`}
+                >
+                  <span>{ann.id}</span>
+                </div>
+                <div className="annotation-label">{ann.title}</div>
               </div>
+            </Html>
+          ))}
+        </group>
 
-              {/* Annotation Label */}
-              <div className="mt-2 bg-black/70 backdrop-blur-md rounded-lg px-3 py-2 whitespace-nowrap text-white text-xs md:text-sm font-geist font-medium border border-white/20">
-                {ann.title}
-              </div>
-            </div>
-          </Html>
-        ))}
-
-        {/* Active Annotation Info Panel */}
-        {activeAnnotation && (
-          <Html position={[0, 0, 0]} center distanceFactor={1}>
-            <div className="fixed top-20 left-1/2 -translate-x-1/2 z-30 bg-black/80 backdrop-blur-md border border-[#a600ff]/50 rounded-lg p-6 md:p-8 max-w-md md:max-w-lg">
-              {(() => {
-                const annotation = annotations.find((a) => a.id === activeAnnotation);
-                return annotation ? (
-                  <>
-                    <div className="flex items-start justify-between mb-2">
-                      <div>
-                        <h3 className="text-[#a600ff] font-geist text-xs md:text-sm uppercase tracking-[0.3em] font-bold mb-1">
-                          Annotation {annotation.id}
-                        </h3>
-                        <h2 className="text-white font-orbitron text-xl md:text-2xl font-bold uppercase">
-                          {annotation.title}
-                        </h2>
-                      </div>
-                    </div>
-                    <p className="text-white/70 font-geist text-sm md:text-base leading-relaxed">
-                      {annotation.description}
-                    </p>
-                  </>
-                ) : null;
-              })()}
-            </div>
-          </Html>
-        )}
       </a.group>
     );
   }

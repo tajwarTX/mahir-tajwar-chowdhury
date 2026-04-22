@@ -1,71 +1,104 @@
-import React, { useRef, Suspense, useState, useEffect } from "react";
+import React, { useRef, Suspense, useState, useEffect, useCallback } from "react";
 import IntroBlock from "../components/IntroBlock";
 import { Canvas, useFrame } from "@react-three/fiber";
 import Island from "../models/Island";
+import CameraController from "../components/CameraController";
 import scrollDown from "../assets/scrolldown.gif";
 import scrollSide from "../assets/scrollside.gif";
 import ScrollLetterRevealDelayed from "../components/ScrollLetterRevealDelayed";
-import gsap from "gsap";
 
 const BASE_POSITION = { x: -2, y: 43, z: -60 };
-const MOBILE_POSITION = { x: -2, y: 24, z: -60 }; // Your requested mobile Y change
+const MOBILE_POSITION = { x: -2, y: 24, z: -60 };
 const BASE_ROTATION_DEG = { x: -8, y: 124, z: 0 };
 const degToRad = (deg) => (deg * Math.PI) / 180;
 
-// Annotation data with camera positions for each view
+// The model center in world space
+const MODEL_CENTER = [BASE_POSITION.x, BASE_POSITION.y, BASE_POSITION.z];
+
+// 5 annotations matching the Sketchfab "Dinner with Cats" model
+// Model geometry: nodes span x:0-170, y:80-155, z:0-50 (pre-center)
+// Root has -90° X rotation. <Center> shifts to origin.
+// After Center: approx x:-85 to 85, swapped Y/Z due to root rotation
+// localPosition = marker position in model-local space (after Center)
+// modelRotationY = model Y rotation for best view
+// camera = world-space camera position & lookAt target
 const ANNOTATIONS = [
   {
     id: 1,
-    position: [30, -2, -5],
-    title: "Main Dining Area",
-    description: "Where the feast begins",
-    cameraPosition: { x: 35, y: 30, z: 40 },
-    cameraRotation: { x: -0.3, y: 0.5, z: 0 }
+    localPosition: [12, -18, -15],
+    title: "The Broken Mecha",
+    description:
+      "A giant robot lies broken in the forest clearing. Its pilot has long since abandoned it, leaving it to rust among the trees. The machine's once-powerful frame now serves as shelter for woodland creatures.",
+    modelRotationY: degToRad(140),
+    camera: {
+      position: [15, 55, -30],
+      target: [-2, 43, -60],
+    },
   },
   {
     id: 2,
-    position: [-8, 2, 6],
-    title: "The Cozy Corner",
-    description: "A hidden gem",
-    cameraPosition: { x: -20, y: 25, z: 35 },
-    cameraRotation: { x: -0.2, y: -0.8, z: 0 }
+    localPosition: [-35, 17, 2],
+    title: "Dinner Table",
+    description:
+      "The heart of the scene — a cozy dinner setup where the traveler shares a meal with friendly forest cats. Warm light spills from lanterns, creating an intimate atmosphere amid the wilderness.",
+    modelRotationY: degToRad(180),
+    camera: {
+      position: [-18, 52, -38],
+      target: [-2, 43, -60],
+    },
   },
   {
     id: 3,
-    position: [12, 5, -8],
-    title: "Window View",
-    description: "Scenic overlook",
-    cameraPosition: { x: 25, y: 35, z: -30 },
-    cameraRotation: { x: -0.4, y: 0.3, z: 0 }
+    localPosition: [-53, -1.5, -2],
+    title: "The Forest Cats",
+    description:
+      "Curious cats have gathered around the campsite, drawn by the warmth and food. These forest dwellers have made friends with the stranded traveler, keeping them company through the night.",
+    modelRotationY: degToRad(100),
+    camera: {
+      position: [-22, 48, -42],
+      target: [-2, 43, -60],
+    },
   },
   {
     id: 4,
-    position: [-15, -3, 10],
-    title: "Kitchen Detail",
-    description: "Where magic happens",
-    cameraPosition: { x: -30, y: 20, z: 35 },
-    cameraRotation: { x: -0.25, y: -0.6, z: 0 }
+    localPosition: [68, -13, 34],
+    title: "The Treetops",
+    description:
+      "Towering voxel trees create a canopy overhead, their pixelated leaves filtering moonlight into the clearing below. The forest seems to close in protectively around the small campsite.",
+    modelRotationY: degToRad(210),
+    camera: {
+      position: [8, 62, -35],
+      target: [-2, 48, -60],
+    },
   },
   {
     id: 5,
-    position: [5, 8, -12],
-    title: "Overhead Scene",
-    description: "The complete picture",
-    cameraPosition: { x: 0, y: 50, z: -20 },
-    cameraRotation: { x: -0.8, y: 0, z: 0 }
+    localPosition: [0, 5, 25],
+    title: "Full Diorama",
+    description:
+      "The complete scene: a voxel masterpiece depicting a stranded pilot finding unexpected companionship. Made with MagicaVoxel and Blender by @ediediedi for the 'Robots are Coming' challenge.",
+    modelRotationY: degToRad(145),
+    camera: {
+      position: [5, 72, -25],
+      target: [-2, 43, -60],
+    },
   },
 ];
 
 // High-performance Infinite scroll text component
 const InfiniteScrollText = () => {
   const text = "ROBOTICS • CREATIVE DEVELOPER • 3D DESIGNING • CINEMATIC • ";
-  
+
   return (
     <div className="absolute left-0 top-[45%] w-full overflow-hidden pointer-events-none z-0 select-none">
       <div className="marquee-container flex whitespace-nowrap">
         <div className="marquee-content flex shrink-0 items-center min-w-full">
-           <span className="text-[200px] font-orbitron font-outline text-white uppercase">{text}</span>
-           <span className="text-[200px] font-orbitron font-outline text-white uppercase">{text}</span>
+          <span className="text-[200px] font-orbitron font-outline text-white uppercase">
+            {text}
+          </span>
+          <span className="text-[200px] font-orbitron font-outline text-white uppercase">
+            {text}
+          </span>
         </div>
       </div>
       <style>{`
@@ -84,17 +117,18 @@ const InfiniteScrollText = () => {
 };
 
 // Custom hook for drag rotation (Desktop + Mobile)
-function useDragRotation(targetRef, rotateSpeed = 0.005) {
+function useDragRotation(targetRef, rotateSpeed = 0.005, isLocked = false) {
   const draggingRef = useRef(false);
   const lastXRef = useRef(0);
 
   const onStart = (clientX) => {
+    if (isLocked) return;
     draggingRef.current = true;
     lastXRef.current = clientX;
   };
 
   const onMove = (clientX) => {
-    if (!draggingRef.current || !targetRef.current) return;
+    if (isLocked || !draggingRef.current || !targetRef.current) return;
     const deltaX = clientX - lastXRef.current;
     lastXRef.current = clientX;
     targetRef.current.rotation.y += deltaX * rotateSpeed;
@@ -127,7 +161,7 @@ function useDragRotation(targetRef, rotateSpeed = 0.005) {
       window.removeEventListener("touchmove", handleTouchMove);
       window.removeEventListener("touchend", onEnd);
     };
-  }, []);
+  }, [isLocked]);
 }
 
 export default function Home() {
@@ -139,68 +173,75 @@ export default function Home() {
   const [showArrowScroll, setShowArrowScroll] = useState(false);
   const [isIntersecting, setIsIntersecting] = useState(false);
   const [activeAnnotation, setActiveAnnotation] = useState(null);
-  const animationRef = useRef(null);
+  const [showInfoPanel, setShowInfoPanel] = useState(false);
 
   // Responsive States
   const [scale, setScale] = useState([1, 1, 1]);
-  const [position, setPosition] = useState([BASE_POSITION.x, BASE_POSITION.y, BASE_POSITION.z]);
+  const [position, setPosition] = useState([
+    BASE_POSITION.x,
+    BASE_POSITION.y,
+    BASE_POSITION.z,
+  ]);
 
-  // Handle annotation click and camera animation
-  const handleAnnotationClick = (annotation) => {
-    if (!cameraRef.current) return;
-
-    // Kill previous animation if exists
-    if (animationRef.current) animationRef.current.kill();
-
-    const camera = cameraRef.current.camera;
-    const targetPosition = annotation.cameraPosition;
-    const targetRotation = annotation.cameraRotation;
-
-    // Animate camera position and rotation
-    animationRef.current = gsap.to(camera.position, {
-      x: targetPosition.x,
-      y: targetPosition.y,
-      z: targetPosition.z,
-      duration: 1.2,
-      ease: "power2.inOut",
-    });
-
-    gsap.to(camera, {
-      x: targetRotation.x,
-      y: targetRotation.y,
-      z: targetRotation.z,
-      duration: 1.2,
-      ease: "power2.inOut",
-      onUpdate: () => {
-        camera.lookAt(annotation.position[0], annotation.position[1], annotation.position[2]);
-      },
-    });
-
+  // Handle annotation click
+  const handleAnnotationClick = useCallback((annotation) => {
     setActiveAnnotation(annotation.id);
-  };
+    // Delay showing info panel for dramatic effect
+    setTimeout(() => setShowInfoPanel(true), 600);
+  }, []);
 
-  // Reset camera to default view when clicking "reset" or on empty space
-  const resetCamera = () => {
-    if (!cameraRef.current) return;
-    if (animationRef.current) animationRef.current.kill();
+  // Reset to default view
+  const resetCamera = useCallback(() => {
+    setShowInfoPanel(false);
+    setTimeout(() => setActiveAnnotation(null), 300);
+  }, []);
 
-    const camera = cameraRef.current.camera;
-    gsap.to(camera.position, {
-      x: 0,
-      y: 0,
-      z: 50,
-      duration: 1.2,
-      ease: "power2.inOut",
-    });
+  // Navigate between annotations
+  const goToAnnotation = useCallback(
+    (direction) => {
+      const currentIdx = ANNOTATIONS.findIndex(
+        (a) => a.id === activeAnnotation
+      );
+      let nextIdx;
+      if (direction === "next") {
+        nextIdx = (currentIdx + 1) % ANNOTATIONS.length;
+      } else {
+        nextIdx =
+          (currentIdx - 1 + ANNOTATIONS.length) % ANNOTATIONS.length;
+      }
+      setShowInfoPanel(false);
+      setTimeout(() => {
+        setActiveAnnotation(ANNOTATIONS[nextIdx].id);
+        setTimeout(() => setShowInfoPanel(true), 600);
+      }, 200);
+    },
+    [activeAnnotation]
+  );
 
-    setActiveAnnotation(null);
-  };
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (activeAnnotation !== null) {
+        if (e.key === "Escape") resetCamera();
+        if (e.key === "ArrowRight" || e.key === "ArrowDown")
+          goToAnnotation("next");
+        if (e.key === "ArrowLeft" || e.key === "ArrowUp")
+          goToAnnotation("prev");
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [activeAnnotation, resetCamera, goToAnnotation]);
 
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 430) {
-        setScale([0.5, 0.5, 0.5]); 
-        setPosition([MOBILE_POSITION.x, MOBILE_POSITION.y, MOBILE_POSITION.z]);
+        setScale([0.5, 0.5, 0.5]);
+        setPosition([
+          MOBILE_POSITION.x,
+          MOBILE_POSITION.y,
+          MOBILE_POSITION.z,
+        ]);
       } else {
         setScale([1, 1, 1]);
         setPosition([BASE_POSITION.x, BASE_POSITION.y, BASE_POSITION.z]);
@@ -211,7 +252,7 @@ export default function Home() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  useDragRotation(islandRef, 0.007);
+  useDragRotation(islandRef, 0.007, activeAnnotation !== null);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -251,9 +292,14 @@ export default function Home() {
     degToRad(BASE_ROTATION_DEG.z),
   ];
 
+  const activeAnn = ANNOTATIONS.find((a) => a.id === activeAnnotation);
+
   return (
     <div className="w-full relative">
-      <section ref={introRef} className="relative w-full h-screen flex justify-start items-center flex-col pt-[28vh] md:pt-[32vh]">
+      <section
+        ref={introRef}
+        className="relative w-full h-screen flex justify-start items-center flex-col pt-[28vh] md:pt-[32vh]"
+      >
         <div className="relative flex flex-col z-20 items-center">
           <IntroBlock />
         </div>
@@ -272,14 +318,18 @@ export default function Home() {
               <ScrollLetterRevealDelayed text="THE" duration={200} delay={0} />
               <br />
               <span className="text-[#a600ff]">
-                <ScrollLetterRevealDelayed text="IDENTITY" duration={200} delay={0.1} />
+                <ScrollLetterRevealDelayed
+                  text="IDENTITY"
+                  duration={200}
+                  delay={0.1}
+                />
               </span>
             </h2>
             <div className="mt-6 flex items-center gap-4">
-               <div className="h-[1px] w-10 bg-[#a600ff]" />
-               <span className="font-geist text-[9px] md:text-[11px] text-white/40 uppercase tracking-[0.4em] font-medium">
-                 ARCHIVE_001 // PERSONAL_SPEC
-               </span>
+              <div className="h-[1px] w-10 bg-[#a600ff]" />
+              <span className="font-geist text-[9px] md:text-[11px] text-white/40 uppercase tracking-[0.4em] font-medium">
+                ARCHIVE_001 // PERSONAL_SPEC
+              </span>
             </div>
           </div>
           <div className="flex flex-col items-end text-right self-center space-y-6">
@@ -298,87 +348,161 @@ export default function Home() {
               />
               <div className="mt-12 flex flex-col items-end">
                 <div className="w-[1.5px] h-16 bg-[#a600ff] opacity-40 mb-4"></div>
-                <span className="text-[#a600ff] text-2xl md:text-3xl font-orbitron font-bold">(01)</span>
+                <span className="text-[#a600ff] text-2xl md:text-3xl font-orbitron font-bold">
+                  (01)
+                </span>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section ref={canvasSectionRef} className="relative w-full -mt-[70px] overflow-hidden flex items-center" style={{ height: "120vh" }}>
+      <section
+        ref={canvasSectionRef}
+        className="relative w-full -mt-[70px] overflow-hidden flex items-center"
+        style={{ height: "120vh" }}
+      >
+        {/* Left side text */}
         <div className="absolute left-9 md:left-24 max-w-lg z-20 top-1/2 -translate-y-[104%] flex flex-col space-y-4">
           <div className="flex flex-col gap-1">
-            <ScrollLetterRevealDelayed 
-              text="OPEN_WORLD_MODULE // v2.0" 
-              duration={100} 
-              delay={0} 
-              className="text-[#a600ff] font-geist text-[9px] md:text-[10px] uppercase tracking-[0.5em] font-bold" 
+            <ScrollLetterRevealDelayed
+              text="OPEN_WORLD_MODULE // v2.0"
+              duration={100}
+              delay={0}
+              className="text-[#a600ff] font-geist text-[9px] md:text-[10px] uppercase tracking-[0.5em] font-bold"
             />
             <h3 className="text-white text-3xl md:text-5xl font-orbitron font-black uppercase tracking-tighter leading-none border-none outline-none">
-              <ScrollLetterRevealDelayed text="EXPLORE THE " duration={200} delay={0.1} />
+              <ScrollLetterRevealDelayed
+                text="EXPLORE THE "
+                duration={200}
+                delay={0.1}
+              />
               <span className="text-[#a600ff]">
-                <ScrollLetterRevealDelayed text="MATRIX" duration={200} delay={0.2} />
+                <ScrollLetterRevealDelayed
+                  text="MATRIX"
+                  duration={200}
+                  delay={0.2}
+                />
               </span>
             </h3>
           </div>
-          
+
           <div className="space-y-1 max-w-sm lg:max-w-md">
-            <ScrollLetterRevealDelayed 
-              text="DISCOVER PROJECTS, MILESTONES, AND MY ENGINEERING LIFE." 
-              duration={100} 
-              delay={0} 
-              className="text-white text-sm md:text-base font-geist font-medium uppercase tracking-[0.2em] leading-relaxed" 
+            <ScrollLetterRevealDelayed
+              text="DISCOVER PROJECTS, MILESTONES, AND MY ENGINEERING LIFE."
+              duration={100}
+              delay={0}
+              className="text-white text-sm md:text-base font-geist font-medium uppercase tracking-[0.2em] leading-relaxed"
             />
             <div className="space-y-2">
-              <ScrollLetterRevealDelayed 
-                text="INTERACT WITH ANNOTATIONS AND DRAG TO ROTATE." 
-                duration={100} 
-                delay={0.1} 
-                className="text-white/40 text-[10px] md:text-xs font-geist uppercase tracking-[0.3em] font-medium block" 
+              <ScrollLetterRevealDelayed
+                text="CLICK ANNOTATIONS TO EXPLORE • DRAG TO ROTATE"
+                duration={100}
+                delay={0.1}
+                className="text-white/40 text-[10px] md:text-xs font-geist uppercase tracking-[0.3em] font-medium block"
               />
             </div>
           </div>
         </div>
+
+        {/* Bottom attribution */}
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-10 pointer-events-none origin-center p-2 mb-2">
-          <img src={scrollSide} alt="scroll side" className="opacity-30 w-32" />
+          <img
+            src={scrollSide}
+            alt="scroll side"
+            className="opacity-30 w-32"
+          />
           <p className="font-geist text-[8px] md:text-[9px] text-white/10 uppercase tracking-[0.3em] whitespace-nowrap">
             MODEL // DINNER WITH CATS BY @EDIEDIEDI SKETCHFAB
           </p>
         </div>
 
-        {/* Annotation Controls */}
-        <div className="absolute bottom-8 right-8 z-20 flex flex-col gap-3 pointer-events-auto">
+        {/* Annotation Navigation Sidebar (Now at Bottom Right) */}
+        <div className="annotation-nav-sidebar">
           {ANNOTATIONS.map((ann) => (
             <button
               key={ann.id}
               onClick={() => handleAnnotationClick(ann)}
-              className={`px-4 py-2 rounded-lg font-geist text-xs md:text-sm font-medium uppercase tracking-[0.2em] transition-all duration-300 ${
-                activeAnnotation === ann.id
-                  ? "bg-[#a600ff] text-white shadow-lg shadow-[#a600ff]/50"
-                  : "bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm border border-white/20"
+              className={`annotation-nav-btn group ${
+                activeAnnotation === ann.id ? "active" : ""
               }`}
+              title={ann.title}
             >
-              {ann.title}
+              <span className="annotation-nav-number">{ann.id}</span>
+              <span className="annotation-nav-title">{ann.title}</span>
             </button>
           ))}
-          <button
-            onClick={resetCamera}
-            className="px-4 py-2 rounded-lg font-geist text-xs md:text-sm font-medium uppercase tracking-[0.2em] transition-all duration-300 bg-white/10 text-white/60 hover:text-white hover:bg-white/20 backdrop-blur-sm border border-white/20 mt-2"
-          >
-            Reset View
-          </button>
+          {activeAnnotation !== null && (
+            <button
+              onClick={resetCamera}
+              className="annotation-nav-btn reset-btn"
+              title="Reset View"
+            >
+              <span className="annotation-nav-number">✕</span>
+              <span className="annotation-nav-title">Reset View</span>
+            </button>
+          )}
         </div>
+
+
+        {/* Annotation Info Panel (Sketchfab-style overlay) */}
+        {activeAnn && (
+          <div
+            className={`annotation-info-panel ${
+              showInfoPanel ? "visible" : ""
+            }`}
+          >
+            <div className="annotation-info-header">
+              <div className="annotation-info-badge">{activeAnn.id} / {ANNOTATIONS.length}</div>
+              <button
+                onClick={resetCamera}
+                className="annotation-info-close"
+              >
+                ✕
+              </button>
+            </div>
+            <h3 className="annotation-info-title">{activeAnn.title}</h3>
+            <p className="annotation-info-desc">{activeAnn.description}</p>
+            <div className="annotation-info-nav">
+              <button
+                onClick={() => goToAnnotation("prev")}
+                className="annotation-info-nav-btn"
+              >
+                ← Prev
+              </button>
+              <button
+                onClick={() => goToAnnotation("next")}
+                className="annotation-info-nav-btn"
+              >
+                Next →
+              </button>
+            </div>
+          </div>
+        )}
 
         <InfiniteScrollText />
         <Canvas
           ref={cameraRef}
           dpr={[1, 1.5]}
-          gl={{ antialias: false, powerPreference: "high-performance" }}
-          camera={{ position: [0, 0, 50], near: 0.1, far: 1000 }}
+          gl={{ 
+            antialias: false, 
+            powerPreference: "high-performance",
+            alpha: true,
+            stencil: false,
+            depth: true
+          }}
+          camera={{ position: [0, 0, 50], near: 0.1, far: 2000 }}
+          performance={{ min: 0.5 }}
         >
           <ambientLight intensity={2} />
           <directionalLight position={[1, 10, 1]} intensity={2} />
           <Suspense fallback={null}>
+            <CameraController
+              activeAnnotation={activeAnnotation}
+              annotations={ANNOTATIONS}
+              islandRef={islandRef}
+              defaultCameraPosition={[0, 0, 50]}
+            />
             <Island
               ref={islandRef}
               cameraRef={cameraRef}
@@ -389,7 +513,6 @@ export default function Home() {
               annotations={ANNOTATIONS}
               activeAnnotation={activeAnnotation}
               onAnnotationClick={handleAnnotationClick}
-              onResetView={resetCamera}
             />
           </Suspense>
         </Canvas>
