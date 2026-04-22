@@ -10,7 +10,6 @@ const dracoLoader = new DRACOLoader();
 dracoLoader.setDecoderPath("/draco/");
 useGLTF.preload(islandscene);
 
-const PARALLAX_STRENGTH = 0.03;
 const MAX_ROTATION_SPEED = -0.2;
 
 const Island = forwardRef(
@@ -81,10 +80,6 @@ const Island = forwardRef(
 
     useFrame((state, delta) => {
       if (!islandRef.current) return;
-
-      // Parallax
-      const scrollY = window.scrollY;
-      islandRef.current.position.y = baseY - scrollY * PARALLAX_STRENGTH;
 
       // Only auto-rotate when no annotation is active
       if (activeAnnotation === null) {

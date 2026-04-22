@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import { Analytics } from "@vercel/analytics/react";
 
 import StaggeredMenu from "./components/StaggeredMenu";
@@ -7,6 +7,7 @@ import Navbar from "./components/Navbar";
 import { Home, About, Projects, Contact, Resume } from "./pages";
 import Dither from "./components/Dither";
 import TargetCursor from "./components/TargetCursor";
+import Loader from "./components/Loader";
 
 const menuItems = [
   { label: 'Home', ariaLabel: 'Go to home page', link: '/' },
@@ -21,7 +22,25 @@ const socialItems = [
   { label: 'LinkedIn', link: 'https://linkedin.com' }
 ];
 
+// Component to handle triggering loader on route change
+const LocationWatcher = ({ setLoading }) => {
+  const location = useLocation();
+  const isFirstMount = useRef(true);
+
+  useEffect(() => {
+    // Skip the very first mount since the initial loading state handles it
+    if (isFirstMount.current) {
+      isFirstMount.current = false;
+      return;
+    }
+    setLoading(true);
+  }, [location.pathname, setLoading]);
+
+  return null;
+};
+
 const App = () => {
+  const [loading, setLoading] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const ditherRef = useRef(null);
@@ -37,6 +56,11 @@ const App = () => {
   return (
     <Router>
       <main className="relative w-full h-full bg-black">
+        <LocationWatcher setLoading={setLoading} />
+
+        {/* Global Loader (triggered every page change) */}
+        {loading && <Loader onFinish={() => setLoading(false)} />}
+
         {/* Global Cursor (only on non-mobile) */}
         {!isMobile && (
           <div className="fixed inset-0 z-[9999] pointer-events-none">
@@ -63,8 +87,8 @@ const App = () => {
           />
         </div>
 
-        {/* Home content */}
-        <div>
+        {/* Home content visibility linked to loading state */}
+        <div className={loading ? "hidden" : "block"}>
           <Navbar />
           <div className="fixed inset-0 z-[1010] pointer-events-none">
             <StaggeredMenu
