@@ -1,4 +1,4 @@
-import React, { useRef, Suspense, useState, useEffect, useCallback } from "react";
+import React, { useRef, Suspense, useState, useEffect, useCallback, useMemo } from "react";
 import IntroBlock from "../components/IntroBlock";
 import { Canvas, useFrame } from "@react-three/fiber";
 import Island from "../models/Island";
@@ -7,7 +7,17 @@ import scrollDown from "../assets/scrolldown.gif";
 import scrollSide from "../assets/scrollside.gif";
 import ScrollLetterRevealDelayed from "../components/ScrollLetterRevealDelayed";
 
-const BASE_POSITION = { x: -2, y: 43, z: -60 };
+// Detect device performance capability
+const getPerformanceTier = () => {
+  if (typeof navigator === 'undefined') return 'high';
+  const cores = navigator.hardwareConcurrency || 4;
+  const memory = navigator.deviceMemory || 8;
+  if (cores <= 2 || memory <= 2) return 'low';
+  if (cores <= 4 || memory <= 4) return 'medium';
+  return 'high';
+};
+
+const BASE_POSITION = { x: -2, y: -5, z: -60 };
 const MOBILE_POSITION = { x: -2, y: 24, z: -60 };
 const BASE_ROTATION_DEG = { x: -8, y: 124, z: 0 };
 const degToRad = (deg) => (deg * Math.PI) / 180;
@@ -85,18 +95,21 @@ const ANNOTATIONS = [
   },
 ];
 
-// High-performance Infinite scroll text component
-const InfiniteScrollText = () => {
+// High-performance Infinite scroll text component (Optimized)
+const InfiniteScrollText = ({ performanceTier }) => {
   const text = "ROBOTICS • CREATIVE DEVELOPER • 3D DESIGNING • CINEMATIC • ";
+  
+  // Skip rendering on very low-end devices
+  if (performanceTier === 'low') return null;
 
   return (
     <div className="absolute left-0 top-[45%] w-full overflow-hidden pointer-events-none z-0 select-none">
-      <div className="marquee-container flex whitespace-nowrap">
+      <div className="marquee-container flex whitespace-nowrap" style={{ willChange: 'transform' }}>
         <div className="marquee-content flex shrink-0 items-center min-w-full">
-          <span className="text-[200px] font-orbitron font-outline text-white uppercase">
+          <span className="text-[100px] md:text-[150px] lg:text-[200px] font-orbitron font-outline text-white uppercase" style={{ backfaceVisibility: 'hidden', perspective: '1000px' }}>
             {text}
           </span>
-          <span className="text-[200px] font-orbitron font-outline text-white uppercase">
+          <span className="text-[100px] md:text-[150px] lg:text-[200px] font-orbitron font-outline text-white uppercase" style={{ backfaceVisibility: 'hidden', perspective: '1000px' }}>
             {text}
           </span>
         </div>
@@ -106,6 +119,7 @@ const InfiniteScrollText = () => {
           animation: scrollLeft 30s linear infinite;
           will-change: transform;
           transform: translate3d(0, 0, 0);
+          backface-visibility: hidden;
         }
         @keyframes scrollLeft {
           from { transform: translate3d(0, 0, 0); }
@@ -116,10 +130,11 @@ const InfiniteScrollText = () => {
   );
 };
 
-// Custom hook for drag rotation (Desktop + Mobile)
+// Custom hook for drag rotation (Desktop + Mobile) - Optimized
 function useDragRotation(targetRef, rotateSpeed = 0.005, isLocked = false) {
   const draggingRef = useRef(false);
   const lastXRef = useRef(0);
+  const performanceTier = useMemo(() => getPerformanceTier(), []);
 
   const onStart = (clientX) => {
     if (isLocked) return;
@@ -131,7 +146,10 @@ function useDragRotation(targetRef, rotateSpeed = 0.005, isLocked = false) {
     if (isLocked || !draggingRef.current || !targetRef.current) return;
     const deltaX = clientX - lastXRef.current;
     lastXRef.current = clientX;
-    targetRef.current.rotation.y += deltaX * rotateSpeed;
+    
+    // Reduce rotation speed on low-end devices
+    const speed = performanceTier === 'low' ? rotateSpeed * 0.5 : rotateSpeed;
+    targetRef.current.rotation.y += deltaX * speed;
     targetRef.current.userData.dragging = true;
   };
 
@@ -146,12 +164,12 @@ function useDragRotation(targetRef, rotateSpeed = 0.005, isLocked = false) {
     const handleTouchStart = (e) => onStart(e.touches[0].clientX);
     const handleTouchMove = (e) => onMove(e.touches[0].clientX);
 
-    window.addEventListener("mousedown", handleMouseDown);
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseup", onEnd);
-    window.addEventListener("touchstart", handleTouchStart, { passive: false });
-    window.addEventListener("touchmove", handleTouchMove, { passive: false });
-    window.addEventListener("touchend", onEnd);
+    window.addEventListener("mousedown", handleMouseDown, { passive: true });
+    window.addEventListener("mousemove", handleMouseMove, { passive: true });
+    window.addEventListener("mouseup", onEnd, { passive: true });
+    window.addEventListener("touchstart", handleTouchStart, { passive: true });
+    window.addEventListener("touchmove", handleTouchMove, { passive: true });
+    window.addEventListener("touchend", onEnd, { passive: true });
 
     return () => {
       window.removeEventListener("mousedown", handleMouseDown);
@@ -174,6 +192,7 @@ export default function Home() {
   const [isIntersecting, setIsIntersecting] = useState(false);
   const [activeAnnotation, setActiveAnnotation] = useState(null);
   const [showInfoPanel, setShowInfoPanel] = useState(false);
+  const performanceTier = useMemo(() => getPerformanceTier(), []);
 
   // Responsive States
   const [scale, setScale] = useState([1, 1, 1]);
@@ -257,7 +276,7 @@ export default function Home() {
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => setIsIntersecting(entry.isIntersecting),
-      { threshold: 0.1 }
+      { threshold: 0.1, rootMargin: '100px' }
     );
     if (canvasSectionRef.current) observer.observe(canvasSectionRef.current);
     return () => observer.disconnect();
@@ -265,6 +284,7 @@ export default function Home() {
 
   useEffect(() => {
     let fadeTimeout;
+    let throttleTimer;
     const checkIntroVisible = () => {
       if (!introRef.current) return;
       const rect = introRef.current.getBoundingClientRect();
@@ -277,12 +297,19 @@ export default function Home() {
         setShowArrowScroll(false);
       }
     };
-    window.addEventListener("scroll", checkIntroVisible);
+    
+    const throttledScroll = () => {
+      clearTimeout(throttleTimer);
+      throttleTimer = setTimeout(checkIntroVisible, 16); // 60fps throttle
+    };
+    
+    window.addEventListener("scroll", throttledScroll, { passive: true });
     checkIntroVisible();
     fadeTimeout = setTimeout(() => setShowArrowScroll(true), 1500);
     return () => {
-      window.removeEventListener("scroll", checkIntroVisible);
+      window.removeEventListener("scroll", throttledScroll);
       clearTimeout(fadeTimeout);
+      clearTimeout(throttleTimer);
     };
   }, []);
 
@@ -480,22 +507,25 @@ export default function Home() {
           </div>
         )}
 
-        <InfiniteScrollText />
+        <InfiniteScrollText performanceTier={performanceTier} />
         <Canvas
           ref={cameraRef}
-          dpr={window.devicePixelRatio} /* Native resolution for maximum sharpness */
+          dpr={performanceTier === 'low' ? 1 : performanceTier === 'medium' ? 1.5 : window.devicePixelRatio}
           gl={{ 
-            antialias: true,
+            antialias: performanceTier === 'low' ? false : true,
             powerPreference: "high-performance",
             alpha: true,
             stencil: false,
             depth: true,
-            precision: "highp" /* High precision for better quality */
+            precision: performanceTier === 'low' ? 'mediump' : 'highp',
+            physicallyCorrectLights: false,
+            logarithmicDepthBuffer: false
           }}
           camera={{ position: [0, 0, 50], near: 0.1, far: 2000 }}
+          performance={{ min: 0.5, max: 1 }}
         >
-          <ambientLight intensity={2} />
-          <directionalLight position={[1, 10, 1]} intensity={2} />
+          <ambientLight intensity={performanceTier === 'low' ? 1.2 : 2} />
+          <directionalLight position={[1, 10, 1]} intensity={performanceTier === 'low' ? 1 : 2} />
           <Suspense fallback={null}>
             <CameraController
               activeAnnotation={activeAnnotation}

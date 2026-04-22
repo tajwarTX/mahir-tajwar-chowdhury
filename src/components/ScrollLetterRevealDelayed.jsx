@@ -1,12 +1,29 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo } from "react";
+
+// Detect performance tier
+const getPerformanceTier = () => {
+  if (typeof navigator === 'undefined') return 'high';
+  const cores = navigator.hardwareConcurrency || 4;
+  const memory = navigator.deviceMemory || 8;
+  if (cores <= 2 || memory <= 2) return 'low';
+  if (cores <= 4 || memory <= 4) return 'medium';
+  return 'high';
+};
 
 const ScrollLetterRevealDelayed = ({ text, duration = 2000, delay = 800, className = "", style = {} }) => {
   const [visibleLetters, setVisibleLetters] = useState([]);
   const containerRef = useRef();
   const letters = text.split("");
   const timeoutRef = useRef(null);
+  const performanceTier = useMemo(() => getPerformanceTier(), []);
 
+  // On low-end devices, skip the animation and show text immediately
   useEffect(() => {
+    if (performanceTier === 'low') {
+      setVisibleLetters(Array(letters.length).fill(true));
+      return;
+    }
+
     const el = containerRef.current;
     if (!el) return;
 
@@ -24,7 +41,7 @@ const ScrollLetterRevealDelayed = ({ text, duration = 2000, delay = 800, classNa
           setVisibleLetters(Array(letters.length).fill(false));
         }
       },
-      { threshold: 0.1 } // triggers when at least 10% visible
+      { threshold: 0.1 }
     );
 
     observer.observe(el);
@@ -33,11 +50,12 @@ const ScrollLetterRevealDelayed = ({ text, duration = 2000, delay = 800, classNa
       clearTimeout(timeoutRef.current);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [text, duration, delay]);
+  }, [text, duration, delay, performanceTier]);
 
   const revealLettersRandomly = () => {
     const delays = letters.map(() => Math.random() * duration);
     const startTime = performance.now();
+    const frameThrottle = performanceTier === 'low' ? 32 : 16; // 30fps vs 60fps
 
     const tick = (now) => {
       const elapsed = now - startTime;
@@ -47,7 +65,11 @@ const ScrollLetterRevealDelayed = ({ text, duration = 2000, delay = 800, classNa
       setVisibleLetters(updated);
 
       if (updated.some((v) => !v)) {
-        requestAnimationFrame(tick);
+        if (performanceTier === 'low') {
+          setTimeout(() => requestAnimationFrame(tick), frameThrottle);
+        } else {
+          requestAnimationFrame(tick);
+        }
       }
     };
 
