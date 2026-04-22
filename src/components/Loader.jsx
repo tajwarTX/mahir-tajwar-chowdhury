@@ -20,10 +20,7 @@ const Loader = ({ onFinish }) => {
         src={loaderGif}
         alt="Loading Portfolio..."
         className="w-full h-full object-cover pointer-events-none"
-        style={{ 
-          display: "block",
-          imageRendering: "high-quality"
-        }}
+        style={{ display: "block" }}
       />
     </div>
   );

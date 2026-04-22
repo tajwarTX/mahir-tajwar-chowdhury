@@ -483,13 +483,14 @@ export default function Home() {
         <InfiniteScrollText />
         <Canvas
           ref={cameraRef}
-          dpr={[1, 2]} /* Use higher DPR for sharpness */
+          dpr={window.devicePixelRatio} /* Native resolution for maximum sharpness */
           gl={{ 
-            antialias: true, /* Enable antialiasing for smoothness */
+            antialias: true,
             powerPreference: "high-performance",
             alpha: true,
             stencil: false,
-            depth: true
+            depth: true,
+            precision: "highp" /* High precision for better quality */
           }}
           camera={{ position: [0, 0, 50], near: 0.1, far: 2000 }}
         >
