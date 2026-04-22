@@ -1,27 +1,45 @@
 // components/Loader.jsx
-import React, { useEffect } from "react";
-import loaderGif from "../assets/loader.gif"; // We are now assuming there is a loader.gif in assets
+import React, { useEffect, useState } from "react";
+import loaderGif from "../assets/loader.gif";
+import loaderVideo from "../assets/loader.mp4";
 
 const Loader = ({ onFinish }) => {
+  const [videoError, setVideoError] = useState(false);
+
   useEffect(() => {
-    // Because GIFs do not have an "ended" event like videos do, 
-    // we use a timeout to remove the loader. 
-    // You can adjust this '3670' (3.67 seconds) to perfectly match your GIF's length.
+    // If using a GIF, we need a timeout fallback
+    // If the video is playing, it will handle onFinish via onEnded
     const timer = setTimeout(() => {
       onFinish();
-    }, 3670); 
+    }, 4500); // Slightly longer fallback
 
     return () => clearTimeout(timer);
   }, [onFinish]);
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black z-50">
-      <img
-        src={loaderGif}
-        alt="Loading Portfolio..."
-        className="w-full h-full object-cover pointer-events-none"
-        style={{ display: "block" }}
-      />
+    <div className="fixed inset-0 flex items-center justify-center bg-black z-50 overflow-hidden">
+      {!videoError ? (
+        <video
+          src={loaderVideo}
+          autoPlay
+          muted
+          playsInline
+          onEnded={onFinish}
+          onError={() => setVideoError(true)}
+          className="w-full h-full object-cover pointer-events-none"
+          style={{ display: "block" }}
+        />
+      ) : (
+        <img
+          src={loaderGif}
+          alt="Loading Portfolio..."
+          className="w-full h-full object-cover pointer-events-none"
+          style={{ 
+            display: "block",
+            imageRendering: "-webkit-optimize-contrast"
+          }}
+        />
+      )}
     </div>
   );
 };
