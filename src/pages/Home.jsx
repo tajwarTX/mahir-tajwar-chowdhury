@@ -483,16 +483,15 @@ export default function Home() {
         <InfiniteScrollText />
         <Canvas
           ref={cameraRef}
-          dpr={[1, 1.5]}
+          dpr={[1, 2]} /* Use higher DPR for sharpness */
           gl={{ 
-            antialias: false, 
+            antialias: true, /* Enable antialiasing for smoothness */
             powerPreference: "high-performance",
             alpha: true,
             stencil: false,
             depth: true
           }}
           camera={{ position: [0, 0, 50], near: 0.1, far: 2000 }}
-          performance={{ min: 0.5 }}
         >
           <ambientLight intensity={2} />
           <directionalLight position={[1, 10, 1]} intensity={2} />
