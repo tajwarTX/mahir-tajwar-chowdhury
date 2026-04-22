@@ -1,16 +1,60 @@
 import React, { useRef, Suspense, useState, useEffect } from "react";
 import IntroBlock from "../components/IntroBlock";
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useFrame } from "@react-three/fiber";
 import Island from "../models/Island";
 import scrollDown from "../assets/scrolldown.gif";
 import scrollSide from "../assets/scrollside.gif";
-import arrow from "../assets/arrow.png";
 import ScrollLetterRevealDelayed from "../components/ScrollLetterRevealDelayed";
+import gsap from "gsap";
 
 const BASE_POSITION = { x: -2, y: 43, z: -60 };
 const MOBILE_POSITION = { x: -2, y: 24, z: -60 }; // Your requested mobile Y change
 const BASE_ROTATION_DEG = { x: -8, y: 124, z: 0 };
 const degToRad = (deg) => (deg * Math.PI) / 180;
+
+// Annotation data with camera positions for each view
+const ANNOTATIONS = [
+  {
+    id: 1,
+    position: [30, -2, -5],
+    title: "Main Dining Area",
+    description: "Where the feast begins",
+    cameraPosition: { x: 35, y: 30, z: 40 },
+    cameraRotation: { x: -0.3, y: 0.5, z: 0 }
+  },
+  {
+    id: 2,
+    position: [-8, 2, 6],
+    title: "The Cozy Corner",
+    description: "A hidden gem",
+    cameraPosition: { x: -20, y: 25, z: 35 },
+    cameraRotation: { x: -0.2, y: -0.8, z: 0 }
+  },
+  {
+    id: 3,
+    position: [12, 5, -8],
+    title: "Window View",
+    description: "Scenic overlook",
+    cameraPosition: { x: 25, y: 35, z: -30 },
+    cameraRotation: { x: -0.4, y: 0.3, z: 0 }
+  },
+  {
+    id: 4,
+    position: [-15, -3, 10],
+    title: "Kitchen Detail",
+    description: "Where magic happens",
+    cameraPosition: { x: -30, y: 20, z: 35 },
+    cameraRotation: { x: -0.25, y: -0.6, z: 0 }
+  },
+  {
+    id: 5,
+    position: [5, 8, -12],
+    title: "Overhead Scene",
+    description: "The complete picture",
+    cameraPosition: { x: 0, y: 50, z: -20 },
+    cameraRotation: { x: -0.8, y: 0, z: 0 }
+  },
+];
 
 // High-performance Infinite scroll text component
 const InfiniteScrollText = () => {
@@ -94,10 +138,63 @@ export default function Home() {
 
   const [showArrowScroll, setShowArrowScroll] = useState(false);
   const [isIntersecting, setIsIntersecting] = useState(false);
+  const [activeAnnotation, setActiveAnnotation] = useState(null);
+  const animationRef = useRef(null);
 
   // Responsive States
   const [scale, setScale] = useState([1, 1, 1]);
   const [position, setPosition] = useState([BASE_POSITION.x, BASE_POSITION.y, BASE_POSITION.z]);
+
+  // Handle annotation click and camera animation
+  const handleAnnotationClick = (annotation) => {
+    if (!cameraRef.current) return;
+
+    // Kill previous animation if exists
+    if (animationRef.current) animationRef.current.kill();
+
+    const camera = cameraRef.current.camera;
+    const targetPosition = annotation.cameraPosition;
+    const targetRotation = annotation.cameraRotation;
+
+    // Animate camera position and rotation
+    animationRef.current = gsap.to(camera.position, {
+      x: targetPosition.x,
+      y: targetPosition.y,
+      z: targetPosition.z,
+      duration: 1.2,
+      ease: "power2.inOut",
+    });
+
+    gsap.to(camera, {
+      x: targetRotation.x,
+      y: targetRotation.y,
+      z: targetRotation.z,
+      duration: 1.2,
+      ease: "power2.inOut",
+      onUpdate: () => {
+        camera.lookAt(annotation.position[0], annotation.position[1], annotation.position[2]);
+      },
+    });
+
+    setActiveAnnotation(annotation.id);
+  };
+
+  // Reset camera to default view when clicking "reset" or on empty space
+  const resetCamera = () => {
+    if (!cameraRef.current) return;
+    if (animationRef.current) animationRef.current.kill();
+
+    const camera = cameraRef.current.camera;
+    gsap.to(camera.position, {
+      x: 0,
+      y: 0,
+      z: 50,
+      duration: 1.2,
+      ease: "power2.inOut",
+    });
+
+    setActiveAnnotation(null);
+  };
 
   useEffect(() => {
     const handleResize = () => {
@@ -248,6 +345,30 @@ export default function Home() {
             MODEL // DINNER WITH CATS BY @EDIEDIEDI SKETCHFAB
           </p>
         </div>
+
+        {/* Annotation Controls */}
+        <div className="absolute bottom-8 right-8 z-20 flex flex-col gap-3 pointer-events-auto">
+          {ANNOTATIONS.map((ann) => (
+            <button
+              key={ann.id}
+              onClick={() => handleAnnotationClick(ann)}
+              className={`px-4 py-2 rounded-lg font-geist text-xs md:text-sm font-medium uppercase tracking-[0.2em] transition-all duration-300 ${
+                activeAnnotation === ann.id
+                  ? "bg-[#a600ff] text-white shadow-lg shadow-[#a600ff]/50"
+                  : "bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm border border-white/20"
+              }`}
+            >
+              {ann.title}
+            </button>
+          ))}
+          <button
+            onClick={resetCamera}
+            className="px-4 py-2 rounded-lg font-geist text-xs md:text-sm font-medium uppercase tracking-[0.2em] transition-all duration-300 bg-white/10 text-white/60 hover:text-white hover:bg-white/20 backdrop-blur-sm border border-white/20 mt-2"
+          >
+            Reset View
+          </button>
+        </div>
+
         <InfiniteScrollText />
         <Canvas
           ref={cameraRef}
@@ -262,13 +383,13 @@ export default function Home() {
               ref={islandRef}
               cameraRef={cameraRef}
               isIntersecting={isIntersecting}
-              position={position} // Responsive Position
-              scale={scale}       // Responsive Scale
+              position={position}
+              scale={scale}
               rotation={islandRotation}
-              annotations={[
-                { id: 1, position: [30, -2, -5], title: "My Journey", description: "This is the top view" },
-                { id: 2, position: [-8, 2, 6], title: "Experience", description: "A giant old tree" },
-              ]}
+              annotations={ANNOTATIONS}
+              activeAnnotation={activeAnnotation}
+              onAnnotationClick={handleAnnotationClick}
+              onResetView={resetCamera}
             />
           </Suspense>
         </Canvas>

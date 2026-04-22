@@ -14,11 +14,10 @@ const PARALLAX_STRENGTH = 0.03;
 const MAX_ROTATION_SPEED = -0.2;
 
 const Island = forwardRef(
-  ({ isIntersecting, position = [0, 0, 0], annotations = [], ...props }, ref) => {
+  ({ isIntersecting, position = [0, 0, 0], annotations = [], activeAnnotation = null, onAnnotationClick = () => {}, onResetView = () => {}, ...props }, ref) => {
     const islandRef = ref || useRef();
     const { scene } = useGLTF(islandscene, dracoLoader);
     const baseY = position[1];
-    const [activeAnnotation, setActiveAnnotation] = useState(null);
 
     const currentSpeed = useRef(0);
     const targetSpeed = useRef(0);
@@ -84,29 +83,69 @@ const Island = forwardRef(
             key={ann.id}
             position={ann.position}
             center
-            distanceFactor={15} // Reduced distance factor for better mobile visibility
-            occlude
+            distanceFactor={1200}
+            occlude={false}
           >
             <div
-              className="touch-none cursor-pointer bg-white/90 rounded-md p-2 text-black text-[10px] md:text-sm transition-all hover:scale-105 select-none"
+              className={`touch-none cursor-pointer transition-all duration-300 select-none transform ${
+                activeAnnotation === ann.id ? "scale-125" : "scale-100 hover:scale-110"
+              }`}
               onClick={(e) => {
-                e.stopPropagation(); // Prevent drag triggering on click
-                setActiveAnnotation(ann.id === activeAnnotation ? null : ann.id);
+                e.stopPropagation();
+                onAnnotationClick(ann);
               }}
             >
-              {ann.title}
-              {activeAnnotation === ann.id && (
-                <div className="mt-2 bg-white rounded-md p-2 shadow-lg max-w-[150px] md:max-w-xs text-black z-50">
-                  <h3 className="font-bold text-xs md:text-base">{ann.title}</h3>
-                  <p className="text-[10px] md:text-sm">{ann.description}</p>
-                </div>
-              )}
+              {/* Annotation Dot */}
+              <div
+                className={`w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center backdrop-blur-sm transition-all duration-300 border-2 ${
+                  activeAnnotation === ann.id
+                    ? "bg-[#a600ff] border-[#a600ff] shadow-lg shadow-[#a600ff]"
+                    : "bg-white/30 border-white/60 hover:bg-white/50"
+                }`}
+              >
+                <span className="text-white text-xs md:text-sm font-bold">{ann.id}</span>
+              </div>
+
+              {/* Annotation Label */}
+              <div className="mt-2 bg-black/70 backdrop-blur-md rounded-lg px-3 py-2 whitespace-nowrap text-white text-xs md:text-sm font-geist font-medium border border-white/20">
+                {ann.title}
+              </div>
             </div>
           </Html>
         ))}
+
+        {/* Active Annotation Info Panel */}
+        {activeAnnotation && (
+          <Html position={[0, 0, 0]} center distanceFactor={1}>
+            <div className="fixed top-20 left-1/2 -translate-x-1/2 z-30 bg-black/80 backdrop-blur-md border border-[#a600ff]/50 rounded-lg p-6 md:p-8 max-w-md md:max-w-lg">
+              {(() => {
+                const annotation = annotations.find((a) => a.id === activeAnnotation);
+                return annotation ? (
+                  <>
+                    <div className="flex items-start justify-between mb-2">
+                      <div>
+                        <h3 className="text-[#a600ff] font-geist text-xs md:text-sm uppercase tracking-[0.3em] font-bold mb-1">
+                          Annotation {annotation.id}
+                        </h3>
+                        <h2 className="text-white font-orbitron text-xl md:text-2xl font-bold uppercase">
+                          {annotation.title}
+                        </h2>
+                      </div>
+                    </div>
+                    <p className="text-white/70 font-geist text-sm md:text-base leading-relaxed">
+                      {annotation.description}
+                    </p>
+                  </>
+                ) : null;
+              })()}
+            </div>
+          </Html>
+        )}
       </a.group>
     );
   }
 );
+
+Island.displayName = "Island";
 
 export default Island;
