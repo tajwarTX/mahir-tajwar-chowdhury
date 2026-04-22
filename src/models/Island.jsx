@@ -26,8 +26,6 @@ const Island = forwardRef(
   ) => {
     const islandRef = ref || useRef();
     const { scene } = useGLTF(islandscene, dracoLoader);
-    const baseY = position[1];
-
     const currentSpeed = useRef(0);
     const targetSpeed = useRef(0);
     const baseRotationY = props.rotation ? props.rotation[1] : 0;

@@ -72,7 +72,7 @@ export default function CameraController({
         ease: "power3.inOut",
       }, 0);
 
-      // Dynamically get island's current position to account for parallax
+      // Get island's current position for reset transition
       const currentIslandPos = islandRef.current.position;
       
       tl.to(lookAtTarget.current, {
