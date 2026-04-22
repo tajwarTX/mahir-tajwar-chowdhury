@@ -1,42 +1,49 @@
 // components/Loader.jsx
 import React, { useEffect, useState } from "react";
-import loaderGif from "../assets/loader.gif";
-import loaderVideo from "../assets/loader.mp4";
+
+// Reference assets directly from the public folder to avoid Vite compression
+const LOADER_VIDEO = "/loader.mp4";
+const LOADER_GIF = "/loader.gif";
 
 const Loader = ({ onFinish }) => {
   const [videoError, setVideoError] = useState(false);
+  const [cacheBuster] = useState(Date.now());
 
   useEffect(() => {
     // If using a GIF, we need a timeout fallback
-    // If the video is playing, it will handle onFinish via onEnded
     const timer = setTimeout(() => {
       onFinish();
-    }, 4500); // Slightly longer fallback
+    }, 4500); 
 
     return () => clearTimeout(timer);
   }, [onFinish]);
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black z-50 overflow-hidden">
+    <div className="fixed inset-0 flex items-center justify-center bg-black z-[9999] overflow-hidden">
       {!videoError ? (
         <video
-          src={loaderVideo}
+          src={`${LOADER_VIDEO}?v=${cacheBuster}`}
           autoPlay
           muted
           playsInline
           onEnded={onFinish}
           onError={() => setVideoError(true)}
           className="w-full h-full object-cover pointer-events-none"
-          style={{ display: "block" }}
+          style={{ 
+            display: "block",
+            filter: "none",
+            transform: "translateZ(0)", /* Force hardware acceleration */
+          }}
         />
       ) : (
         <img
-          src={loaderGif}
+          src={`${LOADER_GIF}?v=${cacheBuster}`}
           alt="Loading Portfolio..."
           className="w-full h-full object-cover pointer-events-none"
           style={{ 
             display: "block",
-            imageRendering: "-webkit-optimize-contrast"
+            imageRendering: "-webkit-optimize-contrast",
+            filter: "none"
           }}
         />
       )}
