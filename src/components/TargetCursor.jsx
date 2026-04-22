@@ -61,7 +61,7 @@ const TargetCursor = ({
     let resumeTimeout = null;
 
     const cleanupTarget = target => {
-      if (currentLeaveHandler) {
+      if (currentLeaveHandler && target) {
         target.removeEventListener('mouseleave', currentLeaveHandler);
       }
       currentLeaveHandler = null;
@@ -85,10 +85,67 @@ const TargetCursor = ({
 
     createSpinTimeline();
 
+    const leaveHandler = () => {
+      gsap.ticker.remove(tickerFnRef.current);
+      isActiveRef.current = false;
+      targetCornerPositionsRef.current = null;
+      gsap.set(activeStrengthRef, { current: 0, overwrite: true });
+      
+      const targetToCleanup = activeTarget;
+      activeTarget = null;
+      
+      if (cornersRef.current) {
+        const corners = Array.from(cornersRef.current);
+        gsap.killTweensOf(corners);
+        const { cornerSize } = constants;
+        const positions = [
+          { x: -cornerSize * 1.5, y: -cornerSize * 1.5 },
+          { x: cornerSize * 0.5, y: -cornerSize * 1.5 },
+          { x: cornerSize * 0.5, y: cornerSize * 0.5 },
+          { x: -cornerSize * 1.5, y: cornerSize * 0.5 }
+        ];
+        const tl = gsap.timeline();
+        corners.forEach((corner, index) => {
+          tl.to(corner, { x: positions[index].x, y: positions[index].y, duration: 0.3, ease: 'power3.out' }, 0);
+        });
+      }
+      
+      resumeTimeout = setTimeout(() => {
+        if (!activeTarget && cursorRef.current && spinTl.current) {
+          const currentRotation = gsap.getProperty(cursorRef.current, 'rotation');
+          const normalizedRotation = currentRotation % 360;
+          spinTl.current.kill();
+          spinTl.current = gsap
+            .timeline({ repeat: -1 })
+            .to(cursorRef.current, { rotation: '+=360', duration: spinDuration, ease: 'none' });
+          gsap.to(cursorRef.current, {
+            rotation: normalizedRotation + 360,
+            duration: spinDuration * (1 - normalizedRotation / 360),
+            ease: 'none',
+            onComplete: () => {
+              spinTl.current?.restart();
+            }
+          });
+        }
+        resumeTimeout = null;
+      }, 50);
+      
+      if (targetToCleanup) {
+        cleanupTarget(targetToCleanup);
+      }
+    };
+
     const tickerFn = () => {
       if (!targetCornerPositionsRef.current || !cursorRef.current || !cornersRef.current) {
         return;
       }
+
+      // Safety check: If target is unmounted or hidden, release cursor
+      if (activeTarget && (!activeTarget.isConnected || activeTarget.offsetParent === null)) {
+        leaveHandler();
+        return;
+      }
+
       const strength = activeStrengthRef.current;
       if (strength === 0) return;
       const cursorX = gsap.getProperty(cursorRef.current, 'x');
@@ -111,7 +168,6 @@ const TargetCursor = ({
         });
       });
     };
-
     tickerFnRef.current = tickerFn;
 
     const moveHandler = e => moveCursor(e.clientX, e.clientY);
@@ -126,9 +182,7 @@ const TargetCursor = ({
         elementUnderMouse &&
         (elementUnderMouse === activeTarget || elementUnderMouse.closest(targetSelector) === activeTarget);
       if (!isStillOverTarget) {
-        if (currentLeaveHandler) {
-          currentLeaveHandler();
-        }
+        leaveHandler();
       }
     };
     window.addEventListener('scroll', scrollHandler, { passive: true });
@@ -161,9 +215,11 @@ const TargetCursor = ({
       const target = allTargets[0] || null;
       if (!target || !cursorRef.current || !cornersRef.current) return;
       if (activeTarget === target) return;
+      
       if (activeTarget) {
-        cleanupTarget(activeTarget);
+        leaveHandler();
       }
+      
       if (resumeTimeout) {
         clearTimeout(resumeTimeout);
         resumeTimeout = null;
@@ -202,50 +258,12 @@ const TargetCursor = ({
         });
       });
 
-      const leaveHandler = () => {
-        gsap.ticker.remove(tickerFnRef.current);
-        isActiveRef.current = false;
-        targetCornerPositionsRef.current = null;
-        gsap.set(activeStrengthRef, { current: 0, overwrite: true });
-        activeTarget = null;
-        if (cornersRef.current) {
-          const corners = Array.from(cornersRef.current);
-          gsap.killTweensOf(corners);
-          const { cornerSize } = constants;
-          const positions = [
-            { x: -cornerSize * 1.5, y: -cornerSize * 1.5 },
-            { x: cornerSize * 0.5, y: -cornerSize * 1.5 },
-            { x: cornerSize * 0.5, y: cornerSize * 0.5 },
-            { x: -cornerSize * 1.5, y: cornerSize * 0.5 }
-          ];
-          const tl = gsap.timeline();
-          corners.forEach((corner, index) => {
-            tl.to(corner, { x: positions[index].x, y: positions[index].y, duration: 0.3, ease: 'power3.out' }, 0);
-          });
-        }
-        resumeTimeout = setTimeout(() => {
-          if (!activeTarget && cursorRef.current && spinTl.current) {
-            const currentRotation = gsap.getProperty(cursorRef.current, 'rotation');
-            const normalizedRotation = currentRotation % 360;
-            spinTl.current.kill();
-            spinTl.current = gsap
-              .timeline({ repeat: -1 })
-              .to(cursorRef.current, { rotation: '+=360', duration: spinDuration, ease: 'none' });
-            gsap.to(cursorRef.current, {
-              rotation: normalizedRotation + 360,
-              duration: spinDuration * (1 - normalizedRotation / 360),
-              ease: 'none',
-              onComplete: () => {
-                spinTl.current?.restart();
-              }
-            });
-          }
-          resumeTimeout = null;
-        }, 50);
-        cleanupTarget(target);
-      };
       currentLeaveHandler = leaveHandler;
       target.addEventListener('mouseleave', leaveHandler);
+      
+      // Safety: If clicked, check if target survived
+      const clickHandler = () => setTimeout(tickerFn, 100);
+      target.addEventListener('click', clickHandler, { once: true });
     };
 
     window.addEventListener('mouseover', enterHandler, { passive: true });

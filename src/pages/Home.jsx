@@ -1,21 +1,13 @@
-import React, { useRef, Suspense, useState, useEffect, useCallback, useMemo } from "react";
+import React, { useRef, Suspense, useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import IntroBlock from "../components/IntroBlock";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { PerformanceMonitor, AdaptiveDpr, AdaptiveEvents, Bvh, Preload, Float } from "@react-three/drei";
 import Island from "../models/Island";
 import CameraController from "../components/CameraController";
 import scrollDown from "../assets/scrolldown.gif";
 import scrollSide from "../assets/scrollside.gif";
 import ScrollLetterRevealDelayed from "../components/ScrollLetterRevealDelayed";
-
-// Detect device performance capability
-const getPerformanceTier = () => {
-  if (typeof navigator === 'undefined') return 'high';
-  const cores = navigator.hardwareConcurrency || 4;
-  const memory = navigator.deviceMemory || 8;
-  if (cores <= 2 || memory <= 2) return 'low';
-  if (cores <= 4 || memory <= 4) return 'medium';
-  return 'high';
-};
 
 const BASE_POSITION = { x: -2, y: -5, z: -60 };
 const MOBILE_POSITION = { x: -2, y: 24, z: -60 };
@@ -35,14 +27,14 @@ const MODEL_CENTER = [BASE_POSITION.x, BASE_POSITION.y, BASE_POSITION.z];
 const ANNOTATIONS = [
   {
     id: 1,
-    localPosition: [12, -18, -15],
-    title: "The Broken Mecha",
+    localPosition: [-35, 32, 2],
+    title: "The Stranded Pilot",
     description:
-      "A giant robot lies broken in the forest clearing. Its pilot has long since abandoned it, leaving it to rust among the trees. The machine's once-powerful frame now serves as shelter for woodland creatures.",
-    modelRotationY: degToRad(140),
+      "Having crashed in this remote forest, the pilot has found a strange peace among the voxel trees. They now spend their evenings sharing stories and meals with the curious forest dwellers.",
+    modelRotationY: degToRad(210),
     camera: {
-      position: [15, 55, -30],
-      target: [-2, 43, -60],
+      position: [-2, 40, -140],
+      target: [90, -20, -190],
     },
   },
   {
@@ -95,46 +87,78 @@ const ANNOTATIONS = [
   },
 ];
 
-// High-performance Infinite scroll text component (Optimized)
-const InfiniteScrollText = ({ performanceTier }) => {
+// High-performance Infinite scroll text component using Canvas-based rendering
+// This approach is much more efficient for large text (200px) as it avoids 
+// DOM painting overhead for complex glyphs.
+const InfiniteScrollText = React.memo(() => {
   const text = "ROBOTICS • CREATIVE DEVELOPER • 3D DESIGNING • CINEMATIC • ";
-  
-  // Skip rendering on very low-end devices
-  if (performanceTier === 'low') return null;
+  const canvasRef = useRef(null);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    const initCanvas = () => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+
+      const fontSize = 200;
+      ctx.font = `800 ${fontSize}px "Orbitron", sans-serif`;
+
+      const metrics = ctx.measureText(text);
+      const textWidth = metrics.width;
+
+      canvas.width = textWidth;
+      canvas.height = fontSize * 1.5;
+
+      ctx.font = `800 ${fontSize}px "Orbitron", sans-serif`;
+      ctx.strokeStyle = 'white';
+      ctx.lineWidth = 2;
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      ctx.strokeText(text, 0, canvas.height / 2);
+
+      if (containerRef.current) {
+        containerRef.current.style.backgroundImage = `url(${canvas.toDataURL()})`;
+        containerRef.current.style.backgroundRepeat = 'repeat-x';
+        containerRef.current.style.backgroundSize = `${textWidth}px auto`;
+        // Set container width to exactly 2x textWidth for a perfect loop
+        containerRef.current.style.width = `${textWidth * 2}px`;
+      }
+    };
+
+    if (document.fonts) {
+      // Explicitly load the font so the canvas can render it correctly
+      document.fonts.load('800 200px Orbitron').then(initCanvas).catch(initCanvas);
+    } else {
+      setTimeout(initCanvas, 500);
+    }
+  }, []);
 
   return (
-    <div className="absolute left-0 top-[45%] w-full overflow-hidden pointer-events-none z-0 select-none">
-      <div className="marquee-container flex whitespace-nowrap" style={{ willChange: 'transform' }}>
-        <div className="marquee-content flex shrink-0 items-center min-w-full">
-          <span className="text-[100px] md:text-[150px] lg:text-[200px] font-orbitron font-outline text-white uppercase" style={{ backfaceVisibility: 'hidden', perspective: '1000px' }}>
-            {text}
-          </span>
-          <span className="text-[100px] md:text-[150px] lg:text-[200px] font-orbitron font-outline text-white uppercase" style={{ backfaceVisibility: 'hidden', perspective: '1000px' }}>
-            {text}
-          </span>
-        </div>
-      </div>
+    <div className="absolute left-0 top-[45%] w-full h-[300px] overflow-hidden pointer-events-none z-0 select-none">
+      <canvas ref={canvasRef} className="hidden" />
+      <div
+        ref={containerRef}
+        className="marquee-optimized h-full flex transform-gpu"
+      />
       <style>{`
-        .marquee-content {
-          animation: scrollLeft 30s linear infinite;
+        .marquee-optimized {
+          animation: scrollCanvas 30s linear infinite;
           will-change: transform;
-          transform: translate3d(0, 0, 0);
-          backface-visibility: hidden;
         }
-        @keyframes scrollLeft {
+        @keyframes scrollCanvas {
           from { transform: translate3d(0, 0, 0); }
           to { transform: translate3d(-50%, 0, 0); }
         }
       `}</style>
     </div>
   );
-};
+});
 
-// Custom hook for drag rotation (Desktop + Mobile) - Optimized
+// Custom hook for drag rotation (Desktop + Mobile)
 function useDragRotation(targetRef, rotateSpeed = 0.005, isLocked = false) {
   const draggingRef = useRef(false);
   const lastXRef = useRef(0);
-  const performanceTier = useMemo(() => getPerformanceTier(), []);
 
   const onStart = (clientX) => {
     if (isLocked) return;
@@ -146,10 +170,7 @@ function useDragRotation(targetRef, rotateSpeed = 0.005, isLocked = false) {
     if (isLocked || !draggingRef.current || !targetRef.current) return;
     const deltaX = clientX - lastXRef.current;
     lastXRef.current = clientX;
-    
-    // Reduce rotation speed on low-end devices
-    const speed = performanceTier === 'low' ? rotateSpeed * 0.5 : rotateSpeed;
-    targetRef.current.rotation.y += deltaX * speed;
+    targetRef.current.rotation.y += deltaX * rotateSpeed;
     targetRef.current.userData.dragging = true;
   };
 
@@ -164,12 +185,12 @@ function useDragRotation(targetRef, rotateSpeed = 0.005, isLocked = false) {
     const handleTouchStart = (e) => onStart(e.touches[0].clientX);
     const handleTouchMove = (e) => onMove(e.touches[0].clientX);
 
-    window.addEventListener("mousedown", handleMouseDown, { passive: true });
-    window.addEventListener("mousemove", handleMouseMove, { passive: true });
-    window.addEventListener("mouseup", onEnd, { passive: true });
-    window.addEventListener("touchstart", handleTouchStart, { passive: true });
-    window.addEventListener("touchmove", handleTouchMove, { passive: true });
-    window.addEventListener("touchend", onEnd, { passive: true });
+    window.addEventListener("mousedown", handleMouseDown);
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", onEnd);
+    window.addEventListener("touchstart", handleTouchStart, { passive: false });
+    window.addEventListener("touchmove", handleTouchMove, { passive: false });
+    window.addEventListener("touchend", onEnd);
 
     return () => {
       window.removeEventListener("mousedown", handleMouseDown);
@@ -183,6 +204,7 @@ function useDragRotation(targetRef, rotateSpeed = 0.005, isLocked = false) {
 }
 
 export default function Home() {
+  const navigate = useNavigate();
   const islandRef = useRef(null);
   const cameraRef = useRef(null);
   const introRef = useRef(null);
@@ -192,10 +214,11 @@ export default function Home() {
   const [isIntersecting, setIsIntersecting] = useState(false);
   const [activeAnnotation, setActiveAnnotation] = useState(null);
   const [showInfoPanel, setShowInfoPanel] = useState(false);
-  const performanceTier = useMemo(() => getPerformanceTier(), []);
 
   // Responsive States
   const [scale, setScale] = useState([1, 1, 1]);
+  // Performance state
+  const [dpr, setDpr] = useState(1.5);
   const [position, setPosition] = useState([
     BASE_POSITION.x,
     BASE_POSITION.y,
@@ -276,7 +299,7 @@ export default function Home() {
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => setIsIntersecting(entry.isIntersecting),
-      { threshold: 0.1, rootMargin: '100px' }
+      { threshold: 0.1 }
     );
     if (canvasSectionRef.current) observer.observe(canvasSectionRef.current);
     return () => observer.disconnect();
@@ -284,7 +307,6 @@ export default function Home() {
 
   useEffect(() => {
     let fadeTimeout;
-    let throttleTimer;
     const checkIntroVisible = () => {
       if (!introRef.current) return;
       const rect = introRef.current.getBoundingClientRect();
@@ -297,19 +319,12 @@ export default function Home() {
         setShowArrowScroll(false);
       }
     };
-    
-    const throttledScroll = () => {
-      clearTimeout(throttleTimer);
-      throttleTimer = setTimeout(checkIntroVisible, 16); // 60fps throttle
-    };
-    
-    window.addEventListener("scroll", throttledScroll, { passive: true });
+    window.addEventListener("scroll", checkIntroVisible);
     checkIntroVisible();
     fadeTimeout = setTimeout(() => setShowArrowScroll(true), 1500);
     return () => {
-      window.removeEventListener("scroll", throttledScroll);
+      window.removeEventListener("scroll", checkIntroVisible);
       clearTimeout(fadeTimeout);
-      clearTimeout(throttleTimer);
     };
   }, []);
 
@@ -322,11 +337,39 @@ export default function Home() {
   const activeAnn = ANNOTATIONS.find((a) => a.id === activeAnnotation);
 
   return (
-    <div className="w-full relative">
+    <div className="w-full relative h-screen overflow-y-auto snap-y snap-mandatory">
       <section
         ref={introRef}
-        className="relative w-full h-screen flex justify-start items-center flex-col pt-[28vh] md:pt-[32vh]"
+        className="relative w-full h-screen flex justify-start items-center flex-col pt-[28vh] md:pt-[32vh] snap-start snap-always"
       >
+        {/* Top left text block - now absolute to only appear in first section */}
+        <div
+          className="absolute text-white text-xs font-light leading-none z-50 pointer-events-none"
+          style={{
+            top: "19px",
+            left: "160px",
+          }}
+        >
+          <ScrollLetterRevealDelayed
+            text="@mahir_tajwar_chowdhury"
+            duration={500}
+            delay={500}
+            className="block"
+          />
+          <ScrollLetterRevealDelayed
+            text="Personal Portfolio Website"
+            duration={500}
+            delay={500}
+            className="block"
+          />
+          <ScrollLetterRevealDelayed
+            text="2025-2026"
+            duration={500}
+            delay={500}
+            className="block"
+          />
+        </div>
+
         <div className="relative flex flex-col z-20 items-center">
           <IntroBlock />
         </div>
@@ -338,7 +381,7 @@ export default function Home() {
         />
       </section>
 
-      <section className="relative w-full min-h-screen flex items-center justify-center px-10 md:px-24 py-20 z-10">
+      <section className="relative w-full h-screen flex items-center justify-center px-10 md:px-24 py-20 z-10 snap-start snap-always">
         <div className="grid grid-cols-1 md:grid-cols-2 w-full max-w-7xl items-center gap-12">
           <div className="flex flex-col">
             <h2 className="text-[60px] md:text-[100px] lg:text-[130px] font-orbitron font-extrabold leading-[0.8] text-white uppercase tracking-tighter">
@@ -386,11 +429,10 @@ export default function Home() {
 
       <section
         ref={canvasSectionRef}
-        className="relative w-full -mt-[70px] overflow-hidden flex items-center"
-        style={{ height: "120vh" }}
+        className="relative w-full overflow-hidden flex items-center h-screen snap-start snap-always"
       >
         {/* Left side text */}
-        <div className="absolute left-9 md:left-24 max-w-lg z-20 top-1/2 -translate-y-[104%] flex flex-col space-y-4">
+        <div className="absolute left-9 md:left-24 max-w-lg z-20 top-1/2 -translate-y-[140%] flex flex-col space-y-4">
           <div className="flex flex-col gap-1">
             <ScrollLetterRevealDelayed
               text="OPEN_WORLD_MODULE // v2.0"
@@ -450,23 +492,46 @@ export default function Home() {
             <button
               key={ann.id}
               onClick={() => handleAnnotationClick(ann)}
-              className={`annotation-nav-btn group ${
-                activeAnnotation === ann.id ? "active" : ""
-              }`}
+              className={`annotation-nav-btn cursor-target group ${activeAnnotation === ann.id ? "active" : ""
+                }`}
               title={ann.title}
             >
               <span className="annotation-nav-number">{ann.id}</span>
-              <span className="annotation-nav-title">{ann.title}</span>
+              <span className="annotation-nav-title">
+                {ann.title.split('').map((char, index, array) => (
+                  <span
+                    key={index}
+                    style={{
+                      transitionDelay: `${(array.length - 1 - index) * 0.03}s`,
+                      display: 'inline-block'
+                    }}
+                  >
+                    {char === ' ' ? '\u00A0' : char}
+                  </span>
+                ))}
+              </span>
             </button>
           ))}
           {activeAnnotation !== null && (
             <button
               onClick={resetCamera}
-              className="annotation-nav-btn reset-btn"
+              className="annotation-nav-btn reset-btn cursor-target"
               title="Reset View"
             >
               <span className="annotation-nav-number">✕</span>
-              <span className="annotation-nav-title">Reset View</span>
+              <span className="annotation-nav-title">
+                {"Reset View".split('').map((char, index, array) => (
+                  <span
+                    key={index}
+                    style={{
+                      transitionDelay: `${(array.length - 1 - index) * 0.03}s`,
+                      display: 'inline-block'
+                    }}
+                  >
+                    {char === ' ' ? '\u00A0' : char}
+                  </span>
+                ))}
+              </span>
             </button>
           )}
         </div>
@@ -475,15 +540,14 @@ export default function Home() {
         {/* Annotation Info Panel (Sketchfab-style overlay) */}
         {activeAnn && (
           <div
-            className={`annotation-info-panel ${
-              showInfoPanel ? "visible" : ""
-            }`}
+            className={`annotation-info-panel ${showInfoPanel ? "visible" : ""
+              }`}
           >
             <div className="annotation-info-header">
               <div className="annotation-info-badge">{activeAnn.id} / {ANNOTATIONS.length}</div>
               <button
                 onClick={resetCamera}
-                className="annotation-info-close"
+                className="annotation-info-close cursor-target"
               >
                 ✕
               </button>
@@ -493,57 +557,76 @@ export default function Home() {
             <div className="annotation-info-nav">
               <button
                 onClick={() => goToAnnotation("prev")}
-                className="annotation-info-nav-btn"
+                className="annotation-info-nav-btn arrow-btn cursor-target"
+                title="Previous"
               >
-                ← Prev
+                ←
+              </button>
+              <button
+                onClick={() => navigate("/projects")}
+                className="annotation-info-nav-btn learn-more-btn cursor-target"
+              >
+                Learn More
               </button>
               <button
                 onClick={() => goToAnnotation("next")}
-                className="annotation-info-nav-btn"
+                className="annotation-info-nav-btn arrow-btn cursor-target"
+                title="Next"
               >
-                Next →
+                →
               </button>
             </div>
           </div>
         )}
 
-        <InfiniteScrollText performanceTier={performanceTier} />
+        <InfiniteScrollText />
+
         <Canvas
           ref={cameraRef}
-          dpr={performanceTier === 'low' ? 1 : performanceTier === 'medium' ? 1.5 : window.devicePixelRatio}
-          gl={{ 
-            antialias: performanceTier === 'low' ? false : true,
+          dpr={[1, dpr]} /* Optimized DPR bounds */
+          gl={{
+            antialias: false, /* Disabled MSAA for massive performance gain */
             powerPreference: "high-performance",
             alpha: true,
             stencil: false,
             depth: true,
-            precision: performanceTier === 'low' ? 'mediump' : 'highp',
-            physicallyCorrectLights: false,
-            logarithmicDepthBuffer: false
+            precision: "mediump" /* Medium precision for better performance on mobile */
           }}
           camera={{ position: [0, 0, 50], near: 0.1, far: 2000 }}
-          performance={{ min: 0.5, max: 1 }}
         >
-          <ambientLight intensity={performanceTier === 'low' ? 1.2 : 2} />
-          <directionalLight position={[1, 10, 1]} intensity={performanceTier === 'low' ? 1 : 2} />
+          <PerformanceMonitor onFallback={() => setDpr(1)} />
+          <AdaptiveDpr pixelated />
+          <AdaptiveEvents />
+          <ambientLight intensity={2} />
+          <directionalLight position={[1, 10, 1]} intensity={2} />
           <Suspense fallback={null}>
-            <CameraController
-              activeAnnotation={activeAnnotation}
-              annotations={ANNOTATIONS}
-              islandRef={islandRef}
-              defaultCameraPosition={[0, 0, 50]}
-            />
-            <Island
-              ref={islandRef}
-              cameraRef={cameraRef}
-              isIntersecting={isIntersecting}
-              position={position}
-              scale={scale}
-              rotation={islandRotation}
-              annotations={ANNOTATIONS}
-              activeAnnotation={activeAnnotation}
-              onAnnotationClick={handleAnnotationClick}
-            />
+            <Bvh firstHitOnly>
+              <CameraController
+                activeAnnotation={activeAnnotation}
+                annotations={ANNOTATIONS}
+                islandRef={islandRef}
+                defaultCameraPosition={[0, 0, 50]}
+              />
+              <Float
+                speed={2} // Animation speed, defaults to 1
+                rotationIntensity={0.5} // XYZ rotation intensity, defaults to 1
+                floatIntensity={0.5} // Up/down float intensity, works like a multiplier with floatingRange,defaults to 1
+                floatingRange={[0, 1.5]} // Range of y-axis values the object will float within, defaults to [-0.1,0.1]
+              >
+                <Island
+                  ref={islandRef}
+                  cameraRef={cameraRef}
+                  isIntersecting={isIntersecting}
+                  position={position}
+                  scale={scale}
+                  rotation={islandRotation}
+                  annotations={ANNOTATIONS}
+                  activeAnnotation={activeAnnotation}
+                  onAnnotationClick={handleAnnotationClick}
+                />
+              </Float>
+            </Bvh>
+            <Preload all />
           </Suspense>
         </Canvas>
       </section>

@@ -10,17 +10,6 @@ const dracoLoader = new DRACOLoader();
 dracoLoader.setDecoderPath("/draco/");
 useGLTF.preload(islandscene);
 
-// Detect performance tier
-const getPerformanceTier = () => {
-  if (typeof navigator === 'undefined') return 'high';
-  const cores = navigator.hardwareConcurrency || 4;
-  const memory = navigator.deviceMemory || 8;
-  if (cores <= 2 || memory <= 2) return 'low';
-  if (cores <= 4 || memory <= 4) return 'medium';
-  return 'high';
-};
-
-const performanceTier = getPerformanceTier();
 const MAX_ROTATION_SPEED = -0.2;
 
 const Island = forwardRef(
@@ -75,43 +64,20 @@ const Island = forwardRef(
     }, [isIntersecting, baseRotationY, activeAnnotation]);
 
     const optimizedScene = useMemo(() => {
-      const optimizeMaterial = (mat) => {
-        mat.metalness = performanceTier === 'low' ? 0 : 0.2;
-        mat.roughness = performanceTier === 'low' ? 1 : 0.8;
-        mat.envMapIntensity = performanceTier === 'low' ? 0 : 1;
-        mat.shadowMap = false;
-        mat.side = THREE.FrontSide;
-      };
-
       scene.traverse((child) => {
         if (child.isMesh) {
           child.castShadow = false;
           child.receiveShadow = false;
           child.frustumCulled = true;
-          
-          // Reduce draw calls on low-end devices
-          if (child.material) {
-            if (Array.isArray(child.material)) {
-              child.material.forEach(mat => optimizeMaterial(mat));
-            } else {
-              optimizeMaterial(child.material);
-            }
-          }
+          child.material.metalness = 0.2;
+          child.material.roughness = 0.8;
         }
       });
       return scene;
     }, [scene]);
 
-    const optimizeMaterial = (mat) => {
-      mat.metalness = performanceTier === 'low' ? 0 : 0.2;
-      mat.roughness = performanceTier === 'low' ? 1 : 0.8;
-      mat.envMapIntensity = performanceTier === 'low' ? 0 : 1;
-      mat.shadowMap = false;
-      mat.side = THREE.FrontSide; // Reduce backface rendering
-    };
-
     useFrame((state, delta) => {
-      if (!islandRef.current) return;
+      if (!islandRef.current || !isIntersecting) return;
 
       // Only auto-rotate when no annotation is active
       if (activeAnnotation === null) {
@@ -146,42 +112,38 @@ const Island = forwardRef(
         </Center>
 
         {/* 3D Annotation Markers - Optimized for Depth & Performance */}
-        {performanceTier !== 'low' && (
-          <group name="annotations-container">
-            {annotations.map((ann) => (
-              <Html
-                key={ann.id}
-                position={ann.localPosition}
-                center
-                distanceFactor={90}
-                occlude
-                zIndexRange={[10, 0]}
-                style={{ 
-                  pointerEvents: "auto",
-                  userSelect: "none",
-                  willChange: "transform, opacity"
+        <group name="annotations-container">
+          {annotations.map((ann) => (
+            <Html
+              key={ann.id}
+              position={ann.localPosition}
+              center
+              distanceFactor={90} /* Slightly larger base size */
+              zIndexRange={[10, 0]}
+              style={{ 
+                pointerEvents: "auto",
+                userSelect: "none"
+              }}
+            >
+              <div
+                className="annotation-marker-wrapper cursor-target"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAnnotationClick(ann);
                 }}
               >
                 <div
-                  className="annotation-marker-wrapper"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onAnnotationClick(ann);
-                  }}
+                  className={`annotation-dot ${
+                    activeAnnotation === ann.id ? "active" : ""
+                  }`}
                 >
-                  <div
-                    className={`annotation-dot ${
-                      activeAnnotation === ann.id ? "active" : ""
-                    }`}
-                  >
-                    <span>{ann.id}</span>
-                  </div>
-                  <div className="annotation-label">{ann.title}</div>
+                  <span>{ann.id}</span>
                 </div>
-              </Html>
-            ))}
-          </group>
-        )}
+                <div className="annotation-label">{ann.title}</div>
+              </div>
+            </Html>
+          ))}
+        </group>
 
       </a.group>
     );

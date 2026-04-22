@@ -6,7 +6,7 @@ import { Effect } from 'postprocessing';
 import * as THREE from 'three';
 
 const waveVertexShader = `
-precision highp float;
+precision mediump float;
 varying vec2 vUv;
 void main() {
   vUv = uv;
@@ -17,7 +17,7 @@ void main() {
 `;
 
 const waveFragmentShader = `
-precision highp float;
+precision mediump float;
 uniform vec2 resolution;
 uniform float time;
 uniform float waveSpeed;
@@ -61,7 +61,7 @@ float cnoise(vec2 P) {
   return 2.3 * mix(n_x.x, n_x.y, fade_xy.y);
 }
 
-const int OCTAVES = 4;
+const int OCTAVES = 2;
 float fbm(vec2 p) {
   float value = 0.0;
   float amp = 1.0;
@@ -97,7 +97,7 @@ void main() {
 `;
 
 const ditherFragmentShader = `
-precision highp float;
+precision mediump float;
 uniform float colorNum;
 uniform float pixelSize;
 const float bayerMatrix8x8[64] = float[64](
@@ -276,7 +276,12 @@ export default function Dither({
       className="w-full h-full relative"
       camera={{ position: [0, 0, 6] }}
       dpr={1}
-      gl={{ antialias: true, preserveDrawingBuffer: true }}
+      gl={{ 
+        antialias: false, 
+        stencil: false, 
+        depth: false, 
+        powerPreference: "high-performance" 
+      }}
     >
       <DitheredWaves
         waveSpeed={waveSpeed}

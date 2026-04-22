@@ -1,44 +1,27 @@
-import { useEffect, useState, useRef, useMemo } from "react";
-
-// Detect performance tier
-const getPerformanceTier = () => {
-  if (typeof navigator === 'undefined') return 'high';
-  const cores = navigator.hardwareConcurrency || 4;
-  const memory = navigator.deviceMemory || 8;
-  if (cores <= 2 || memory <= 2) return 'low';
-  if (cores <= 4 || memory <= 4) return 'medium';
-  return 'high';
-};
+import { useEffect, useRef } from "react";
 
 const ScrollLetterRevealDelayed = ({ text, duration = 2000, delay = 800, className = "", style = {} }) => {
-  const [visibleLetters, setVisibleLetters] = useState([]);
-  const containerRef = useRef();
-  const letters = text.split("");
+  const containerRef = useRef(null);
+  const lettersRef = useRef([]);
   const timeoutRef = useRef(null);
-  const performanceTier = useMemo(() => getPerformanceTier(), []);
+  const reqRef = useRef(null);
 
-  // On low-end devices, skip the animation and show text immediately
   useEffect(() => {
-    if (performanceTier === 'low') {
-      setVisibleLetters(Array(letters.length).fill(true));
-      return;
-    }
-
     const el = containerRef.current;
     if (!el) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          // Delay before starting animation
           timeoutRef.current = setTimeout(() => {
             revealLettersRandomly();
           }, delay);
         } else {
-          // If scrolled out, remove text immediately and clear timer
           clearTimeout(timeoutRef.current);
-          timeoutRef.current = null;
-          setVisibleLetters(Array(letters.length).fill(false));
+          if (reqRef.current) cancelAnimationFrame(reqRef.current);
+          lettersRef.current.forEach(span => {
+            if (span) span.style.opacity = "0";
+          });
         }
       },
       { threshold: 0.1 }
@@ -48,41 +31,46 @@ const ScrollLetterRevealDelayed = ({ text, duration = 2000, delay = 800, classNa
     return () => {
       observer.disconnect();
       clearTimeout(timeoutRef.current);
+      if (reqRef.current) cancelAnimationFrame(reqRef.current);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [text, duration, delay, performanceTier]);
+  }, [text, duration, delay]);
 
   const revealLettersRandomly = () => {
-    const delays = letters.map(() => Math.random() * duration);
+    const delays = Array.from({ length: text.length }).map(() => Math.random() * duration);
     const startTime = performance.now();
-    const frameThrottle = performanceTier === 'low' ? 32 : 16; // 30fps vs 60fps
 
     const tick = (now) => {
       const elapsed = now - startTime;
-      const updated = letters.map((_, i) =>
-        elapsed >= delays[i]
-      );
-      setVisibleLetters(updated);
-
-      if (updated.some((v) => !v)) {
-        if (performanceTier === 'low') {
-          setTimeout(() => requestAnimationFrame(tick), frameThrottle);
+      let allDone = true;
+      
+      lettersRef.current.forEach((span, i) => {
+        if (!span) return;
+        if (elapsed >= delays[i]) {
+          span.style.opacity = "1";
         } else {
-          requestAnimationFrame(tick);
+          allDone = false;
         }
+      });
+
+      if (!allDone) {
+        reqRef.current = requestAnimationFrame(tick);
       }
     };
 
-    requestAnimationFrame(tick);
+    reqRef.current = requestAnimationFrame(tick);
   };
 
+  const letters = text.split("");
+
   return (
-  <span ref={containerRef} className={className} style={style}>
+    <span ref={containerRef} className={className} style={style}>
       {letters.map((letter, i) => (
         <span
           key={i}
+          ref={(el) => (lettersRef.current[i] = el)}
           style={{
-            opacity: visibleLetters[i] ? 1 : 0,
+            opacity: 0,
             transition: "opacity 0.3s ease",
           }}
         >

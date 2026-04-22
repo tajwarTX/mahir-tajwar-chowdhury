@@ -269,7 +269,7 @@ body:has(.card[data-color="green"]:hover) {
 .annotation-dot span {
   color: white;
   font-family: "Orbitron", sans-serif;
-  font-size: 14px; /* Slightly larger text */
+  font-size: 16px;
   font-weight: 700;
   line-height: 1;
 }
@@ -348,8 +348,8 @@ body:has(.card[data-color="green"]:hover) {
 
 .annotation-nav-sidebar {
   position: absolute;
-  right: 24px;
-  bottom: 24px;
+  right: 96px;
+  bottom: 50px;
   z-index: 20;
   display: flex;
   flex-direction: column;
@@ -359,18 +359,19 @@ body:has(.card[data-color="green"]:hover) {
 
 .annotation-nav-btn {
   display: flex;
+  flex-direction: row-reverse; /* Put number on the right, text on the left */
   align-items: center;
   gap: 0;
-  padding: 8px 10px;
+  padding: 0; /* Remove padding to allow number to fill the box */
+  height: 40px; /* Fixed height */
   border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.9); /* Solidified for performance */
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
   max-width: 40px;
+  margin-left: auto; /* Push to the right of the container */
   will-change: transform, max-width;
 }
 
@@ -393,11 +394,14 @@ body:has(.card[data-color="green"]:hover) {
 
 .annotation-nav-number {
   font-family: "Orbitron", sans-serif;
-  font-size: 13px;
+  font-size: 15px;
   font-weight: 700;
   color: #a600ff;
-  min-width: 20px;
-  text-align: center;
+  width: 40px; /* Exactly match the collapsed width */
+  height: 40px; /* Match the container height */
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Perfectly center the text */
   flex-shrink: 0;
 }
 
@@ -414,9 +418,11 @@ body:has(.card[data-color="green"]:hover) {
   letter-spacing: 0.15em;
   white-space: nowrap;
   overflow: hidden;
-  padding-left: 8px;
+  padding-left: 16px; /* Distance from left edge when expanded */
+  padding-right: 8px; /* Distance from the number */
   opacity: 0;
   transition: opacity 0.3s ease;
+  text-align: right;
 }
 
 .annotation-nav-btn:hover .annotation-nav-title,
@@ -430,14 +436,12 @@ body:has(.card[data-color="green"]:hover) {
 
 .annotation-info-panel {
   position: absolute;
-  bottom: 80px;
-  left: 24px;
+  bottom: 50px;
+  left: 96px;
   z-index: 30;
   max-width: 400px;
-  width: calc(100% - 48px);
-  background: rgba(8, 8, 16, 0.92);
-  backdrop-filter: blur(12px); /* Reduced from 24px */
-  -webkit-backdrop-filter: blur(12px);
+  width: calc(100% - 132px);
+  background: rgba(8, 8, 16, 0.98); /* Solidified for performance */
   border: 1px solid rgba(166, 0, 255, 0.25);
   border-radius: 16px;
   padding: 24px;
@@ -517,11 +521,12 @@ body:has(.card[data-color="green"]:hover) {
 .annotation-info-nav {
   display: flex;
   gap: 8px;
+  align-items: center;
 }
 
 .annotation-info-nav-btn {
-  flex: 1;
-  padding: 8px 16px;
+  height: 40px;
+  padding: 0 16px;
   border-radius: 8px;
   border: 1px solid rgba(166, 0, 255, 0.3);
   background: rgba(166, 0, 255, 0.08);
@@ -533,6 +538,19 @@ body:has(.card[data-color="green"]:hover) {
   letter-spacing: 0.15em;
   cursor: pointer;
   transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.annotation-info-nav-btn.arrow-btn {
+  flex: 0 0 45px;
+  font-size: 18px;
+  padding: 0;
+}
+
+.annotation-info-nav-btn.learn-more-btn {
+  flex: 1;
 }
 
 .annotation-info-nav-btn:hover {
@@ -544,10 +562,15 @@ body:has(.card[data-color="green"]:hover) {
 /* Mobile responsive */
 @media (max-width: 768px) {
   .annotation-info-panel {
-    bottom: 60px;
-    left: 12px;
-    max-width: calc(100% - 80px);
+    bottom: 40px;
+    left: 36px;
+    max-width: calc(100% - 72px);
     padding: 16px;
+  }
+
+  .annotation-nav-sidebar {
+    right: 36px;
+    bottom: 40px;
   }
 
   .annotation-info-title {

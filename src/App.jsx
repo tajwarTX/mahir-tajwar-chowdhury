@@ -1,10 +1,14 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, lazy, Suspense } from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import { Analytics } from "@vercel/analytics/react";
 
 import StaggeredMenu from "./components/StaggeredMenu";
 import Navbar from "./components/Navbar";
-import { Home, About, Projects, Contact, Resume } from "./pages";
+const Home = lazy(() => import("./pages/Home"));
+const About = lazy(() => import("./pages/About"));
+const Projects = lazy(() => import("./pages/Projects"));
+const Contact = lazy(() => import("./pages/Contact"));
+const Resume = lazy(() => import("./pages/Resume"));
 import Dither from "./components/Dither";
 import TargetCursor from "./components/TargetCursor";
 import Loader from "./components/Loader";
@@ -58,6 +62,9 @@ const App = () => {
       <main className="relative w-full h-full bg-black">
         <LocationWatcher setLoading={setLoading} />
 
+        {/* Global Cinematic Vignette Overlay */}
+        <div className="fixed inset-0 pointer-events-none z-[15] bg-[radial-gradient(circle,transparent_40%,rgba(0,0,0,0.8)_100%)]" />
+
         {/* Global Loader (triggered every page change) */}
         {loading && <Loader onFinish={() => setLoading(false)} />}
 
@@ -74,7 +81,14 @@ const App = () => {
           </div>
         )}
 
-        <div ref={ditherRef} className={`fixed inset-0 w-full h-full pointer-events-none z-0 transition-opacity duration-300 ${menuOpen ? 'opacity-0' : 'opacity-100'}`}>
+        <div 
+          ref={ditherRef} 
+          className={`fixed inset-0 w-full h-full pointer-events-none z-0 transition-all duration-500 ${menuOpen ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}
+          style={{ 
+            display: menuOpen ? 'none' : 'block',
+            willChange: 'opacity, transform' 
+          }}
+        >
           <Dither
             waveColor={[0.3, 0.1, 0.4]}
             disableAnimation={false}
@@ -107,13 +121,15 @@ const App = () => {
             />
           </div>
           <div className={`transition-all duration-300 ${menuOpen ? 'opacity-0 pointer-events-none' : 'opacity-100 pointer-events-auto'}`}>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/projects" element={<Projects />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/resume" element={<Resume />} />
-            </Routes>
+            <Suspense fallback={null}>
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/projects" element={<Projects />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/resume" element={<Resume />} />
+              </Routes>
+            </Suspense>
           </div>
         </div>
       </main>

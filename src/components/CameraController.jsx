@@ -3,18 +3,6 @@ import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import * as THREE from "three";
 
-// Detect performance tier
-const getPerformanceTier = () => {
-  if (typeof navigator === 'undefined') return 'high';
-  const cores = navigator.hardwareConcurrency || 4;
-  const memory = navigator.deviceMemory || 8;
-  if (cores <= 2 || memory <= 2) return 'low';
-  if (cores <= 4 || memory <= 4) return 'medium';
-  return 'high';
-};
-
-const performanceTier = getPerformanceTier();
-
 export default function CameraController({
   activeAnnotation,
   annotations,
@@ -37,18 +25,14 @@ export default function CameraController({
       hasActiveAnnotation.current = true;
       isAnimating.current = true;
 
-      // Reduce animation duration on low-end devices
-      const modelDuration = performanceTier === 'low' ? 0.8 : 1.2;
-      const cameraDuration = performanceTier === 'low' ? 1 : 1.5;
-
       const tl = gsap.timeline();
       timelineRef.current = tl;
 
       // Animate model rotation to best viewing angle for this annotation
       tl.to(islandRef.current.rotation, {
         y: ann.modelRotationY,
-        duration: modelDuration,
-        ease: performanceTier === 'low' ? "linear" : "power2.inOut",
+        duration: 1.2,
+        ease: "power2.inOut",
       }, 0);
 
       // Animate camera position
@@ -56,8 +40,8 @@ export default function CameraController({
         x: ann.camera.position[0],
         y: ann.camera.position[1],
         z: ann.camera.position[2],
-        duration: cameraDuration,
-        ease: performanceTier === 'low' ? "linear" : "power3.inOut",
+        duration: 1.5,
+        ease: "power3.inOut",
       }, 0);
 
       // Animate lookAt target
@@ -65,8 +49,8 @@ export default function CameraController({
         x: ann.camera.target[0],
         y: ann.camera.target[1],
         z: ann.camera.target[2],
-        duration: cameraDuration,
-        ease: performanceTier === 'low' ? "linear" : "power3.inOut",
+        duration: 1.5,
+        ease: "power3.inOut",
         onComplete: () => {
           isAnimating.current = false;
         },
@@ -77,8 +61,6 @@ export default function CameraController({
       hasActiveAnnotation.current = false;
       isAnimating.current = true;
 
-      const resetDuration = performanceTier === 'low' ? 1 : 1.5;
-
       const tl = gsap.timeline();
       timelineRef.current = tl;
 
@@ -86,8 +68,8 @@ export default function CameraController({
         x: defaultCameraPosition[0],
         y: defaultCameraPosition[1],
         z: defaultCameraPosition[2],
-        duration: resetDuration,
-        ease: performanceTier === 'low' ? "linear" : "power3.inOut",
+        duration: 1.5,
+        ease: "power3.inOut",
       }, 0);
 
       // Get island's current position for reset transition
@@ -97,8 +79,8 @@ export default function CameraController({
         x: currentIslandPos.x,
         y: currentIslandPos.y,
         z: currentIslandPos.z,
-        duration: resetDuration,
-        ease: performanceTier === 'low' ? "linear" : "power3.inOut",
+        duration: 1.5,
+        ease: "power3.inOut",
         onComplete: () => {
           isAnimating.current = false;
         },
