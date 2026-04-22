@@ -1,4 +1,4 @@
-import logo from '../assets/logo.png';
+const logo = "/logo.png";
 import { NavLink } from 'react-router-dom';
 import ScrollLetterRevealDelayed from "./ScrollLetterRevealDelayed";
 
