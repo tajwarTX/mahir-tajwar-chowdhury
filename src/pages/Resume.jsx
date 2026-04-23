@@ -69,7 +69,7 @@ export const Resume = () => {
         </div>
 
         {/* Right Side: Minimal Interactive Form */}
-        <div className="relative w-full max-w-md mx-auto lg:mx-0 lg:ml-auto z-10">
+        <div className="relative w-full max-w-md mx-auto z-10 flex flex-col items-center text-center lg:items-start lg:text-left">
           <AnimatePresence mode="wait">
             {!submitted ? (
               <motion.div
