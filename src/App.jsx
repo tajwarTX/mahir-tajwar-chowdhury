@@ -26,13 +26,12 @@ const socialItems = [
   { label: 'LinkedIn', link: 'https://linkedin.com' }
 ];
 
-// Component to handle triggering loader on route change
 const LocationWatcher = ({ setLoading }) => {
   const location = useLocation();
   const isFirstMount = useRef(true);
 
   useEffect(() => {
-    // Skip the very first mount since the initial loading state handles it
+
     if (isFirstMount.current) {
       isFirstMount.current = false;
       return;
@@ -50,7 +49,6 @@ const App = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const ditherRef = useRef(null);
 
-  // Check if device is mobile on load & on resize
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 480);
     checkMobile();
@@ -63,10 +61,8 @@ const App = () => {
       <main className="relative w-full h-full bg-black">
         <LocationWatcher setLoading={setLoading} />
 
-        {/* Global Cinematic Vignette Overlay */}
         <div className="fixed inset-0 pointer-events-none z-[15] bg-[radial-gradient(circle,transparent_40%,rgba(0,0,0,0.8)_100%)]" />
 
-        {/* Global Loader (triggered every page change) */}
         {loading && (
           <Loader 
             isInitial={isInitialLoad} 
@@ -77,7 +73,6 @@ const App = () => {
           />
         )}
 
-        {/* Global Cursor (only on non-mobile) */}
         {!isMobile && (
           <div className="fixed inset-0 z-[9999] pointer-events-none">
             <TargetCursor
@@ -110,7 +105,6 @@ const App = () => {
           />
         </div>
 
-        {/* Home content visibility linked to loading state */}
         <div className={loading ? "hidden" : "block"}>
           <Navbar />
           <div className="fixed inset-0 z-[1010] pointer-events-none">

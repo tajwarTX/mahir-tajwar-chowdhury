@@ -30,7 +30,6 @@ const Island = forwardRef(
     const targetSpeed = useRef(0);
     const baseRotationY = props.rotation ? props.rotation[1] : 0;
 
-    // Log bounding box on load for debugging
     useEffect(() => {
       if (scene) {
         const box = new THREE.Box3().setFromObject(scene);
@@ -50,7 +49,7 @@ const Island = forwardRef(
           targetSpeed.current = MAX_ROTATION_SPEED;
         }, 1000);
       } else if (activeAnnotation !== null) {
-        // Stop rotation when annotation is active
+
         targetSpeed.current = 0;
         currentSpeed.current = 0;
       } else {
@@ -79,7 +78,6 @@ const Island = forwardRef(
     useFrame((state, delta) => {
       if (!islandRef.current || !isIntersecting) return;
 
-      // Only auto-rotate when no annotation is active
       if (activeAnnotation === null) {
         currentSpeed.current = THREE.MathUtils.lerp(
           currentSpeed.current,
@@ -96,7 +94,7 @@ const Island = forwardRef(
     const onModelClick = (e) => {
       e.stopPropagation();
       if (e.point) {
-        // Log the clicked point in local coordinates relative to the island group
+
         const localPoint = islandRef.current.worldToLocal(e.point.clone());
         console.log(`[Surface Click] localPosition: [${localPoint.x.toFixed(2)}, ${localPoint.y.toFixed(2)}, ${localPoint.z.toFixed(2)}]`);
       }
@@ -111,14 +109,13 @@ const Island = forwardRef(
           />
         </Center>
 
-        {/* 3D Annotation Markers - Optimized for Depth & Performance */}
         <group name="annotations-container">
           {annotations.map((ann) => (
             <Html
               key={ann.id}
               position={ann.localPosition}
               center
-              distanceFactor={90} /* Slightly larger base size */
+              distanceFactor={90} 
               zIndexRange={[10, 0]}
               style={{ 
                 pointerEvents: "auto",

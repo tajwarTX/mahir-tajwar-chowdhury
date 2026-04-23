@@ -2,10 +2,6 @@ import React, { useCallback, useRef, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 
-/**
- * A high-performance, animated black-screen menu.
- * Optimized with Framer Motion for cinematic entrance and exit (outro).
- */
 export const StaggeredMenu = ({
   items = [],
   socialItems = [],
@@ -73,7 +69,6 @@ export const StaggeredMenu = ({
     };
   }, []);
 
-  // Animation Variants
   const menuVariants = {
     hidden: { y: "-100%" },
     visible: { 
@@ -104,13 +99,11 @@ export const StaggeredMenu = ({
 
   return (
     <div className={`menu-wrapper ${isFixed ? 'fixed inset-0' : 'relative w-full h-full'} z-[1000] pointer-events-none ${className}`}>
-      {/* Global Header Container */}
       <header 
         className="absolute left-0 w-full flex items-center justify-end px-4 md:px-6 pointer-events-none"
         style={{ top: '20px' }}
       >
         <div className="flex items-center gap-5 md:gap-8 pointer-events-auto">
-          {/* Resume Button (Pushed UNDER the curtain layers) */}
           <Link
             to="/resume"
             className="cursor-target font-geist text-[11px] md:text-xs font-medium tracking-[0.2em] uppercase leading-[0.5] no-underline px-0.5 py-0 transition-colors duration-500 z-[1000] relative mr-2 md:mr-4"
@@ -119,7 +112,6 @@ export const StaggeredMenu = ({
             RESUME
           </Link>
 
-          {/* Contact Button (Pushed UNDER the curtain layers) */}
           <Link
             to="/contact"
             className="cursor-target font-geist text-[11px] md:text-xs font-medium tracking-[0.2em] uppercase leading-[0.5] no-underline px-0.5 py-0 transition-colors duration-500 z-[1000] relative"
@@ -128,7 +120,6 @@ export const StaggeredMenu = ({
             CONTACT
           </Link>
 
-          {/* Menu Button (Always ON TOP of the curtain layers) */}
           <button
             ref={toggleBtnRef}
             onClick={toggleMenu}
@@ -158,11 +149,9 @@ export const StaggeredMenu = ({
         </div>
       </header>
 
-      {/* Animated Multi-Layer Menu Panel */}
       <AnimatePresence>
         {open && (
           <div className="fixed inset-0 z-[1002] pointer-events-none overflow-hidden">
-            {/* Layer 1 (Medium Purple - Subdued) */}
             <motion.div
               initial={{ y: "-100%" }}
               animate={{ y: "0%" }}
@@ -170,7 +159,6 @@ export const StaggeredMenu = ({
               transition={{ duration: 0.6, ease: [0.19, 1, 0.22, 1] }}
               className="absolute inset-0 bg-[#a600ff]"
             />
-            {/* Layer 2 (Deep Purple - Subdued) */}
             <motion.div
               initial={{ y: "-100%" }}
               animate={{ y: "0%" }}
@@ -178,7 +166,6 @@ export const StaggeredMenu = ({
               transition={{ duration: 0.6, ease: [0.19, 1, 0.22, 1], delay: 0.1 }}
               className="absolute inset-0 bg-[#4b0073]"
             />
-            {/* Layer 3 (Final Main Layer) */}
             <motion.aside
               ref={panelRef}
               initial={{ y: "-100%" }}
@@ -214,7 +201,6 @@ export const StaggeredMenu = ({
                 </ul>
               </div>
 
-              {/* Social Links */}
               {displaySocials && socialItems.length > 0 && (
                 <motion.div 
                   variants={itemVariants}

@@ -90,10 +90,10 @@ const TargetCursor = ({
       isActiveRef.current = false;
       targetCornerPositionsRef.current = null;
       gsap.set(activeStrengthRef, { current: 0, overwrite: true });
-      
+
       const targetToCleanup = activeTarget;
       activeTarget = null;
-      
+
       if (cornersRef.current) {
         const corners = Array.from(cornersRef.current);
         gsap.killTweensOf(corners);
@@ -109,7 +109,7 @@ const TargetCursor = ({
           tl.to(corner, { x: positions[index].x, y: positions[index].y, duration: 0.3, ease: 'power3.out' }, 0);
         });
       }
-      
+
       resumeTimeout = setTimeout(() => {
         if (!activeTarget && cursorRef.current && spinTl.current) {
           const currentRotation = gsap.getProperty(cursorRef.current, 'rotation');
@@ -129,7 +129,7 @@ const TargetCursor = ({
         }
         resumeTimeout = null;
       }, 50);
-      
+
       if (targetToCleanup) {
         cleanupTarget(targetToCleanup);
       }
@@ -140,7 +140,6 @@ const TargetCursor = ({
         return;
       }
 
-      // Safety check: If target is unmounted or hidden, release cursor
       if (activeTarget && (!activeTarget.isConnected || activeTarget.offsetParent === null)) {
         leaveHandler();
         return;
@@ -215,11 +214,11 @@ const TargetCursor = ({
       const target = allTargets[0] || null;
       if (!target || !cursorRef.current || !cornersRef.current) return;
       if (activeTarget === target) return;
-      
+
       if (activeTarget) {
         leaveHandler();
       }
-      
+
       if (resumeTimeout) {
         clearTimeout(resumeTimeout);
         resumeTimeout = null;
@@ -260,8 +259,7 @@ const TargetCursor = ({
 
       currentLeaveHandler = leaveHandler;
       target.addEventListener('mouseleave', leaveHandler);
-      
-      // Safety: If clicked, check if target survived
+
       const clickHandler = () => setTimeout(tickerFn, 100);
       target.addEventListener('click', clickHandler, { once: true });
     };

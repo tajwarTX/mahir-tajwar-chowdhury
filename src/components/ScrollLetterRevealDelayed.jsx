@@ -33,7 +33,7 @@ const ScrollLetterRevealDelayed = ({ text, duration = 2000, delay = 800, classNa
       clearTimeout(timeoutRef.current);
       if (reqRef.current) cancelAnimationFrame(reqRef.current);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, [text, duration, delay]);
 
   const revealLettersRandomly = () => {
@@ -43,7 +43,7 @@ const ScrollLetterRevealDelayed = ({ text, duration = 2000, delay = 800, classNa
     const tick = (now) => {
       const elapsed = now - startTime;
       let allDone = true;
-      
+
       lettersRef.current.forEach((span, i) => {
         if (!span) return;
         if (elapsed >= delays[i]) {

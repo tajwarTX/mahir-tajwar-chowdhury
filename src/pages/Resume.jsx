@@ -3,22 +3,16 @@ import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import ScrollLetterRevealDelayed from "../components/ScrollLetterRevealDelayed";
 
-/**
- * A high-end, 'gated' Resume page.
- * Uses a login-style interface where users provide credentials to request access.
- * Styled with our signature Orbitron/Geist typography and high-tech minimalism.
- */
 export const Resume = () => {
   const navigate = useNavigate();
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({ name: '', email: '' });
 
-  // Handle Formspree submission (or any email endpoint)
   const handleSubmit = async (e) => {
      e.preventDefault();
      setIsSubmitting(true);
-     
+
      try {
        const response = await fetch("https://formspree.io/f/mvzddpak", { 
          method: "POST",
@@ -32,7 +26,7 @@ export const Resume = () => {
            message: `RESUME REQUEST FROM: ${formData.name} (${formData.email})`
          })
        });
-       
+
        if (response.ok) {
          setSubmitted(true);
        }
@@ -45,13 +39,11 @@ export const Resume = () => {
 
   return (
     <div className="w-full min-h-screen flex items-center justify-center bg-black px-6 md:px-24 py-20 md:py-32 overflow-hidden selection:bg-[#a600ff] selection:text-white">
-      
-      {/* Cinematic Backdrop Glow - Replaced heavy CSS blur with a much lighter radial gradient */}
+
       <div className="absolute top-1/2 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[radial-gradient(circle_at_center,_rgba(166,0,255,0.15)_0%,_transparent_70%)] pointer-events-none" />
 
       <div className="max-w-[1400px] w-full grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center relative z-[20]">
-        
-        {/* Left Side: Typography and Info */}
+
         <div className="flex flex-col items-center text-center lg:items-start lg:text-left z-10 w-full relative">
           <h1 className="font-orbitron text-[38px] md:text-[75px] lg:text-[90px] font-extrabold text-white uppercase leading-[0.9] lg:leading-[0.8] tracking-tighter">
             <ScrollLetterRevealDelayed text="REQUEST" duration={200} delay={0} />
@@ -60,11 +52,11 @@ export const Resume = () => {
                <ScrollLetterRevealDelayed text="RESUME.PDF" duration={200} delay={0.1} />
             </span>
           </h1>
-          
+
           <div className="mt-8 flex flex-col lg:flex-row items-center gap-4">
              <div className="h-[1px] w-12 bg-[#a600ff]" />
              <span className="font-geist text-[10px] md:text-[11px] text-white/60 uppercase tracking-[0.4em] font-medium">
-               ARCHIVE_002 // DATA_SYNC
+               ARCHIVE_002 
              </span>
           </div>
 
@@ -72,10 +64,8 @@ export const Resume = () => {
             PROVIDE YOUR DETAILS TO RECEIVE A DIRECT COPY OF MAHIR TAJWAR'S DIGITAL DOSSIER AND ENGINEERING RESUME.
           </p>
 
-
         </div>
 
-        {/* Right Side: Minimal Interactive Form */}
         <div className="relative w-full max-w-md mx-auto lg:mx-0 lg:ml-auto z-10">
           <AnimatePresence mode="wait">
             {!submitted ? (
@@ -139,7 +129,7 @@ export const Resume = () => {
                 <div className="flex items-center gap-4 absolute -bottom-16 left-0">
                   <div className="h-[1px] w-6 bg-white/20" />
                   <p className="font-geist text-white/50 text-[8px] uppercase tracking-[0.3em]">
-                    SECURE // ENCRYPTED
+                    SECURE 
                   </p>
                 </div>
               </motion.div>
@@ -167,7 +157,7 @@ export const Resume = () => {
                     />
                   </svg>
                 </motion.div>
-                
+
                 <motion.h2 
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
@@ -176,7 +166,7 @@ export const Resume = () => {
                 >
                   REQUEST <span className="text-[#a600ff]">RECEIVED</span>
                 </motion.h2>
-                
+
                 <motion.p 
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
@@ -185,7 +175,7 @@ export const Resume = () => {
                 >
                   DATA SYNC COMPLETE. THE DIGITAL DOSSIER WILL BE DISPATCHED TO YOUR INBOX WITHIN 1-2 BUSINESS DAYS.
                 </motion.p>
-                
+
                 <motion.button
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}

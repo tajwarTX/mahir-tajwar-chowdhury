@@ -28,14 +28,12 @@ export default function CameraController({
       const tl = gsap.timeline();
       timelineRef.current = tl;
 
-      // Animate model rotation to best viewing angle for this annotation
       tl.to(islandRef.current.rotation, {
         y: ann.modelRotationY,
         duration: 1.2,
         ease: "power2.inOut",
       }, 0);
 
-      // Animate camera position
       tl.to(camera.position, {
         x: ann.camera.position[0],
         y: ann.camera.position[1],
@@ -44,7 +42,6 @@ export default function CameraController({
         ease: "power3.inOut",
       }, 0);
 
-      // Animate lookAt target
       tl.to(lookAtTarget.current, {
         x: ann.camera.target[0],
         y: ann.camera.target[1],
@@ -57,7 +54,7 @@ export default function CameraController({
       }, 0);
 
     } else if (hasActiveAnnotation.current) {
-      // Reset to default view
+
       hasActiveAnnotation.current = false;
       isAnimating.current = true;
 
@@ -72,9 +69,8 @@ export default function CameraController({
         ease: "power3.inOut",
       }, 0);
 
-      // Get island's current position for reset transition
       const currentIslandPos = islandRef.current.position;
-      
+
       tl.to(lookAtTarget.current, {
         x: currentIslandPos.x,
         y: currentIslandPos.y,
@@ -92,7 +88,6 @@ export default function CameraController({
     };
   }, [activeAnnotation]);
 
-  // Keep camera looking at the target while annotation is active or during transition
   useFrame(() => {
     if (hasActiveAnnotation.current || isAnimating.current) {
       camera.lookAt(lookAtTarget.current);

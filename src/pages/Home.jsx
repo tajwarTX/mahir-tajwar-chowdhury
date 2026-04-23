@@ -14,16 +14,8 @@ const MOBILE_POSITION = { x: -2, y: 24, z: -60 };
 const BASE_ROTATION_DEG = { x: -8, y: 124, z: 0 };
 const degToRad = (deg) => (deg * Math.PI) / 180;
 
-// The model center in world space
 const MODEL_CENTER = [BASE_POSITION.x, BASE_POSITION.y, BASE_POSITION.z];
 
-// 5 annotations matching the Sketchfab "Dinner with Cats" model
-// Model geometry: nodes span x:0-170, y:80-155, z:0-50 (pre-center)
-// Root has -90° X rotation. <Center> shifts to origin.
-// After Center: approx x:-85 to 85, swapped Y/Z due to root rotation
-// localPosition = marker position in model-local space (after Center)
-// modelRotationY = model Y rotation for best view
-// camera = world-space camera position & lookAt target
 const ANNOTATIONS = [
   {
     id: 1,
@@ -87,9 +79,6 @@ const ANNOTATIONS = [
   },
 ];
 
-// High-performance Infinite scroll text component using Canvas-based rendering
-// This approach is much more efficient for large text (200px) as it avoids 
-// DOM painting overhead for complex glyphs.
 const InfiniteScrollText = React.memo(() => {
   const text = "ROBOTICS • CREATIVE DEVELOPER • 3D DESIGNING • CINEMATIC • ";
   const canvasRef = useRef(null);
@@ -121,13 +110,13 @@ const InfiniteScrollText = React.memo(() => {
         containerRef.current.style.backgroundImage = `url(${canvas.toDataURL()})`;
         containerRef.current.style.backgroundRepeat = 'repeat-x';
         containerRef.current.style.backgroundSize = `${textWidth}px auto`;
-        // Set container width to exactly 2x textWidth for a perfect loop
+
         containerRef.current.style.width = `${textWidth * 2}px`;
       }
     };
 
     if (document.fonts) {
-      // Explicitly load the font so the canvas can render it correctly
+
       document.fonts.load('800 200px Orbitron').then(initCanvas).catch(initCanvas);
     } else {
       setTimeout(initCanvas, 500);
@@ -155,7 +144,6 @@ const InfiniteScrollText = React.memo(() => {
   );
 });
 
-// Custom hook for drag rotation (Desktop + Mobile)
 function useDragRotation(targetRef, rotateSpeed = 0.005, isLocked = false) {
   const draggingRef = useRef(false);
   const lastXRef = useRef(0);
@@ -215,9 +203,8 @@ export default function Home() {
   const [activeAnnotation, setActiveAnnotation] = useState(null);
   const [showInfoPanel, setShowInfoPanel] = useState(false);
 
-  // Responsive States
   const [scale, setScale] = useState([1, 1, 1]);
-  // Performance state
+
   const [dpr, setDpr] = useState(1.5);
   const [position, setPosition] = useState([
     BASE_POSITION.x,
@@ -225,20 +212,17 @@ export default function Home() {
     BASE_POSITION.z,
   ]);
 
-  // Handle annotation click
   const handleAnnotationClick = useCallback((annotation) => {
     setActiveAnnotation(annotation.id);
-    // Delay showing info panel for dramatic effect
+
     setTimeout(() => setShowInfoPanel(true), 600);
   }, []);
 
-  // Reset to default view
   const resetCamera = useCallback(() => {
     setShowInfoPanel(false);
     setTimeout(() => setActiveAnnotation(null), 300);
   }, []);
 
-  // Navigate between annotations
   const goToAnnotation = useCallback(
     (direction) => {
       const currentIdx = ANNOTATIONS.findIndex(
@@ -260,7 +244,6 @@ export default function Home() {
     [activeAnnotation]
   );
 
-  // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (activeAnnotation !== null) {
@@ -281,7 +264,7 @@ export default function Home() {
         setScale([0.45, 0.45, 0.45]);
         setPosition([
           MOBILE_POSITION.x,
-          MOBILE_POSITION.y + 2, // Push it slightly higher on mobile
+          MOBILE_POSITION.y + 2, 
           MOBILE_POSITION.z,
         ]);
       } else {
@@ -342,7 +325,6 @@ export default function Home() {
         ref={introRef}
         className="relative w-full h-screen flex justify-start items-center flex-col pt-[28vh] md:pt-[32vh] snap-start snap-always"
       >
-        {/* Top left text block - now absolute to only appear in first section */}
         <div
           className="absolute text-white text-xs font-light leading-none z-50 pointer-events-none"
           style={{
@@ -398,7 +380,7 @@ export default function Home() {
             <div className="mt-6 flex items-center gap-4">
               <div className="h-[1px] w-10 bg-[#a600ff]" />
               <span className="font-geist text-[9px] md:text-[11px] text-white/40 uppercase tracking-[0.4em] font-medium">
-                ARCHIVE_001 // PERSONAL_SPEC
+                ARCHIVE_001 
               </span>
             </div>
           </div>
@@ -431,11 +413,10 @@ export default function Home() {
         ref={canvasSectionRef}
         className="relative w-full overflow-hidden flex items-center h-screen snap-start snap-always"
       >
-        {/* Left side text */}
         <div className="absolute left-6 md:left-24 max-w-lg z-20 top-1/2 -translate-y-[150%] md:-translate-y-[140%] flex flex-col space-y-4">
           <div className="flex flex-col gap-1">
             <ScrollLetterRevealDelayed
-              text="OPEN_WORLD_MODULE // v2.0"
+              text="OPEN_WORLD_MODULE 
               duration={100}
               delay={0}
               className="text-[#a600ff] font-geist text-[9px] md:text-[10px] uppercase tracking-[0.5em] font-bold"
@@ -474,7 +455,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Bottom attribution */}
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-10 pointer-events-none origin-center p-2 mb-2">
           <img
             src={scrollSide}
@@ -482,11 +462,10 @@ export default function Home() {
             className="opacity-30 w-32"
           />
           <p className="font-geist text-[8px] md:text-[9px] text-white/10 uppercase tracking-[0.3em] whitespace-nowrap">
-            MODEL // DINNER WITH CATS BY @EDIEDIEDI SKETCHFAB
+            MODEL 
           </p>
         </div>
 
-        {/* Annotation Navigation Sidebar (Now at Bottom Right) */}
         <div className="annotation-nav-sidebar">
           {ANNOTATIONS.map((ann) => (
             <button
@@ -536,8 +515,6 @@ export default function Home() {
           )}
         </div>
 
-
-        {/* Annotation Info Panel (Sketchfab-style overlay) */}
         {activeAnn && (
           <div
             className={`annotation-info-panel ${showInfoPanel ? "visible" : ""
@@ -583,14 +560,14 @@ export default function Home() {
 
         <Canvas
           ref={cameraRef}
-          dpr={[1, dpr]} /* Optimized DPR bounds */
+          dpr={[1, dpr]} 
           gl={{
-            antialias: false, /* Disabled MSAA for massive performance gain */
+            antialias: false, 
             powerPreference: "high-performance",
             alpha: true,
             stencil: false,
             depth: true,
-            precision: "mediump" /* Medium precision for better performance on mobile */
+            precision: "mediump" 
           }}
           camera={{ position: [0, 0, 50], near: 0.1, far: 2000 }}
         >
@@ -608,10 +585,10 @@ export default function Home() {
                 defaultCameraPosition={[0, 0, 50]}
               />
               <Float
-                speed={2} // Animation speed, defaults to 1
-                rotationIntensity={0.5} // XYZ rotation intensity, defaults to 1
-                floatIntensity={0.5} // Up/down float intensity, works like a multiplier with floatingRange,defaults to 1
-                floatingRange={[0, 1.5]} // Range of y-axis values the object will float within, defaults to [-0.1,0.1]
+                speed={2} 
+                rotationIntensity={0.5} 
+                floatIntensity={0.5} 
+                floatingRange={[0, 1.5]} 
               >
                 <Island
                   ref={islandRef}

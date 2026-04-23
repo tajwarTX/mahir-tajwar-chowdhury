@@ -1,4 +1,4 @@
-// components/Loader.jsx
+
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import loaderGif from "../assets/loading.gif";
@@ -7,17 +7,17 @@ const Loader = ({ onFinish, isInitial }) => {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    // Longer duration for initial GIF, shorter for page transitions
+
     const duration = isInitial ? 3000 : 1200; 
-    
+
     if (!isInitial) {
       const interval = setInterval(() => {
         setProgress(prev => (prev < 100 ? prev + 1 : 100));
       }, duration / 100);
-      
+
       const timer = setTimeout(() => {
         onFinish();
-      }, duration + 100); // Small buffer
+      }, duration + 100); 
 
       return () => {
         clearTimeout(timer);
@@ -41,10 +41,8 @@ const Loader = ({ onFinish, isInitial }) => {
         />
       ) : (
         <div className="flex flex-col items-center justify-center w-full h-full relative overflow-hidden">
-          {/* Background Ambient Glow */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-[#a600ff]/5 rounded-full blur-[100px] pointer-events-none" />
 
-          {/* Minimal Percentage Counter */}
           <div className="relative flex flex-col items-center">
             <motion.div
               initial={{ opacity: 0, y: 10 }}
@@ -59,7 +57,6 @@ const Loader = ({ onFinish, isInitial }) => {
               </span>
             </motion.div>
 
-            {/* Glitch Overlay Text (intermittent) */}
             <motion.div
               animate={{ 
                 opacity: [0, 0.4, 0, 0.2, 0],
@@ -73,7 +70,6 @@ const Loader = ({ onFinish, isInitial }) => {
               </span>
             </motion.div>
 
-            {/* Progress Bar */}
             <div className="mt-4 w-32 h-[1px] bg-white/5 relative">
               <motion.div 
                 className="absolute top-0 left-0 h-full bg-[#a600ff] shadow-[0_0_10px_#a600ff]"

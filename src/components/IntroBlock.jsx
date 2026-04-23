@@ -35,7 +35,7 @@ const IntroBlock = ({ className = "" }) => {
   const [gmtOffset, setGmtOffset] = useState("GMT");
 
   useEffect(() => {
-    // Update local time and GMT every second
+
     const updateTime = () => {
       const now = new Date();
       const formatted = now.toLocaleTimeString('en-US', { 
@@ -45,9 +45,8 @@ const IntroBlock = ({ className = "" }) => {
         hour12: false
       });
       setLocalTime(formatted);
-      
-      // Calculate GMT offset
-      const rawOffset = -now.getTimezoneOffset(); // in minutes, positive = ahead of UTC
+
+      const rawOffset = -now.getTimezoneOffset(); 
       const absH = Math.floor(Math.abs(rawOffset) / 60);
       const absM = Math.abs(rawOffset) % 60;
       const sign = rawOffset >= 0 ? "+" : "-";
@@ -72,10 +71,9 @@ const IntroBlock = ({ className = "" }) => {
         timezone: "LOCAL_TIME",
         ip: ip || "N/A",
       });
-      return validCoords; // return true if we got good data
+      return validCoords; 
     };
 
-    // Primary: ipinfo.io — very reliable, no key needed, loc = "lat,lon"
     fetch("https://ipinfo.io/json", { method: "GET" })
       .then(r => r.json())
       .then(d => {
@@ -84,7 +82,7 @@ const IntroBlock = ({ className = "" }) => {
         if (!ok) throw new Error("no coords");
       })
       .catch(() =>
-        // Secondary: freeipapi.com — direct numeric lat/lon
+
         fetch("https://freeipapi.com/api/json", { method: "GET" })
           .then(r => r.json())
           .then(d => {
@@ -92,12 +90,12 @@ const IntroBlock = ({ className = "" }) => {
             if (!ok) throw new Error("no coords");
           })
           .catch(() =>
-            // Tertiary: ipapi.co — alternative with IP display
+
             fetch("https://ipapi.co/json/", { method: "GET" })
               .then(r => r.json())
               .then(d => applyGeo(d.city, d.country_name, d.latitude, d.longitude, d.ip))
               .catch(() => {
-                // All failed — fetch just IP as fallback
+
                 fetch("https://api.ipify.org?format=json", { method: "GET" })
                   .then(r => r.json())
                   .then(d => {
@@ -112,7 +110,7 @@ const IntroBlock = ({ className = "" }) => {
                     }));
                   })
                   .catch(() => {
-                    // Complete fallback if all APIs fail
+
                     setGeoData(prev => ({
                       ...prev,
                       city: "LOCATION",
@@ -128,8 +126,6 @@ const IntroBlock = ({ className = "" }) => {
       );
   }, []);
 
-
-
   const nextFirst = () =>
     setFirstIndex((prev) => (prev + 1) % firstNames.length);
 
@@ -138,19 +134,17 @@ const IntroBlock = ({ className = "" }) => {
 
   return (
     <div className={`flex flex-col items-center justify-center text-center text-white ${className}`}>
-      
-      {/* Top Metadata Row */}
+
       <div className="flex items-center gap-4 mb-8 opacity-40">
          <span className="font-geist text-[8px] md:text-[9px] uppercase tracking-[0.4em] whitespace-nowrap">
-           {localTime || "SYNCING..."} // {gmtOffset}
+           {localTime || "SYNCING..."} 
          </span>
          <div className="w-[1px] h-3 bg-white/30" />
          <span className="font-geist text-[8px] md:text-[9px] uppercase tracking-[0.4em] whitespace-nowrap">
-           {geoData.lat === null ? "SYNCING..." : `${geoData.lat}° N`} // {geoData.lon === null ? "..." : `${geoData.lon}° E`}
+           {geoData.lat === null ? "SYNCING..." : `${geoData.lat}° N`} 
          </span>
       </div>
 
-      {/* Intro Text */}
       <ScrollLetterRevealDelayed
         text="HEY _ I AM _"
         duration={600}
@@ -158,7 +152,6 @@ const IntroBlock = ({ className = "" }) => {
         className="block text-[10px] md:text-xs font-geist uppercase tracking-[0.3em] font-medium mb-1 text-white"
       />
 
-      {/* First Name with Sync Indicator */}
       <div className="relative group flex items-center">
         <button
           onClick={nextFirst}
@@ -177,7 +170,6 @@ const IntroBlock = ({ className = "" }) => {
           </div>
         </button>
 
-        {/* Sync Feature Indicator */}
         <div className="absolute left-full ml-4 hidden md:block pointer-events-none">
           <div className="flex items-center gap-2 animate-pulse">
             <div className="h-[1px] w-8 bg-[#a600ff]" />
@@ -188,7 +180,6 @@ const IntroBlock = ({ className = "" }) => {
         </div>
       </div>
 
-      {/* Last Name */}
       <div
         onClick={nextLast}
         dir={lastNames[lastIndex].dir}
@@ -206,10 +197,9 @@ const IntroBlock = ({ className = "" }) => {
         </div>
       </div>
 
-      {/* Bottom Metadata Row */}
       <div className="mt-10 flex flex-col items-center gap-2 opacity-50">
          <span className="font-geist text-[9px] md:text-[10px] uppercase tracking-[0.5em] font-bold">
-           {geoData.city} // {geoData.country}
+           {geoData.city} 
          </span>
          <div className="h-[1px] w-12 bg-[#a600ff]" />
          <p className="font-geist text-[8px] uppercase tracking-[0.3em] max-w-[240px] leading-relaxed">
