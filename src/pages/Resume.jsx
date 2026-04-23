@@ -69,7 +69,7 @@ export const Resume = () => {
         </div>
 
         {/* Right Side: Minimal Interactive Form */}
-        <div className="relative w-full max-w-md mx-auto z-10 flex flex-col items-center text-center lg:items-start lg:text-left">
+        <div className="relative w-full max-w-md mx-auto z-10">
           <AnimatePresence mode="wait">
             {!submitted ? (
               <motion.div
@@ -81,8 +81,8 @@ export const Resume = () => {
                 className="space-y-12"
               >
                 <form onSubmit={handleSubmit} className="space-y-8">
-                  <div className="space-y-2 group">
-                    <label className="block font-geist text-[9px] text-white/90 uppercase tracking-[0.4em] transition-colors duration-200 group-focus-within:text-[#a600ff]">
+                  <div className="space-y-2 group flex flex-col items-center">
+                    <label className="block font-geist text-[9px] text-white/90 uppercase tracking-[0.4em] transition-colors duration-200 group-focus-within:text-[#a600ff] text-center">
                       FULL NAME
                     </label>
                     <input
@@ -91,12 +91,12 @@ export const Resume = () => {
                       value={formData.name}
                       placeholder="ENTER NAME"
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full bg-transparent border-b border-white/20 py-3 font-geist text-sm text-white uppercase tracking-[0.2em] focus:outline-none focus:border-[#a600ff] transition-all duration-300 placeholder:text-white/30"
+                      className="w-full bg-transparent border-b border-white/20 py-3 font-geist text-sm text-white uppercase tracking-[0.2em] focus:outline-none focus:border-[#a600ff] transition-all duration-300 placeholder:text-white/30 text-center"
                     />
                   </div>
 
-                  <div className="space-y-2 group">
-                    <label className="block font-geist text-[9px] text-white/90 uppercase tracking-[0.4em] transition-colors duration-200 group-focus-within:text-[#a600ff]">
+                  <div className="space-y-2 group flex flex-col items-center">
+                    <label className="block font-geist text-[9px] text-white/90 uppercase tracking-[0.4em] transition-colors duration-200 group-focus-within:text-[#a600ff] text-center">
                       CONTACT EMAIL
                     </label>
                     <input
@@ -105,7 +105,7 @@ export const Resume = () => {
                       value={formData.email}
                       placeholder="ENTER EMAIL ADDRESS"
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full bg-transparent border-b border-white/20 py-3 font-geist text-sm text-white uppercase tracking-[0.2em] focus:outline-none focus:border-[#a600ff] transition-all duration-300 placeholder:text-white/30"
+                      className="w-full bg-transparent border-b border-white/20 py-3 font-geist text-sm text-white uppercase tracking-[0.2em] focus:outline-none focus:border-[#a600ff] transition-all duration-300 placeholder:text-white/30 text-center"
                     />
                   </div>
 
@@ -144,20 +144,20 @@ export const Resume = () => {
                 transition={{ duration: 0.6, ease: [0.19, 1, 0.22, 1] }}
                 className="space-y-8"
               >
-                <h2 className="font-orbitron text-3xl md:text-4xl font-bold text-white uppercase tracking-tighter">
+                <h2 className="font-orbitron text-3xl md:text-4xl font-bold text-white uppercase tracking-tighter text-center">
                   RESUME <br/>
                   <span className="text-[#a600ff]">DISPATCHED</span>
                 </h2>
                 
-                <div className="w-12 h-[1px] bg-[#a600ff]/50" />
+                <div className="w-12 h-[1px] bg-[#a600ff]/50 mx-auto" />
                 
-                <p className="font-geist text-white/80 text-[10px] md:text-sm uppercase tracking-[0.3em] leading-relaxed">
+                <p className="font-geist text-white/80 text-[10px] md:text-sm uppercase tracking-[0.3em] leading-relaxed text-center">
                   TRANSFER INITIATED. THE RESUME.PDF HAS BEEN SENT TO YOUR INBOX.
                 </p>
                 
                 <button
                   onClick={() => setSubmitted(false)}
-                  className="pt-8 font-geist text-[9px] text-[#a600ff]/60 uppercase tracking-[0.4em] hover:text-[#a600ff] transition-colors duration-300 flex items-center gap-2"
+                  className="pt-8 font-geist text-[9px] text-[#a600ff]/60 uppercase tracking-[0.4em] hover:text-[#a600ff] transition-colors duration-300 flex items-center justify-center gap-2"
                 >
                   <span className="text-[12px]">←</span> RETURN
                 </button>
