@@ -106,8 +106,8 @@ export const StaggeredMenu = ({
     <div className={`menu-wrapper ${isFixed ? 'fixed inset-0' : 'relative w-full h-full'} z-[1000] pointer-events-none ${className}`}>
       {/* Global Header Container */}
       <header 
-        className="absolute left-0 w-full flex items-center justify-end px-2 md:px-4 pointer-events-none"
-        style={{ top: '14px' }}
+        className="absolute left-0 w-full flex items-center justify-end px-4 md:px-6 pointer-events-none"
+        style={{ top: '20px' }}
       >
         <div className="flex items-center gap-5 md:gap-8 pointer-events-auto">
           {/* Resume Button (Pushed UNDER the curtain layers) */}
@@ -205,7 +205,7 @@ export const StaggeredMenu = ({
                             (0{idx + 1})
                           </span>
                         )}
-                        <span className="cursor-target font-orbitron font-extrabold text-[2.2rem] md:text-[4.5rem] leading-[0.8] tracking-tighter uppercase inline-block px-3 py-2 hover:text-[#a600ff] transition-colors duration-200">
+                        <span className="cursor-target font-orbitron font-extrabold text-[1.8rem] md:text-[4.5rem] leading-[0.85] tracking-tighter uppercase inline-block px-3 py-2 hover:text-[#a600ff] transition-colors duration-200">
                           {it.label}
                         </span>
                       </Link>

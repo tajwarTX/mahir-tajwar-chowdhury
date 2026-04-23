@@ -44,7 +44,7 @@ export const Resume = () => {
   };
 
   return (
-    <div className="w-full min-h-screen flex items-center justify-center bg-black px-8 md:px-24 py-32 overflow-hidden selection:bg-[#a600ff] selection:text-white">
+    <div className="w-full min-h-screen flex items-center justify-center bg-black px-6 md:px-24 py-20 md:py-32 overflow-hidden selection:bg-[#a600ff] selection:text-white">
       
       {/* Cinematic Backdrop Glow - Replaced heavy CSS blur with a much lighter radial gradient */}
       <div className="absolute top-1/2 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[radial-gradient(circle_at_center,_rgba(166,0,255,0.15)_0%,_transparent_70%)] pointer-events-none" />
@@ -53,7 +53,7 @@ export const Resume = () => {
         
         {/* Left Side: Typography and Info */}
         <div className="flex flex-col items-center text-center lg:items-start lg:text-left z-10 w-full relative">
-          <h1 className="font-orbitron text-[50px] md:text-[75px] lg:text-[90px] font-extrabold text-white uppercase leading-[0.8] tracking-tighter">
+          <h1 className="font-orbitron text-[38px] md:text-[75px] lg:text-[90px] font-extrabold text-white uppercase leading-[0.9] lg:leading-[0.8] tracking-tighter">
             <ScrollLetterRevealDelayed text="REQUEST" duration={200} delay={0} />
             <br />
             <span className="text-[#a600ff]">
@@ -172,7 +172,7 @@ export const Resume = () => {
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.6, duration: 0.8 }}
-                  className="font-orbitron text-3xl md:text-5xl font-bold text-white uppercase tracking-tighter mb-4"
+                  className="font-orbitron text-2xl md:text-5xl font-bold text-white uppercase tracking-tighter mb-4"
                 >
                   REQUEST <span className="text-[#a600ff]">RECEIVED</span>
                 </motion.h2>

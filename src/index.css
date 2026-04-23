@@ -129,15 +129,6 @@ body:has(.card[data-color="green"]:hover) {
   animation: morphFade 0.5s ease forwards;
 }
 
-@keyframes scan {
-  0% { top: 0; }
-  100% { top: 100%; }
-}
-
-.animate-scan {
-  animation: scan linear infinite;
-}
-
 .glassmorphism {
   background: rgba(8, 116, 239, 0.07);
   backdrop-filter: blur(10px);
@@ -587,17 +578,17 @@ body:has(.card[data-color="green"]:hover) {
   }
 
   .annotation-dot {
-    width: 28px;
-    height: 28px;
+    width: 36px;
+    height: 36px;
   }
 
   .annotation-dot span {
-    font-size: 10px;
+    font-size: 14px;
   }
 
   .annotation-pulse-ring {
-    width: 28px;
-    height: 28px;
+    width: 36px;
+    height: 36px;
   }
 }
 

@@ -135,7 +135,7 @@ const InfiniteScrollText = React.memo(() => {
   }, []);
 
   return (
-    <div className="absolute left-0 top-[45%] w-full h-[300px] overflow-hidden pointer-events-none z-0 select-none">
+    <div className="absolute left-0 top-[55%] md:top-[45%] w-full h-[150px] md:h-[300px] overflow-hidden pointer-events-none z-0 select-none">
       <canvas ref={canvasRef} className="hidden" />
       <div
         ref={containerRef}
@@ -277,11 +277,11 @@ export default function Home() {
 
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth < 430) {
-        setScale([0.5, 0.5, 0.5]);
+      if (window.innerWidth < 480) {
+        setScale([0.45, 0.45, 0.45]);
         setPosition([
           MOBILE_POSITION.x,
-          MOBILE_POSITION.y,
+          MOBILE_POSITION.y + 2, // Push it slightly higher on mobile
           MOBILE_POSITION.z,
         ]);
       } else {
@@ -381,10 +381,10 @@ export default function Home() {
         />
       </section>
 
-      <section className="relative w-full h-screen flex items-center justify-center px-10 md:px-24 py-20 z-10 snap-start snap-always">
+      <section className="relative w-full h-screen flex items-center justify-center px-6 md:px-24 py-16 md:py-20 z-10 snap-start snap-always">
         <div className="grid grid-cols-1 md:grid-cols-2 w-full max-w-7xl items-center gap-12">
           <div className="flex flex-col">
-            <h2 className="text-[60px] md:text-[100px] lg:text-[130px] font-orbitron font-extrabold leading-[0.8] text-white uppercase tracking-tighter">
+            <h2 className="text-[52px] md:text-[100px] lg:text-[130px] font-orbitron font-extrabold leading-[0.85] text-white uppercase tracking-tighter">
               <ScrollLetterRevealDelayed text="THE" duration={200} delay={0} />
               <br />
               <span className="text-[#a600ff]">
@@ -432,7 +432,7 @@ export default function Home() {
         className="relative w-full overflow-hidden flex items-center h-screen snap-start snap-always"
       >
         {/* Left side text */}
-        <div className="absolute left-9 md:left-24 max-w-lg z-20 top-1/2 -translate-y-[140%] flex flex-col space-y-4">
+        <div className="absolute left-6 md:left-24 max-w-lg z-20 top-1/2 -translate-y-[150%] md:-translate-y-[140%] flex flex-col space-y-4">
           <div className="flex flex-col gap-1">
             <ScrollLetterRevealDelayed
               text="OPEN_WORLD_MODULE // v2.0"
