@@ -612,9 +612,8 @@ export default function Home() {
           <OrbitControls 
             ref={controlsRef} 
             makeDefault 
-            enableDamping={true}
-            dampingFactor={0.05}
-            rotateSpeed={0.5}
+            enablePan={true}
+            screenSpacePanning={true}
           />
           <CameraDebugger controlsRef={controlsRef} />
 
@@ -626,24 +625,17 @@ export default function Home() {
                 islandRef={islandRef}
                 defaultCameraPosition={[0, 0, 50]}
               />
-              <Float
-                speed={1} 
-                rotationIntensity={1} 
-                floatIntensity={2} 
-                floatingRange={[-2, 2]} 
-              >
-                <Island
-                  ref={islandRef}
-                  cameraRef={cameraRef}
-                  isIntersecting={true}
-                  position={position}
-                  scale={scale}
-                  rotation={islandRotation}
-                  annotations={ANNOTATIONS}
-                  activeAnnotation={activeAnnotation}
-                  onAnnotationClick={handleAnnotationClick}
-                />
-              </Float>
+              <Island
+                ref={islandRef}
+                cameraRef={cameraRef}
+                isIntersecting={false}
+                position={position}
+                scale={scale}
+                rotation={islandRotation}
+                annotations={ANNOTATIONS}
+                activeAnnotation={activeAnnotation}
+                onAnnotationClick={handleAnnotationClick}
+              />
             </Bvh>
             <Preload all />
           </Suspense>
