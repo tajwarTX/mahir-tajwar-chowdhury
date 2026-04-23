@@ -34,7 +34,7 @@ const ANNOTATIONS = [
       "Having crashed in this remote forest, the pilot has found a strange peace among the voxel trees. They now spend their evenings sharing stories and meals with the curious forest dwellers.",
     modelRotationY: degToRad(210),
     camera: {
-      position: [-10.46, -29.06, -142.89],
+      position: [-3.49, 2.79, 25.04],
     },
   },
   {
@@ -209,6 +209,7 @@ function useDragRotation(targetRef, rotateSpeed = 0.005, isLocked = false) {
 }
 
 export default function Home() {
+  const navigate = useNavigate();
   const islandRef = useRef(null);
   const cameraRef = useRef(null);
   const controlsRef = useRef(null);
@@ -604,7 +605,25 @@ export default function Home() {
           <ambientLight intensity={2} />
           <directionalLight position={[1, 10, 1]} intensity={2} />
 
-          <OrbitControls ref={controlsRef} makeDefault />
+          <OrbitControls
+            ref={controlsRef}
+            makeDefault
+            enableDamping={true}
+            dampingFactor={0.05}
+            minDistance={5}
+            maxDistance={1000}
+            enablePan={true}
+            screenSpacePanning={true}
+            panSpeed={2}
+            rotateSpeed={1.0}
+            zoomSpeed={1.5}
+            target={MODEL_CENTER}
+            mouseButtons={{
+              LEFT: THREE.MOUSE.ROTATE,
+              MIDDLE: THREE.MOUSE.DOLLY,
+              RIGHT: THREE.MOUSE.PAN
+            }}
+          />
           <CameraDebugLogic setDebugInfo={setDebugInfo} />
 
           <Suspense fallback={null}>
