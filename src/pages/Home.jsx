@@ -3,24 +3,16 @@ import { useNavigate } from "react-router-dom";
 import IntroBlock from "../components/IntroBlock";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
-import { PerformanceMonitor, AdaptiveDpr, AdaptiveEvents, Bvh, Preload, Float, OrbitControls, Html } from "@react-three/drei";
+import { PerformanceMonitor, AdaptiveDpr, AdaptiveEvents, Bvh, Preload, Float } from "@react-three/drei";
 import Island from "../models/Island";
 import CameraController from "../components/CameraController";
 import scrollDown from "../assets/scrolldown.gif";
 import scrollSide from "../assets/scrollside.gif";
 import ScrollLetterRevealDelayed from "../components/ScrollLetterRevealDelayed";
 
-const CameraDebugLogic = ({ setDebugInfo }) => {
-  const { camera } = useThree();
-  useFrame(() => {
-    setDebugInfo([camera.position.x.toFixed(2), camera.position.y.toFixed(2), camera.position.z.toFixed(2)]);
-  });
-  return null;
-};
-
 const BASE_POSITION = { x: -2, y: -0, z: -63 };
 const MOBILE_POSITION = { x: -2, y: 24, z: -60 };
-const BASE_ROTATION_DEG = { x: -8, y: 124, z: 0 };
+const BASE_ROTATION_DEG = { x: 0, y: 60, z: 0 };
 const degToRad = (deg) => (deg * Math.PI) / 180;
 
 const MODEL_CENTER = [BASE_POSITION.x, BASE_POSITION.y, BASE_POSITION.z];
@@ -211,11 +203,9 @@ function useDragRotation(targetRef, rotateSpeed = 0.005, isLocked = false) {
 export default function Home() {
   const islandRef = useRef(null);
   const cameraRef = useRef(null);
-  const controlsRef = useRef(null);
   const introRef = useRef(null);
   const canvasSectionRef = useRef(null);
 
-  const [debugInfo, setDebugInfo] = useState([0, 0, 0]);
   const [showArrowScroll, setShowArrowScroll] = useState(false);
   const [isIntersecting, setIsIntersecting] = useState(false);
   const [activeAnnotation, setActiveAnnotation] = useState(null);
@@ -339,15 +329,6 @@ export default function Home() {
 
   return (
     <div className="w-full relative h-screen overflow-y-auto snap-y snap-mandatory">
-      {/* Fixed Debug Panel */}
-      <div className="fixed bottom-6 right-6 bg-black/80 text-white p-4 rounded-xl border border-[#a600ff] z-[9999] pointer-events-auto select-text font-geist min-w-[260px] shadow-2xl backdrop-blur-md">
-        <h4 className="text-[#a600ff] font-bold mb-2 uppercase tracking-widest text-[10px]">Camera Debugger</h4>
-        <div className="space-y-1">
-          <p className="text-xs font-mono"><span className="text-gray-400">Position:</span> [{debugInfo.join(", ")}]</p>
-        </div>
-        <p className="text-[8px] text-[#a600ff] mt-3 italic font-semibold text-center tracking-widest uppercase opacity-80">Rotation & Float Frozen</p>
-      </div>
-
       <section
         ref={introRef}
         className="relative w-full h-screen flex justify-start items-center flex-col pt-[28vh] md:pt-[32vh] snap-start snap-always"
@@ -604,26 +585,6 @@ export default function Home() {
           <ambientLight intensity={2} />
           <directionalLight position={[1, 10, 1]} intensity={2} />
 
-          <OrbitControls 
-            ref={controlsRef} 
-            makeDefault 
-            enableDamping={true}
-            dampingFactor={0.05}
-            minDistance={5}
-            maxDistance={1000}
-            enablePan={true}
-            screenSpacePanning={true}
-            panSpeed={2}
-            rotateSpeed={1.0}
-            zoomSpeed={1.5}
-            mouseButtons={{
-              LEFT: THREE.MOUSE.ROTATE,
-              MIDDLE: THREE.MOUSE.DOLLY,
-              RIGHT: THREE.MOUSE.PAN
-            }}
-          />
-          <CameraDebugLogic setDebugInfo={setDebugInfo} />
-
           <Suspense fallback={null}>
             <Bvh firstHitOnly>
               <CameraController
@@ -632,17 +593,24 @@ export default function Home() {
                 islandRef={islandRef}
                 defaultCameraPosition={[0, 0, 50]}
               />
-              <Island
-                ref={islandRef}
-                cameraRef={cameraRef}
-                isIntersecting={false}
-                position={position}
-                scale={scale}
-                rotation={islandRotation}
-                annotations={ANNOTATIONS}
-                activeAnnotation={activeAnnotation}
-                onAnnotationClick={handleAnnotationClick}
-              />
+              <Float
+                speed={2} 
+                rotationIntensity={0.5} 
+                floatIntensity={0.5} 
+                floatingRange={[0, 1.5]} 
+              >
+                <Island
+                  ref={islandRef}
+                  cameraRef={cameraRef}
+                  isIntersecting={isIntersecting}
+                  position={position}
+                  scale={scale}
+                  rotation={islandRotation}
+                  annotations={ANNOTATIONS}
+                  activeAnnotation={activeAnnotation}
+                  onAnnotationClick={handleAnnotationClick}
+                />
+              </Float>
             </Bvh>
             <Preload all />
           </Suspense>
