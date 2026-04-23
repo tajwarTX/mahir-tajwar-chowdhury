@@ -10,27 +10,12 @@ import scrollDown from "../assets/scrolldown.gif";
 import scrollSide from "../assets/scrollside.gif";
 import ScrollLetterRevealDelayed from "../components/ScrollLetterRevealDelayed";
 
-const CameraDebugger = ({ controlsRef }) => {
+const CameraDebugLogic = ({ setDebugInfo }) => {
   const { camera } = useThree();
-  const [debugInfo, setDebugInfo] = useState({ pos: [0, 0, 0] });
-
   useFrame(() => {
-    setDebugInfo({
-      pos: [camera.position.x.toFixed(2), camera.position.y.toFixed(2), camera.position.z.toFixed(2)]
-    });
+    setDebugInfo([camera.position.x.toFixed(2), camera.position.y.toFixed(2), camera.position.z.toFixed(2)]);
   });
-
-  return (
-    <Html fullscreen pointerEvents="none">
-      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 bg-black/80 text-white p-4 rounded-xl border border-[#a600ff] pointer-events-auto select-text font-geist min-w-[300px]">
-        <h4 className="text-[#a600ff] font-bold mb-2 uppercase tracking-widest text-sm">Camera Debugger</h4>
-        <div className="space-y-1">
-          <p className="text-xs font-mono"><span className="text-gray-400">Position:</span> [{debugInfo.pos.join(", ")}]</p>
-        </div>
-        <p className="text-[9px] text-[#a600ff] mt-3 italic font-semibold text-center tracking-widest uppercase">Rotation & Float Frozen</p>
-      </div>
-    </Html>
-  );
+  return null;
 };
 
 const BASE_POSITION = { x: -2, y: -0, z: -63 };
@@ -231,6 +216,7 @@ export default function Home() {
   const introRef = useRef(null);
   const canvasSectionRef = useRef(null);
 
+  const [debugInfo, setDebugInfo] = useState([0, 0, 0]);
   const [showArrowScroll, setShowArrowScroll] = useState(false);
   const [isIntersecting, setIsIntersecting] = useState(false);
   const [activeAnnotation, setActiveAnnotation] = useState(null);
@@ -354,6 +340,15 @@ export default function Home() {
 
   return (
     <div className="w-full relative h-screen overflow-y-auto snap-y snap-mandatory">
+      {/* Fixed Debug Panel */}
+      <div className="fixed bottom-6 right-6 bg-black/80 text-white p-4 rounded-xl border border-[#a600ff] z-[9999] pointer-events-auto select-text font-geist min-w-[260px] shadow-2xl backdrop-blur-md">
+        <h4 className="text-[#a600ff] font-bold mb-2 uppercase tracking-widest text-[10px]">Camera Debugger</h4>
+        <div className="space-y-1">
+          <p className="text-xs font-mono"><span className="text-gray-400">Position:</span> [{debugInfo.join(", ")}]</p>
+        </div>
+        <p className="text-[8px] text-[#a600ff] mt-3 italic font-semibold text-center tracking-widest uppercase opacity-80">Rotation & Float Frozen</p>
+      </div>
+
       <section
         ref={introRef}
         className="relative w-full h-screen flex justify-start items-center flex-col pt-[28vh] md:pt-[32vh] snap-start snap-always"
@@ -628,7 +623,7 @@ export default function Home() {
               RIGHT: THREE.MOUSE.PAN
             }}
           />
-          <CameraDebugger controlsRef={controlsRef} />
+          <CameraDebugLogic setDebugInfo={setDebugInfo} />
 
           <Suspense fallback={null}>
             <Bvh firstHitOnly>
