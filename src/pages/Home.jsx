@@ -3,24 +3,13 @@ import { useNavigate } from "react-router-dom";
 import IntroBlock from "../components/IntroBlock";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
-import { PerformanceMonitor, AdaptiveDpr, AdaptiveEvents, Bvh, Preload, Float, OrbitControls, Html } from "@react-three/drei";
+import { PerformanceMonitor, AdaptiveDpr, AdaptiveEvents, Bvh, Preload, Float } from "@react-three/drei";
 import Island from "../models/Island";
 import CameraController from "../components/CameraController";
 import scrollDown from "../assets/scrolldown.gif";
 import scrollSide from "../assets/scrollside.gif";
 import ScrollLetterRevealDelayed from "../components/ScrollLetterRevealDelayed";
 
-const CameraDebugLogic = ({ setDebugInfo }) => {
-  const { camera } = useThree();
-  useFrame(() => {
-    setDebugInfo([camera.position.x.toFixed(2), camera.position.y.toFixed(2), camera.position.z.toFixed(2)]);
-  });
-  return null;
-};
-
-const BASE_POSITION = { x: -2, y: -0, z: -63 };
-const MOBILE_POSITION = { x: -2, y: 24, z: -60 };
-const BASE_ROTATION_DEG = { x: -8, y: 124, z: 0 };
 const degToRad = (deg) => (deg * Math.PI) / 180;
 
 const MODEL_CENTER = [BASE_POSITION.x, BASE_POSITION.y, BASE_POSITION.z];
@@ -34,7 +23,7 @@ const ANNOTATIONS = [
       "Having crashed in this remote forest, the pilot has found a strange peace among the voxel trees. They now spend their evenings sharing stories and meals with the curious forest dwellers.",
     modelRotationY: degToRad(210),
     camera: {
-      position: [-110, 20, -50],
+      position: [-10.46, -29.06, -142.89],
     },
   },
   {
@@ -46,7 +35,7 @@ const ANNOTATIONS = [
       "The heart of the scene — a cozy dinner setup where the traveler shares a meal with friendly forest cats. Warm light spills from lanterns, creating an intimate atmosphere amid the wilderness.",
     modelRotationY: degToRad(180),
     camera: {
-      position: [20, 70, -100],
+      position: [-59.59, 51.2, -127.2],
     },
   },
   {
@@ -57,7 +46,7 @@ const ANNOTATIONS = [
       "Curious cats have gathered around the campsite, drawn by the warmth and food. These forest dwellers have made friends with the stranded traveler, keeping them company through the night.",
     modelRotationY: degToRad(100),
     camera: {
-      position: [-90, -10, 50],
+      position: [-4.29, -26.91, 29.85],
     },
   },
   {
@@ -68,7 +57,7 @@ const ANNOTATIONS = [
       "Towering voxel trees create a canopy overhead, their pixelated leaves filtering moonlight into the clearing below. The forest seems to close in protectively around the small campsite.",
     modelRotationY: degToRad(210),
     camera: {
-      position: [50, 0, 90],
+      position: [35.89, -15.24, 36.67],
     },
   },
   {
@@ -80,7 +69,7 @@ const ANNOTATIONS = [
       "The complete scene: a voxel masterpiece depicting a stranded pilot finding unexpected companionship. Made with MagicaVoxel and Blender by @ediediedi for the 'Robots are Coming' challenge.",
     modelRotationY: degToRad(145),
     camera: {
-      position: [0, 40, 40],
+      position: [44.79, 8.34, -54.95],
     },
   },
   {
@@ -91,7 +80,7 @@ const ANNOTATIONS = [
       "A rhythmic signal pulses from the dense overgrowth. It appears to be an automated distress beacon, long forgotten but still operational in the digital wilderness.",
     modelRotationY: degToRad(45),
     camera: {
-      position: [-70, 0, 100],
+      position: [28.74, -25.4, 56.71],
     },
   },
 ];
@@ -209,14 +198,11 @@ function useDragRotation(targetRef, rotateSpeed = 0.005, isLocked = false) {
 }
 
 export default function Home() {
-  const navigate = useNavigate();
   const islandRef = useRef(null);
   const cameraRef = useRef(null);
-  const controlsRef = useRef(null);
   const introRef = useRef(null);
   const canvasSectionRef = useRef(null);
 
-  const [debugInfo, setDebugInfo] = useState([0, 0, 0]);
   const [showArrowScroll, setShowArrowScroll] = useState(false);
   const [isIntersecting, setIsIntersecting] = useState(false);
   const [activeAnnotation, setActiveAnnotation] = useState(null);
@@ -283,7 +269,7 @@ export default function Home() {
         setScale([0.45, 0.45, 0.45]);
         setPosition([
           MOBILE_POSITION.x,
-          MOBILE_POSITION.y + 2, 
+          MOBILE_POSITION.y + 2,
           MOBILE_POSITION.z,
         ]);
       } else {
@@ -340,15 +326,6 @@ export default function Home() {
 
   return (
     <div className="w-full relative h-screen overflow-y-auto snap-y snap-mandatory">
-      {/* Fixed Debug Panel */}
-      <div className="fixed bottom-6 right-6 bg-black/80 text-white p-4 rounded-xl border border-[#a600ff] z-[9999] pointer-events-auto select-text font-geist min-w-[260px] shadow-2xl backdrop-blur-md">
-        <h4 className="text-[#a600ff] font-bold mb-2 uppercase tracking-widest text-[10px]">Camera Debugger</h4>
-        <div className="space-y-1">
-          <p className="text-xs font-mono"><span className="text-gray-400">Position:</span> [{debugInfo.join(", ")}]</p>
-        </div>
-        <p className="text-[8px] text-[#a600ff] mt-3 italic font-semibold text-center tracking-widest uppercase opacity-80">Rotation & Float Frozen</p>
-      </div>
-
       <section
         ref={introRef}
         className="relative w-full h-screen flex justify-start items-center flex-col pt-[28vh] md:pt-[32vh] snap-start snap-always"
@@ -408,7 +385,7 @@ export default function Home() {
             <div className="mt-6 flex items-center gap-4">
               <div className="h-[1px] w-10 bg-[#a600ff]" />
               <span className="font-geist text-[9px] md:text-[11px] text-white/40 uppercase tracking-[0.4em] font-medium">
-                ARCHIVE_001 
+                ARCHIVE_001
               </span>
             </div>
           </div>
@@ -490,7 +467,7 @@ export default function Home() {
             className="opacity-30 w-32"
           />
           <p className="font-geist text-[8px] md:text-[9px] text-white/10 uppercase tracking-[0.3em] whitespace-nowrap">
-            MODEL 
+            MODEL
           </p>
         </div>
 
@@ -588,14 +565,14 @@ export default function Home() {
 
         <Canvas
           ref={cameraRef}
-          dpr={[1, dpr]} 
+          dpr={[1, dpr]}
           gl={{
-            antialias: false, 
+            antialias: false,
             powerPreference: "high-performance",
             alpha: true,
             stencil: false,
             depth: true,
-            precision: "mediump" 
+            precision: "mediump"
           }}
           camera={{ position: [0, 0, 50], near: 0.1, far: 2000 }}
         >
@@ -605,26 +582,6 @@ export default function Home() {
           <ambientLight intensity={2} />
           <directionalLight position={[1, 10, 1]} intensity={2} />
 
-          <OrbitControls 
-            ref={controlsRef} 
-            makeDefault 
-            enableDamping={true}
-            dampingFactor={0.05}
-            minDistance={5}
-            maxDistance={1000}
-            enablePan={true}
-            screenSpacePanning={true}
-            panSpeed={2}
-            rotateSpeed={1.0}
-            zoomSpeed={1.5}
-            mouseButtons={{
-              LEFT: THREE.MOUSE.ROTATE,
-              MIDDLE: THREE.MOUSE.DOLLY,
-              RIGHT: THREE.MOUSE.PAN
-            }}
-          />
-          <CameraDebugLogic setDebugInfo={setDebugInfo} />
-
           <Suspense fallback={null}>
             <Bvh firstHitOnly>
               <CameraController
@@ -633,17 +590,24 @@ export default function Home() {
                 islandRef={islandRef}
                 defaultCameraPosition={[0, 0, 50]}
               />
-              <Island
-                ref={islandRef}
-                cameraRef={cameraRef}
-                isIntersecting={false}
-                position={position}
-                scale={scale}
-                rotation={islandRotation}
-                annotations={ANNOTATIONS}
-                activeAnnotation={activeAnnotation}
-                onAnnotationClick={handleAnnotationClick}
-              />
+              <Float
+                speed={2} 
+                rotationIntensity={0.5} 
+                floatIntensity={0.5} 
+                floatingRange={[0, 1.5]} 
+              >
+                <Island
+                  ref={islandRef}
+                  cameraRef={cameraRef}
+                  isIntersecting={isIntersecting}
+                  position={position}
+                  scale={scale}
+                  rotation={islandRotation}
+                  annotations={ANNOTATIONS}
+                  activeAnnotation={activeAnnotation}
+                  onAnnotationClick={handleAnnotationClick}
+                />
+              </Float>
             </Bvh>
             <Preload all />
           </Suspense>
