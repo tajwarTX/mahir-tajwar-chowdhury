@@ -64,6 +64,8 @@ const Island = forwardRef(
           child.frustumCulled = true;
           child.material.metalness = 0.2;
           child.material.roughness = 0.8;
+          child.matrixAutoUpdate = false;
+          child.updateMatrix();
         }
       });
       return scene;
@@ -106,7 +108,6 @@ const Island = forwardRef(
               position={ann.localPosition}
               center
               distanceFactor={90} 
-              occlude
               zIndexRange={[10, 0]}
               style={{ 
                 pointerEvents: "auto",

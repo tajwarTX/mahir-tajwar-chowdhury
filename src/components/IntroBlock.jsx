@@ -137,11 +137,15 @@ const IntroBlock = ({ className = "" }) => {
 
       <div className="flex items-center gap-4 mb-8 opacity-40">
          <span className="font-geist text-[8px] md:text-[9px] uppercase tracking-[0.4em] whitespace-nowrap">
-           {localTime || "SYNCING..."} 
+           {localTime || "SYNCING..."} {gmtOffset}
          </span>
          <div className="w-[1px] h-3 bg-white/30" />
          <span className="font-geist text-[8px] md:text-[9px] uppercase tracking-[0.4em] whitespace-nowrap">
-           {geoData.lat === null ? "SYNCING..." : `${geoData.lat}° N`} 
+           {geoData.lat === null ? "SYNCING..." : `${Math.abs(geoData.lat)}° ${geoData.lat >= 0 ? 'N' : 'S'}`} 
+         </span>
+         <div className="w-[1px] h-3 bg-white/30" />
+         <span className="font-geist text-[8px] md:text-[9px] uppercase tracking-[0.4em] whitespace-nowrap">
+           {geoData.lon === null ? "SYNCING..." : `${Math.abs(geoData.lon)}° ${geoData.lon >= 0 ? 'E' : 'W'}`} 
          </span>
       </div>
 

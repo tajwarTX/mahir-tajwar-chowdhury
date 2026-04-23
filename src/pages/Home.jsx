@@ -38,7 +38,7 @@ const ANNOTATIONS = [
       "The heart of the scene — a cozy dinner setup where the traveler shares a meal with friendly forest cats. Warm light spills from lanterns, creating an intimate atmosphere amid the wilderness.",
     modelRotationY: degToRad(180),
     camera: {
-      position: [-59.59, 51.2, -127.2],
+      position: [-2, 150, -63],
     },
   },
   {
@@ -213,7 +213,7 @@ export default function Home() {
 
   const [scale, setScale] = useState([1, 1, 1]);
 
-  const [dpr, setDpr] = useState(1.5);
+  const [dpr, setDpr] = useState(1);
   const [position, setPosition] = useState([
     BASE_POSITION.x,
     BASE_POSITION.y,
@@ -579,7 +579,10 @@ export default function Home() {
           }}
           camera={{ position: [0, 0, 50], near: 0.1, far: 2000 }}
         >
-          <PerformanceMonitor onFallback={() => setDpr(1)} />
+          <PerformanceMonitor 
+            onDecline={() => setDpr(0.7)} 
+            onIncline={() => setDpr(1)} 
+          />
           <AdaptiveDpr pixelated />
           <AdaptiveEvents />
           <ambientLight intensity={2} />
