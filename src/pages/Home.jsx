@@ -32,7 +32,7 @@ const ANNOTATIONS = [
   {
     id: 2,
     localPosition: [35.47, 46.5, -66.73],
-    markerScale: 1.3,
+    markerScale: 1.8,
     title: "Dinner Table",
     description:
       "The heart of the scene — a cozy dinner setup where the traveler shares a meal with friendly forest cats. Warm light spills from lanterns, creating an intimate atmosphere amid the wilderness.",
