@@ -45,18 +45,18 @@ const Loader = ({ onFinish, isInitial }) => {
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-[#a600ff]/5 rounded-full blur-[100px] pointer-events-none" />
 
           {/* Background Data Streams */}
-          <div className="absolute left-12 top-0 h-full w-[1px] bg-white/5 hidden md:block overflow-hidden">
+          <div className="absolute left-8 top-0 h-full w-[1px] bg-white/5 hidden md:block overflow-hidden">
             <motion.div 
               animate={{ y: ["-100%", "100%"] }}
-              transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-              className="h-32 w-full bg-gradient-to-b from-transparent via-[#a600ff]/30 to-transparent"
+              transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+              className="h-64 w-full bg-gradient-to-b from-transparent via-[#a600ff]/60 to-transparent shadow-[0_0_8px_rgba(166,0,255,0.4)]"
             />
           </div>
-          <div className="absolute right-12 top-0 h-full w-[1px] bg-white/5 hidden md:block overflow-hidden">
+          <div className="absolute right-8 top-0 h-full w-[1px] bg-white/5 hidden md:block overflow-hidden">
             <motion.div 
               animate={{ y: ["100%", "-100%"] }}
-              transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
-              className="h-32 w-full bg-gradient-to-b from-transparent via-[#a600ff]/30 to-transparent"
+              transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+              className="h-64 w-full bg-gradient-to-b from-transparent via-[#a600ff]/60 to-transparent shadow-[0_0_8px_rgba(166,0,255,0.4)]"
             />
           </div>
 
@@ -67,11 +67,11 @@ const Loader = ({ onFinish, isInitial }) => {
                 key={rot}
                 style={{ rotate: rot }}
                 animate={{ 
-                  scale: [1, 1.02, 1],
-                  opacity: [0.1, 0.3, 0.1] 
+                  scale: [1, 1.05, 1],
+                  opacity: [0.3, 0.7, 0.3] 
                 }}
-                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-                className="absolute top-0 left-0 w-6 h-6 border-t-[1px] border-l-[1px] border-[#a600ff]/60"
+                transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute top-0 left-0 w-8 h-8 border-t-[2px] border-l-[2px] border-[#a600ff]"
               />
             ))}
           </div>
