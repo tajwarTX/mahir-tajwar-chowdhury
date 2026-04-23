@@ -55,7 +55,7 @@ const ANNOTATIONS = [
   },
   {
     id: 4,
-    localPosition: [23.41, -22.62, 64.61],
+    localPosition: [23.41, -25.62, 64.61],
     title: "The Treetops",
     description:
       "Towering voxel trees create a canopy overhead, their pixelated leaves filtering moonlight into the clearing below. The forest seems to close in protectively around the small campsite.",
@@ -67,7 +67,7 @@ const ANNOTATIONS = [
   },
   {
     id: 5,
-    localPosition: [-1.4, -2.88, -7.84],
+    localPosition: [-1.4, -5.88, -7.84],
     title: "Full Diorama",
     description:
       "The complete scene: a voxel masterpiece depicting a stranded pilot finding unexpected companionship. Made with MagicaVoxel and Blender by @ediediedi for the 'Robots are Coming' challenge.",
