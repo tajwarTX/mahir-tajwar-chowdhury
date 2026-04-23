@@ -24,64 +24,86 @@ const Loader = ({ onFinish, isInitial }) => {
           className="w-full h-full object-cover"
         />
       ) : (
-        <div className="flex flex-col items-center gap-8">
+        <div className="flex flex-col items-center justify-center gap-10 w-full h-full relative overflow-hidden">
+          {/* Subtle Digital Grid Background */}
+          <div className="absolute inset-0 opacity-20 pointer-events-none bg-[linear-gradient(rgba(166,0,255,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(166,0,255,0.1)_1px,transparent_1px)] bg-[size:40px_40px]" />
+          
           <div className="relative">
-            {/* Main Glowing Logo */}
+            {/* High Intensity Glow Base */}
+            <div className="absolute inset-0 bg-[#a600ff] blur-[60px] opacity-20 animate-pulse" />
+
+            {/* Main Logo with Chromatic Aberration */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.9, filter: "blur(10px) brightness(2)" }}
+              initial={{ opacity: 0, scale: 0.8, filter: "blur(20px) brightness(3)" }}
               animate={{ 
                 opacity: 1, 
                 scale: 1, 
-                filter: "blur(0px) brightness(1.2)"
+                filter: "blur(0px) brightness(1.1)"
               }}
-              transition={{ duration: 0.5, ease: [0.19, 1, 0.22, 1] }}
+              transition={{ duration: 0.4, ease: [0.19, 1, 0.22, 1] }}
+              className="relative z-10"
             >
               <img 
                 src="/logo.png" 
                 alt="Logo" 
-                className="w-24 h-24 md:w-32 md:h-32 object-contain drop-shadow-[0_0_20px_rgba(166,0,255,0.4)]" 
+                className="w-32 h-32 md:w-44 md:h-44 object-contain drop-shadow-[0_0_30px_rgba(166,0,255,0.6)]" 
               />
             </motion.div>
 
-            {/* Glitch Layer 1 */}
+            {/* Red Glitch Offset */}
             <motion.div
               animate={{ 
-                opacity: [0, 0.3, 0, 0.2, 0],
-                x: [0, -4, 4, -2, 0],
-                clipPath: [
-                  "inset(20% 0 50% 0)",
-                  "inset(10% 0 80% 0)",
-                  "inset(40% 0 30% 0)",
-                  "inset(60% 0 10% 0)",
-                  "inset(20% 0 50% 0)"
-                ]
+                opacity: [0, 0.4, 0, 0.2, 0],
+                x: [-2, 3, -4, 2, 0],
+                y: [1, -2, 2, -1, 0],
               }}
-              transition={{ duration: 0.4, repeat: Infinity, repeatDelay: 1.5 }}
-              className="absolute inset-0 pointer-events-none"
+              transition={{ duration: 0.2, repeat: Infinity, repeatDelay: 0.1 }}
+              className="absolute inset-0 pointer-events-none mix-blend-screen opacity-50"
             >
               <img 
                 src="/logo.png" 
-                alt="Logo Glitch" 
-                className="w-24 h-24 md:w-32 md:h-32 object-contain brightness-200 hue-rotate-[280deg]" 
+                alt="Logo Glitch Red" 
+                className="w-32 h-32 md:w-44 md:h-44 object-contain brightness-200 saturate-[5] hue-rotate-[0deg]" 
               />
             </motion.div>
 
-            {/* Scanline Effect */}
+            {/* Cyan Glitch Offset */}
+            <motion.div
+              animate={{ 
+                opacity: [0, 0.4, 0, 0.2, 0],
+                x: [2, -3, 4, -2, 0],
+                y: [-1, 2, -2, 1, 0],
+              }}
+              transition={{ duration: 0.2, repeat: Infinity, repeatDelay: 0.15 }}
+              className="absolute inset-0 pointer-events-none mix-blend-screen opacity-50"
+            >
+              <img 
+                src="/logo.png" 
+                alt="Logo Glitch Cyan" 
+                className="w-32 h-32 md:w-44 md:h-44 object-contain brightness-200 saturate-[5] hue-rotate-[180deg]" 
+              />
+            </motion.div>
+
+            {/* Fast Scanline */}
             <motion.div 
-              className="absolute inset-0 w-full h-[2px] bg-[#a600ff] opacity-40 z-10"
-              animate={{ top: ["0%", "100%"] }}
-              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-              style={{ boxShadow: "0 0 10px #a600ff" }}
+              className="absolute inset-0 w-full h-[3px] bg-white opacity-60 z-20"
+              animate={{ top: ["-10%", "110%"] }}
+              transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
+              style={{ boxShadow: "0 0 15px #a600ff" }}
             />
           </div>
 
-          <div className="flex flex-col items-center gap-1">
-            <span className="font-geist text-[9px] text-[#a600ff] uppercase tracking-[0.6em] animate-pulse">
-              System_Recalibrating
+          <div className="flex flex-col items-center gap-2 z-10">
+            <span className="font-orbitron text-[11px] md:text-[13px] text-white font-bold uppercase tracking-[0.8em] animate-pulse">
+              SYNCING_INTERFACE
             </span>
-            <span className="font-geist text-[7px] text-white/20 uppercase tracking-[0.2em]">
-              Archive_Access_Authorized
-            </span>
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-[1px] bg-[#a600ff]/30" />
+              <span className="font-geist text-[8px] text-[#a600ff] uppercase tracking-[0.4em] font-medium">
+                ESTABLISHING_LINK
+              </span>
+              <div className="w-12 h-[1px] bg-[#a600ff]/30" />
+            </div>
           </div>
         </div>
       )}
