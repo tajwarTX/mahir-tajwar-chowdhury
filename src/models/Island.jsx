@@ -126,12 +126,17 @@ const Island = forwardRef(
                   }`}
                   style={{
                     transform: ann.markerScale ? `scale(${ann.markerScale})` : 'scale(1)',
-                    transition: 'transform 0.3s ease'
+                    transition: 'transform 0.3s ease, opacity 0.3s ease',
+                    opacity: activeAnnotation === ann.id ? 0 : 1,
+                    pointerEvents: activeAnnotation === ann.id ? 'none' : 'auto'
                   }}
                 >
                   <span>{ann.id}</span>
                 </div>
-                <div className="annotation-label">{ann.title}</div>
+                <div className="annotation-label" style={{
+                  opacity: activeAnnotation === ann.id ? 0 : undefined,
+                  pointerEvents: activeAnnotation === ann.id ? 'none' : 'auto'
+                }}>{ann.title}</div>
               </div>
             </Html>
           ))}

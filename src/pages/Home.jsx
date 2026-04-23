@@ -25,8 +25,8 @@ const ANNOTATIONS = [
       "Having crashed in this remote forest, the pilot has found a strange peace among the voxel trees. They now spend their evenings sharing stories and meals with the curious forest dwellers.",
     modelRotationY: degToRad(210),
     camera: {
-      position: [-2, 40, -140],
-      target: [90, -20, -190],
+      position: [-110, 20, -50],
+      target: [-67, -5, -20],
     },
   },
   {
@@ -38,8 +38,8 @@ const ANNOTATIONS = [
       "The heart of the scene — a cozy dinner setup where the traveler shares a meal with friendly forest cats. Warm light spills from lanterns, creating an intimate atmosphere amid the wilderness.",
     modelRotationY: degToRad(180),
     camera: {
-      position: [-18, 52, -38],
-      target: [-2, 43, -60],
+      position: [20, 70, -100],
+      target: [35, 46, -66],
     },
   },
   {
@@ -50,8 +50,8 @@ const ANNOTATIONS = [
       "Curious cats have gathered around the campsite, drawn by the warmth and food. These forest dwellers have made friends with the stranded traveler, keeping them company through the night.",
     modelRotationY: degToRad(100),
     camera: {
-      position: [-22, 48, -42],
-      target: [0, 43, -60],
+      position: [-90, -10, 50],
+      target: [-60, -28, 26],
     },
   },
   {
@@ -62,8 +62,8 @@ const ANNOTATIONS = [
       "Towering voxel trees create a canopy overhead, their pixelated leaves filtering moonlight into the clearing below. The forest seems to close in protectively around the small campsite.",
     modelRotationY: degToRad(210),
     camera: {
-      position: [8, 62, -35],
-      target: [0, 48, -60],
+      position: [50, 0, 90],
+      target: [23, -28, 64],
     },
   },
   {
@@ -75,8 +75,8 @@ const ANNOTATIONS = [
       "The complete scene: a voxel masterpiece depicting a stranded pilot finding unexpected companionship. Made with MagicaVoxel and Blender by @ediediedi for the 'Robots are Coming' challenge.",
     modelRotationY: degToRad(145),
     camera: {
-      position: [5, 72, -25],
-      target: [0, 43, -60],
+      position: [0, 40, 40],
+      target: [-1, -5, -8],
     },
   },
   {
@@ -87,8 +87,8 @@ const ANNOTATIONS = [
       "A rhythmic signal pulses from the dense overgrowth. It appears to be an automated distress beacon, long forgotten but still operational in the digital wilderness.",
     modelRotationY: degToRad(45),
     camera: {
-      position: [-40, 30, 100],
-      target: [-38, -39, 67],
+      position: [-70, 0, 100],
+      target: [-39, -29, 68],
     },
   },
 ];
