@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import IntroBlock from "../components/IntroBlock";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
-import { PerformanceMonitor, AdaptiveDpr, AdaptiveEvents, Bvh, Preload, Float } from "@react-three/drei";
+import { PerformanceMonitor, AdaptiveDpr, AdaptiveEvents, Bvh, Preload, Float, OrbitControls, Html } from "@react-three/drei";
 import Island from "../models/Island";
 import CameraController from "../components/CameraController";
 import scrollDown from "../assets/scrolldown.gif";
@@ -604,24 +604,7 @@ export default function Home() {
           <ambientLight intensity={2} />
           <directionalLight position={[1, 10, 1]} intensity={2} />
 
-          <OrbitControls
-            ref={controlsRef}
-            makeDefault
-            enableDamping={true}
-            dampingFactor={0.05}
-            minDistance={5}
-            maxDistance={1000}
-            enablePan={true}
-            screenSpacePanning={true}
-            panSpeed={2}
-            rotateSpeed={1.0}
-            zoomSpeed={1.5}
-            mouseButtons={{
-              LEFT: THREE.MOUSE.ROTATE,
-              MIDDLE: THREE.MOUSE.DOLLY,
-              RIGHT: THREE.MOUSE.PAN
-            }}
-          />
+          <OrbitControls ref={controlsRef} makeDefault />
           <CameraDebugLogic setDebugInfo={setDebugInfo} />
 
           <Suspense fallback={null}>
