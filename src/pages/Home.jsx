@@ -609,7 +609,13 @@ export default function Home() {
           <ambientLight intensity={2} />
           <directionalLight position={[1, 10, 1]} intensity={2} />
 
-          <OrbitControls ref={controlsRef} makeDefault />
+          <OrbitControls 
+            ref={controlsRef} 
+            makeDefault 
+            enableDamping={true}
+            dampingFactor={0.05}
+            rotateSpeed={0.5}
+          />
           <CameraDebugger controlsRef={controlsRef} />
 
           <Suspense fallback={null}>
@@ -620,17 +626,24 @@ export default function Home() {
                 islandRef={islandRef}
                 defaultCameraPosition={[0, 0, 50]}
               />
-              <Island
-                ref={islandRef}
-                cameraRef={cameraRef}
-                isIntersecting={isIntersecting}
-                position={position}
-                scale={scale}
-                rotation={islandRotation}
-                annotations={ANNOTATIONS}
-                activeAnnotation={activeAnnotation}
-                onAnnotationClick={handleAnnotationClick}
-              />
+              <Float
+                speed={1} 
+                rotationIntensity={1} 
+                floatIntensity={2} 
+                floatingRange={[-2, 2]} 
+              >
+                <Island
+                  ref={islandRef}
+                  cameraRef={cameraRef}
+                  isIntersecting={true}
+                  position={position}
+                  scale={scale}
+                  rotation={islandRotation}
+                  annotations={ANNOTATIONS}
+                  activeAnnotation={activeAnnotation}
+                  onAnnotationClick={handleAnnotationClick}
+                />
+              </Float>
             </Bvh>
             <Preload all />
           </Suspense>
