@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import ScrollLetterRevealDelayed from "../components/ScrollLetterRevealDelayed";
 
@@ -8,6 +9,7 @@ import ScrollLetterRevealDelayed from "../components/ScrollLetterRevealDelayed";
  * Styled with our signature Orbitron/Geist typography and high-tech minimalism.
  */
 export const Resume = () => {
+  const navigate = useNavigate();
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({ name: '', email: '' });
@@ -188,8 +190,11 @@ export const Resume = () => {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 1.2, duration: 1 }}
-                  onClick={() => setSubmitted(false)}
-                  className="mt-16 px-8 py-4 cursor-target border border-[#a600ff]/30 hover:border-[#a600ff] bg-transparent hover:bg-[#a600ff]/5 font-geist text-[9px] text-[#a600ff] uppercase tracking-[0.4em] transition-all duration-300"
+                  onClick={() => {
+                    setSubmitted(false);
+                    navigate('/');
+                  }}
+                  className="mt-16 px-8 py-4 cursor-target border border-[#a600ff]/30 hover:border-[#a600ff] bg-transparent hover:bg-[#a600ff]/5 font-geist text-[11px] text-[#a600ff] uppercase tracking-[0.4em] transition-all duration-300"
                 >
                   RETURN TO HOME
                 </motion.button>
