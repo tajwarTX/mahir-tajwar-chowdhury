@@ -55,7 +55,7 @@ const ANNOTATIONS = [
   },
   {
     id: 4,
-    localPosition: [23.41, -25.62, 64.61],
+    localPosition: [23.41, -28.62, 64.61],
     title: "The Treetops",
     description:
       "Towering voxel trees create a canopy overhead, their pixelated leaves filtering moonlight into the clearing below. The forest seems to close in protectively around the small campsite.",
