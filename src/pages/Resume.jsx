@@ -141,7 +141,7 @@ export const Resume = () => {
                   </p>
                 </div>
               </motion.div>
-             : (
+            ) : (
               <motion.div
                 key="success-message"
                 initial={{ opacity: 0 }}
