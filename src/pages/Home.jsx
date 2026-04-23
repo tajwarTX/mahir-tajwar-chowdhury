@@ -9,23 +9,27 @@ import scrollDown from "../assets/scrolldown.gif";
 import scrollSide from "../assets/scrollside.gif";
 import ScrollLetterRevealDelayed from "../components/ScrollLetterRevealDelayed";
 
-const CameraDebugger = () => {
+const CameraDebugger = ({ controlsRef }) => {
   const { camera } = useThree();
   const [debugInfo, setDebugInfo] = useState({ pos: [0, 0, 0], target: [0, 0, 0] });
 
   useFrame(() => {
+    const target = controlsRef.current ? controlsRef.current.target : { x: 0, y: 0, z: 0 };
     setDebugInfo({
       pos: [camera.position.x.toFixed(2), camera.position.y.toFixed(2), camera.position.z.toFixed(2)],
-      target: [0, 0, 0] 
+      target: [target.x.toFixed(2), target.y.toFixed(2), target.z.toFixed(2)]
     });
   });
 
   return (
     <Html fullscreen pointerEvents="none">
-      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 bg-black/80 text-white p-4 rounded-xl border border-[#a600ff] pointer-events-auto select-text font-geist">
-        <h4 className="text-[#a600ff] font-bold mb-2">DEBUG CAMERA</h4>
-        <p className="text-xs">Position: [{debugInfo.pos.join(", ")}]</p>
-        <p className="text-[10px] opacity-50 mt-2 italic">Move camera and copy these values for ANNOTATIONS</p>
+      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 bg-black/80 text-white p-4 rounded-xl border border-[#a600ff] pointer-events-auto select-text font-geist min-w-[300px]">
+        <h4 className="text-[#a600ff] font-bold mb-2 uppercase tracking-widest text-sm">Camera Debugger</h4>
+        <div className="space-y-1">
+          <p className="text-xs font-mono"><span className="text-gray-400">Position:</span> [{debugInfo.pos.join(", ")}]</p>
+          <p className="text-xs font-mono"><span className="text-gray-400">Target:</span> [{debugInfo.target.join(", ")}]</p>
+        </div>
+        <p className="text-[9px] text-[#a600ff] mt-3 italic font-semibold">ROTATION & FLOAT DISABLED FOR CALIBRATION</p>
       </div>
     </Html>
   );
@@ -231,6 +235,7 @@ export default function Home() {
   const navigate = useNavigate();
   const islandRef = useRef(null);
   const cameraRef = useRef(null);
+  const controlsRef = useRef(null);
   const introRef = useRef(null);
   const canvasSectionRef = useRef(null);
 
@@ -613,8 +618,8 @@ export default function Home() {
           <ambientLight intensity={2} />
           <directionalLight position={[1, 10, 1]} intensity={2} />
 
-          <OrbitControls makeDefault />
-          <CameraDebugger />
+          <OrbitControls ref={controlsRef} makeDefault />
+          <CameraDebugger controlsRef={controlsRef} />
 
           <Suspense fallback={null}>
             <Bvh firstHitOnly>
@@ -624,24 +629,17 @@ export default function Home() {
                 islandRef={islandRef}
                 defaultCameraPosition={[0, 0, 50]}
               />
-              <Float
-                speed={2} 
-                rotationIntensity={0.5} 
-                floatIntensity={0.5} 
-                floatingRange={[0, 1.5]} 
-              >
-                <Island
-                  ref={islandRef}
-                  cameraRef={cameraRef}
-                  isIntersecting={isIntersecting}
-                  position={position}
-                  scale={scale}
-                  rotation={islandRotation}
-                  annotations={ANNOTATIONS}
-                  activeAnnotation={activeAnnotation}
-                  onAnnotationClick={handleAnnotationClick}
-                />
-              </Float>
+              <Island
+                ref={islandRef}
+                cameraRef={cameraRef}
+                isIntersecting={false}
+                position={position}
+                scale={scale}
+                rotation={islandRotation}
+                annotations={ANNOTATIONS}
+                activeAnnotation={activeAnnotation}
+                onAnnotationClick={handleAnnotationClick}
+              />
             </Bvh>
             <Preload all />
           </Suspense>
