@@ -40,9 +40,26 @@ const Loader = ({ onFinish, isInitial }) => {
           className="w-full h-full object-cover"
         />
       ) : (
-        <div className="flex flex-col items-center justify-center w-full h-full relative overflow-hidden">
+        <div className="flex flex-col items-center justify-center w-full h-full relative overflow-hidden bg-[#050505]">
+          {/* Background Animated Logo (Stroked/Watermark feel) */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
+            <motion.img 
+              src="/logo.png" 
+              alt="Background Logo" 
+              className="w-[120vw] max-w-none opacity-[0.03] grayscale invert brightness-200"
+              animate={{ 
+                rotate: 360,
+                scale: [1, 1.1, 1]
+              }}
+              transition={{ 
+                rotate: { duration: 80, repeat: Infinity, ease: "linear" },
+                scale: { duration: 15, repeat: Infinity, ease: "easeInOut" }
+              }}
+            />
+          </div>
+
           {/* Background Ambient Glow */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-[#a600ff]/5 rounded-full blur-[100px] pointer-events-none" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-[#a600ff]/5 rounded-full blur-[100px] pointer-events-none z-0" />
 
           {/* Minimal Percentage Counter */}
           <div className="relative flex flex-col items-center">
