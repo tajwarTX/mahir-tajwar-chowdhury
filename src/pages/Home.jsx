@@ -43,43 +43,43 @@ const ANNOTATIONS = [
   },
   {
     id: 3,
-    localPosition: [-59.52, -33.19, 26.29],
+    localPosition: [-59.52, -28.19, 26.29],
     title: "The Forest Cats",
     description:
       "Curious cats have gathered around the campsite, drawn by the warmth and food. These forest dwellers have made friends with the stranded traveler, keeping them company through the night.",
     modelRotationY: degToRad(100),
     camera: {
       position: [-22, 48, -42],
-      target: [-2, 43, -60],
+      target: [0, 43, -60],
     },
   },
   {
     id: 4,
-    localPosition: [23.41, -27.62, 64.61],
+    localPosition: [23.41, -22.62, 64.61],
     title: "The Treetops",
     description:
       "Towering voxel trees create a canopy overhead, their pixelated leaves filtering moonlight into the clearing below. The forest seems to close in protectively around the small campsite.",
     modelRotationY: degToRad(210),
     camera: {
       position: [8, 62, -35],
-      target: [-2, 48, -60],
+      target: [0, 48, -60],
     },
   },
   {
     id: 5,
-    localPosition: [-1.4, -7.88, -7.84],
+    localPosition: [-1.4, -2.88, -7.84],
     title: "Full Diorama",
     description:
       "The complete scene: a voxel masterpiece depicting a stranded pilot finding unexpected companionship. Made with MagicaVoxel and Blender by @ediediedi for the 'Robots are Coming' challenge.",
     modelRotationY: degToRad(145),
     camera: {
       position: [5, 72, -25],
-      target: [-2, 43, -60],
+      target: [0, 43, -60],
     },
   },
   {
     id: 6,
-    localPosition: [-38.87, -34.31, 67.93],
+    localPosition: [-38.87, -29.31, 67.93],
     title: "The Hidden Signal",
     description:
       "A rhythmic signal pulses from the dense overgrowth. It appears to be an automated distress beacon, long forgotten but still operational in the digital wilderness.",
