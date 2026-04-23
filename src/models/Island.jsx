@@ -124,6 +124,10 @@ const Island = forwardRef(
                   className={`annotation-dot ${
                     activeAnnotation === ann.id ? "active" : ""
                   }`}
+                  style={{
+                    transform: ann.markerScale ? `scale(${ann.markerScale})` : 'scale(1)',
+                    transition: 'transform 0.3s ease'
+                  }}
                 >
                   <span>{ann.id}</span>
                 </div>

@@ -9,7 +9,7 @@ import scrollDown from "../assets/scrolldown.gif";
 import scrollSide from "../assets/scrollside.gif";
 import ScrollLetterRevealDelayed from "../components/ScrollLetterRevealDelayed";
 
-const BASE_POSITION = { x: -2, y: -5, z: -60 };
+const BASE_POSITION = { x: -2, y: -0, z: -63 };
 const MOBILE_POSITION = { x: -2, y: 24, z: -60 };
 const BASE_ROTATION_DEG = { x: -8, y: 124, z: 0 };
 const degToRad = (deg) => (deg * Math.PI) / 180;
@@ -32,6 +32,7 @@ const ANNOTATIONS = [
   {
     id: 2,
     localPosition: [35.47, 46.5, -66.73],
+    markerScale: 1.3,
     title: "Dinner Table",
     description:
       "The heart of the scene — a cozy dinner setup where the traveler shares a meal with friendly forest cats. Warm light spills from lanterns, creating an intimate atmosphere amid the wilderness.",
