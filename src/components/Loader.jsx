@@ -41,25 +41,35 @@ const Loader = ({ onFinish, isInitial }) => {
         />
       ) : (
         <div className="flex flex-col items-center justify-center w-full h-full relative overflow-hidden bg-[#050505]">
-          {/* Background Animated Logo (Stroked/Watermark feel) */}
+          {/* Background Animated Logo (90% size, Stroked effect) */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
-            <motion.img 
-              src="/logo.png" 
-              alt="Background Logo" 
-              className="w-[80vw] max-w-[500px] opacity-[0.1] grayscale brightness-[1.5] contrast-[1.1]"
-              animate={{ 
-                rotate: 360,
-                scale: [1, 1.05, 1]
-              }}
-              transition={{ 
-                rotate: { duration: 60, repeat: Infinity, ease: "linear" },
-                scale: { duration: 10, repeat: Infinity, ease: "easeInOut" }
-              }}
-            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 0.5, scale: 1 }}
+              transition={{ duration: 1.2, ease: "easeOut" }}
+              className="w-[90vw] h-[90vh] flex items-center justify-center"
+            >
+              <img 
+                src="/logo.png" 
+                alt="Background Logo" 
+                className="w-full h-full object-contain opacity-40 grayscale invert brightness-200"
+                style={{
+                  filter: 'drop-shadow(0 0 2px #a600ff) drop-shadow(0 0 1px #a600ff)',
+                  WebkitMaskImage: 'url(/logo.png)',
+                  maskImage: 'url(/logo.png)',
+                  WebkitMaskRepeat: 'no-repeat',
+                  maskRepeat: 'no-repeat',
+                  WebkitMaskSize: 'contain',
+                  maskSize: 'contain',
+                  WebkitMaskPosition: 'center',
+                  maskPosition: 'center',
+                }}
+              />
+            </motion.div>
           </div>
 
           {/* Background Ambient Glow */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-[#a600ff]/5 rounded-full blur-[100px] pointer-events-none z-0" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-[#a600ff]/10 rounded-full blur-[100px] pointer-events-none z-0" />
 
           {/* Minimal Percentage Counter */}
           <div className="relative flex flex-col items-center">
