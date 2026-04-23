@@ -71,7 +71,7 @@ export const Resume = () => {
           </div>
         </div>
 
-        {/* Right Side: Minimal Interactive Form */}
+        {/* Right Side: High-Tech Interactive Form */}
         <div className="relative w-full max-w-md mx-auto lg:mx-0 lg:ml-auto z-10">
           <AnimatePresence mode="wait">
             {!submitted ? (
@@ -79,81 +79,112 @@ export const Resume = () => {
                 key="request-form"
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
-                exit={{ y: -20, opacity: 0 }}
-                transition={{ duration: 0.6, ease: [0.19, 1, 0.22, 1] }}
-                className="space-y-12"
+                exit={{ 
+                  y: -40, 
+                  opacity: 0,
+                  filter: "blur(10px)",
+                  transition: { duration: 0.4, ease: [0.19, 1, 0.22, 1] }
+                }}
+                transition={{ duration: 0.8, ease: [0.19, 1, 0.22, 1] }}
+                className="relative p-8 md:p-10 bg-white/[0.03] border border-white/10 rounded-2xl backdrop-blur-md overflow-hidden group"
               >
-                <form onSubmit={handleSubmit} className="space-y-8">
-                  <div className="space-y-2 group">
-                    <label className="block font-geist text-[9px] text-white/90 uppercase tracking-[0.4em] transition-colors duration-200 group-focus-within:text-[#a600ff]">
-                      FULL NAME
+                {/* Subtle scanning line background effect */}
+                <div className="absolute inset-0 pointer-events-none opacity-20">
+                  <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#a600ff] to-transparent animate-scan" style={{ animationDuration: '4s' }} />
+                </div>
+
+                <form onSubmit={handleSubmit} className="space-y-10 relative z-10">
+                  <div className="space-y-3 group/input">
+                    <label className="block font-geist text-[10px] text-[#a600ff] uppercase tracking-[0.4em] font-bold">
+                      SYSTEM_ACCESS // NAME
                     </label>
                     <input
                       required
                       type="text"
                       value={formData.name}
-                      placeholder="ENTER NAME"
+                      placeholder="IDENTIFY YOURSELF"
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full bg-transparent border-b border-white/20 py-3 font-geist text-sm text-white uppercase tracking-[0.2em] focus:outline-none focus:border-[#a600ff] transition-all duration-300 placeholder:text-white/30"
+                      className="w-full bg-white/[0.02] border border-white/10 rounded-lg px-4 py-4 font-geist text-sm text-white uppercase tracking-[0.2em] focus:outline-none focus:border-[#a600ff] focus:bg-white/[0.05] transition-all duration-500 placeholder:text-white/20"
                     />
                   </div>
 
-                  <div className="space-y-2 group">
-                    <label className="block font-geist text-[9px] text-white/90 uppercase tracking-[0.4em] transition-colors duration-200 group-focus-within:text-[#a600ff]">
-                      CONTACT EMAIL
+                  <div className="space-y-3 group/input">
+                    <label className="block font-geist text-[10px] text-[#a600ff] uppercase tracking-[0.4em] font-bold">
+                      TRANSMISSION // DESTINATION
                     </label>
                     <input
                       required
                       type="email"
                       value={formData.email}
-                      placeholder="ENTER EMAIL ADDRESS"
+                      placeholder="SECURE_EMAIL_ADDRESS"
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full bg-transparent border-b border-white/20 py-3 font-geist text-sm text-white uppercase tracking-[0.2em] focus:outline-none focus:border-[#a600ff] transition-all duration-300 placeholder:text-white/30"
+                      className="w-full bg-white/[0.02] border border-white/10 rounded-lg px-4 py-4 font-geist text-sm text-white uppercase tracking-[0.2em] focus:outline-none focus:border-[#a600ff] focus:bg-white/[0.05] transition-all duration-500 placeholder:text-white/20"
                     />
                   </div>
 
                   <button
                     type="submit"
-                    className="w-full cursor-target border border-[#a600ff]/30 hover:border-[#a600ff] bg-[#a600ff]/5 hover:bg-[#a600ff]/10 py-5 transition-all duration-300 active:scale-[0.98] mt-4"
+                    className="w-full relative overflow-hidden cursor-target border border-[#a600ff]/50 bg-[#a600ff]/10 hover:bg-[#a600ff]/20 py-5 rounded-lg transition-all duration-500 active:scale-[0.98] group/btn"
                   >
-                    <span className="font-geist text-[10px] text-[#a600ff] uppercase tracking-[0.5em] font-bold">
-                      EXECUTE SYNC
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-1000" />
+                    <span className="relative z-10 font-geist text-[11px] text-white uppercase tracking-[0.6em] font-black">
+                      EXECUTE_SYNC
                     </span>
                   </button>
                 </form>
 
-                <div className="flex items-center gap-4">
-                  <div className="h-[1px] w-6 bg-white/20" />
-                  <p className="font-geist text-white/50 text-[8px] uppercase tracking-[0.3em]">
-                    SECURE // ENCRYPTED
+                <div className="mt-8 pt-8 border-t border-white/5 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#a600ff] animate-pulse" />
+                    <p className="font-geist text-white/40 text-[8px] uppercase tracking-[0.3em]">
+                      SECURE CHANNEL
+                    </p>
+                  </div>
+                  <p className="font-geist text-white/20 text-[8px] uppercase tracking-[0.3em]">
+                    v3.1 // ENCRYPTED
                   </p>
                 </div>
               </motion.div>
             ) : (
               <motion.div
                 key="success-message"
-                initial={{ scale: 0.95, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.6, ease: [0.19, 1, 0.22, 1] }}
-                className="space-y-8"
+                initial={{ scale: 0.9, opacity: 0, filter: "blur(10px)" }}
+                animate={{ scale: 1, opacity: 1, filter: "blur(0px)" }}
+                transition={{ duration: 0.8, ease: [0.19, 1, 0.22, 1] }}
+                className="relative p-10 bg-[#a600ff]/5 border border-[#a600ff]/20 rounded-2xl text-center space-y-8 overflow-hidden"
               >
-                <h2 className="font-orbitron text-3xl md:text-4xl font-bold text-white uppercase tracking-tighter">
-                  RESUME <br/>
-                  <span className="text-[#a600ff]">DISPATCHED</span>
-                </h2>
+                {/* Success glow background */}
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(166,0,255,0.1)_0%,_transparent_100%)] pointer-events-none" />
                 
-                <div className="w-12 h-[1px] bg-[#a600ff]/50" />
-                
-                <p className="font-geist text-white/80 text-[10px] md:text-sm uppercase tracking-[0.3em] leading-relaxed">
-                  TRANSFER INITIATED. THE RESUME.PDF HAS BEEN SENT TO YOUR INBOX.
-                </p>
-                
-                <button
-                  onClick={() => setSubmitted(false)}
-                  className="pt-8 font-geist text-[9px] text-[#a600ff]/60 uppercase tracking-[0.4em] hover:text-[#a600ff] transition-colors duration-300 flex items-center gap-2"
-                >
-                  <span className="text-[12px]">←</span> RETURN
-                </button>
+                <div className="relative z-10">
+                  <motion.div 
+                    initial={{ scale: 0.5, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                    className="w-16 h-16 border-2 border-[#a600ff] rounded-full flex items-center justify-center mx-auto mb-8"
+                  >
+                    <div className="w-8 h-[2px] bg-[#a600ff] rotate-45 translate-x-1 translate-y-1" />
+                    <div className="w-4 h-[2px] bg-[#a600ff] -rotate-45 -translate-x-2 translate-y-2" />
+                  </motion.div>
+
+                  <h2 className="font-orbitron text-3xl md:text-4xl font-bold text-white uppercase tracking-tighter">
+                    TRANSFER <br/>
+                    <span className="text-[#a600ff] drop-shadow-[0_0_15px_rgba(166,0,255,0.5)]">COMPLETE</span>
+                  </h2>
+                  
+                  <div className="w-12 h-[1px] bg-[#a600ff]/50 mx-auto my-8" />
+                  
+                  <p className="font-geist text-white/80 text-[10px] md:text-xs uppercase tracking-[0.4em] leading-loose max-w-xs mx-auto">
+                    THE DIGITAL DOSSIER HAS BEEN DISPATCHED TO YOUR COORDINATES. CHECK YOUR INBOX FOR RESUME.PDF
+                  </p>
+                  
+                  <button
+                    onClick={() => setSubmitted(false)}
+                    className="mt-12 font-geist text-[9px] text-white/40 hover:text-[#a600ff] border border-white/10 hover:border-[#a600ff]/40 px-6 py-3 rounded-full uppercase tracking-[0.4em] transition-all duration-300 flex items-center gap-2 mx-auto"
+                  >
+                    RETURN TO TERMINAL
+                  </button>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
