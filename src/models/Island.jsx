@@ -1,7 +1,6 @@
 import React, { useRef, useMemo, forwardRef, useEffect } from "react";
 import { useGLTF, Center, Html } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
-import { a } from "@react-spring/three";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";
 import * as THREE from "three";
 import islandscene from "../assets/3d/island.glb";
@@ -35,10 +34,6 @@ const Island = forwardRef(
         const box = new THREE.Box3().setFromObject(scene);
         const size = box.getSize(new THREE.Vector3());
         const center = box.getCenter(new THREE.Vector3());
-        console.log("[Island] Bounding Box Size:", size);
-        console.log("[Island] Bounding Box Center:", center);
-        console.log("[Island] Bounding Box Min:", box.min);
-        console.log("[Island] Bounding Box Max:", box.max);
       }
     }, [scene]);
 
@@ -49,7 +44,6 @@ const Island = forwardRef(
           targetSpeed.current = MAX_ROTATION_SPEED;
         }, 1000);
       } else if (activeAnnotation !== null) {
-
         targetSpeed.current = 0;
         currentSpeed.current = 0;
       } else {
@@ -77,14 +71,12 @@ const Island = forwardRef(
 
     useFrame((state, delta) => {
       if (!islandRef.current || !isIntersecting) return;
-
       if (activeAnnotation === null) {
         currentSpeed.current = THREE.MathUtils.lerp(
           currentSpeed.current,
           targetSpeed.current,
           0.01
         );
-
         if (!islandRef.current.userData.dragging) {
           islandRef.current.rotation.y += delta * currentSpeed.current;
         }
@@ -94,21 +86,18 @@ const Island = forwardRef(
     const onModelClick = (e) => {
       e.stopPropagation();
       if (e.point) {
-
         const localPoint = islandRef.current.worldToLocal(e.point.clone());
-        console.log(`[Surface Click] localPosition: [${localPoint.x.toFixed(2)}, ${localPoint.y.toFixed(2)}, ${localPoint.z.toFixed(2)}]`);
       }
     };
 
     return (
-      <a.group ref={islandRef} position={position} {...props}>
+      <group ref={islandRef} position={position} {...props}>
         <Center>
           <primitive 
             object={optimizedScene} 
             onClick={onModelClick}
           />
         </Center>
-
         <group name="annotations-container">
           {annotations.map((ann) => (
             <Html
@@ -141,12 +130,10 @@ const Island = forwardRef(
             </Html>
           ))}
         </group>
-
-      </a.group>
+      </group>
     );
   }
 );
 
 Island.displayName = "Island";
-
 export default Island;
