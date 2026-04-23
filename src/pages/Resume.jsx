@@ -82,7 +82,7 @@ export const Resume = () => {
               >
                 <form onSubmit={handleSubmit} className="space-y-8">
                   <div className="space-y-2 group">
-                    <label className="block font-geist text-[9px] text-white/90 uppercase tracking-[0.4em] transition-colors duration-200 group-focus-within:text-[#a600ff]">
+                    <label className="block font-geist text-[13px] text-white/90 uppercase tracking-[0.4em] transition-colors duration-200 group-focus-within:text-[#a600ff]">
                       FULL NAME
                     </label>
                     <input
@@ -91,12 +91,12 @@ export const Resume = () => {
                       value={formData.name}
                       placeholder="ENTER NAME"
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full bg-transparent border-b border-white/20 py-3 font-geist text-sm text-white uppercase tracking-[0.2em] focus:outline-none focus:border-[#a600ff] transition-all duration-300 placeholder:text-white/30"
+                      className="w-full bg-transparent border-b border-white/20 py-3 font-geist text-lg text-white uppercase tracking-[0.2em] focus:outline-none focus:border-[#a600ff] transition-all duration-300 placeholder:text-white/30"
                     />
                   </div>
 
                   <div className="space-y-2 group">
-                    <label className="block font-geist text-[9px] text-white/90 uppercase tracking-[0.4em] transition-colors duration-200 group-focus-within:text-[#a600ff]">
+                    <label className="block font-geist text-[13px] text-white/90 uppercase tracking-[0.4em] transition-colors duration-200 group-focus-within:text-[#a600ff]">
                       CONTACT EMAIL
                     </label>
                     <input
@@ -105,7 +105,7 @@ export const Resume = () => {
                       value={formData.email}
                       placeholder="ENTER EMAIL ADDRESS"
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full bg-transparent border-b border-white/20 py-3 font-geist text-sm text-white uppercase tracking-[0.2em] focus:outline-none focus:border-[#a600ff] transition-all duration-300 placeholder:text-white/30"
+                      className="w-full bg-transparent border-b border-white/20 py-3 font-geist text-lg text-white uppercase tracking-[0.2em] focus:outline-none focus:border-[#a600ff] transition-all duration-300 placeholder:text-white/30"
                     />
                   </div>
 
@@ -123,7 +123,7 @@ export const Resume = () => {
                       transition={{ duration: 0.85, ease: [0.19, 1, 0.22, 1] }}
                       className="absolute inset-0 bg-[#a600ff] z-0"
                     />
-                    <span className="relative z-10 font-geist text-[10px] text-[#a600ff] group-hover:text-white uppercase tracking-[0.5em] font-bold transition-colors duration-300">
+                    <span className="relative z-10 font-geist text-[13px] text-[#a600ff] group-hover:text-white uppercase tracking-[0.5em] font-bold transition-colors duration-300">
                       EXECUTE SYNC
                     </span>
                   </motion.button>
@@ -131,7 +131,7 @@ export const Resume = () => {
 
                 <div className="flex items-center gap-4 absolute -bottom-16 left-0">
                   <div className="h-[1px] w-6 bg-white/20" />
-                  <p className="font-geist text-white/50 text-[8px] uppercase tracking-[0.3em]">
+                  <p className="font-geist text-white/50 text-[11px] uppercase tracking-[0.3em]">
                     SECURE // ENCRYPTED
                   </p>
                 </div>
