@@ -2,6 +2,7 @@ import React, { useRef, Suspense, useState, useEffect, useCallback } from "react
 import { useNavigate } from "react-router-dom";
 import IntroBlock from "../components/IntroBlock";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import * as THREE from "three";
 import { PerformanceMonitor, AdaptiveDpr, AdaptiveEvents, Bvh, Preload, Float, OrbitControls, Html } from "@react-three/drei";
 import Island from "../models/Island";
 import CameraController from "../components/CameraController";
@@ -614,13 +615,18 @@ export default function Home() {
             makeDefault 
             enableDamping={true}
             dampingFactor={0.05}
-            minDistance={10}
-            maxDistance={500}
+            minDistance={5}
+            maxDistance={1000}
             enablePan={true}
             screenSpacePanning={true}
-            panSpeed={1.5}
+            panSpeed={2}
             rotateSpeed={1.0}
             zoomSpeed={1.5}
+            mouseButtons={{
+              LEFT: THREE.MOUSE.ROTATE,
+              MIDDLE: THREE.MOUSE.DOLLY,
+              RIGHT: THREE.MOUSE.PAN
+            }}
           />
           <CameraDebugger controlsRef={controlsRef} />
 
