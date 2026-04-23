@@ -17,70 +17,73 @@ const degToRad = (deg) => (deg * Math.PI) / 180;
 
 const MODEL_CENTER = [BASE_POSITION.x, BASE_POSITION.y, BASE_POSITION.z];
 
-// Annotation data sourced from the original Sketchfab model.
-// localPosition = hotspot in model local space.
-// camera.position = Sketchfab eye + island world offset (-2, 0, -63).
-// camera.target   = Sketchfab target + island world offset (-2, 0, -63).
 const ANNOTATIONS = [
   {
     id: 1,
-    localPosition: [36.13, -33.61, 35.53],
-    title: "Dinner with Cats",
+    localPosition: [-67.22, -5.74, -19.56],
+    title: "The Stranded Pilot",
     description:
-      "Lost in the forest with his broken robot — ended with a dinner with cats. The full diorama seen from a bird's eye view.",
-    modelRotationY: 0,
+      "Having crashed in this remote forest, the pilot has found a strange peace among the voxel trees. They now spend their evenings sharing stories and meals with the curious forest dwellers.",
+    modelRotationY: degToRad(210),
     camera: {
-      position: [-165.61, -73.60, 24.37],
-      target:   [-14.85,  -43.76, -36.29],
+      position: [-10.46, -29.06, -142.89],
     },
   },
   {
     id: 2,
-    localPosition: [-80.82, -21.54, 26.93],
-    title: "Awakened",
+    localPosition: [35.47, 46.5, -66.73],
+    markerScale: 1.5,
+    title: "Dinner Table",
     description:
-      "I saw something big, a big monster. I can't see its form. But I see a big canine and bright red eyes. I was unconscious, and then I woke up and met you guys here.",
-    modelRotationY: 0,
+      "The heart of the scene — a cozy dinner setup where the traveler shares a meal with friendly forest cats. Warm light spills from lanterns, creating an intimate atmosphere amid the wilderness.",
+    modelRotationY: degToRad(180),
     camera: {
-      position: [-95.45, 2.40, -26.57],
-      target:   [-61.90, -27.30, -48.54],
+      position: [-59.59, 51.2, -127.2],
     },
   },
   {
     id: 3,
-    localPosition: [40.38, -111.46, 17.48],
-    title: "Who is he?",
+    localPosition: [-59.52, -28.19, 26.29],
+    title: "The Forest Cats",
     description:
-      "What is this big thing? And who is he? He can talk with cats?",
-    modelRotationY: 0,
+      "Curious cats have gathered around the campsite, drawn by the warmth and food. These forest dwellers have made friends with the stranded traveler, keeping them company through the night.",
+    modelRotationY: degToRad(100),
     camera: {
-      position: [-26.40, -120.48, -44.47],
-      target:   [27.96,  -108.64, -50.43],
+      position: [-4.29, -26.91, 29.85],
     },
   },
   {
     id: 4,
-    localPosition: [-0.65, 41.00, 10.68],
-    title: "Broken Arms",
+    localPosition: [23.41, -28.62, 64.61],
+    title: "The Treetops",
     description:
-      "Both of the arms are broken while the monster was pulling this robot into the forest. A glimpse into the wreckage of the crash.",
-    modelRotationY: 0,
+      "Towering voxel trees create a canopy overhead, their pixelated leaves filtering moonlight into the clearing below. The forest seems to close in protectively around the small campsite.",
+    modelRotationY: degToRad(210),
     camera: {
-      position: [-70.11, 9.27, 90.70],
-      target:   [-10.90, -2.92, -14.55],
+      position: [35.89, -15.24, 36.67],
     },
   },
   {
     id: 5,
-    localPosition: [22.10, 23.13, 80.99],
-    markerScale: 1.2,
-    title: "Meoow!",
+    localPosition: [-1.4, -5.88, -7.84],
+    markerScale: 1.15,
+    title: "Full Diorama",
     description:
-      "Somebody, help me please! One of the forest cats finds itself in a precarious spot, calling out from the treetops of the voxel wilderness.",
-    modelRotationY: 0,
+      "The complete scene: a voxel masterpiece depicting a stranded pilot finding unexpected companionship. Made with MagicaVoxel and Blender by @ediediedi for the 'Robots are Coming' challenge.",
+    modelRotationY: degToRad(145),
     camera: {
-      position: [42.42, 24.80, 38.16],
-      target:   [16.66, 21.79, 17.33],
+      position: [44.79, 8.34, -54.95],
+    },
+  },
+  {
+    id: 6,
+    localPosition: [-38.87, -29.31, 67.93],
+    title: "The Hidden Signal",
+    description:
+      "A rhythmic signal pulses from the dense overgrowth. It appears to be an automated distress beacon, long forgotten but still operational in the digital wilderness.",
+    modelRotationY: degToRad(45),
+    camera: {
+      position: [28.74, -25.4, 56.71],
     },
   },
 ];
@@ -590,7 +593,12 @@ export default function Home() {
                 islandRef={islandRef}
                 defaultCameraPosition={[0, 0, 50]}
               />
-              <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5} floatingRange={[0, 1.5]}>
+              <Float
+                speed={2} 
+                rotationIntensity={0.5} 
+                floatIntensity={0.5} 
+                floatingRange={[0, 1.5]} 
+              >
                 <Island
                   ref={islandRef}
                   cameraRef={cameraRef}
