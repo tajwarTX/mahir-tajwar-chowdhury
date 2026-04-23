@@ -3,38 +3,12 @@ import { useNavigate } from "react-router-dom";
 import IntroBlock from "../components/IntroBlock";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
-import { PerformanceMonitor, AdaptiveDpr, AdaptiveEvents, Bvh, Preload, Float, OrbitControls, Html } from "@react-three/drei";
+import { PerformanceMonitor, AdaptiveDpr, AdaptiveEvents, Bvh, Preload, Float } from "@react-three/drei";
 import Island from "../models/Island";
 import CameraController from "../components/CameraController";
 import scrollDown from "../assets/scrolldown.gif";
 import scrollSide from "../assets/scrollside.gif";
 import ScrollLetterRevealDelayed from "../components/ScrollLetterRevealDelayed";
-
-const CameraDebugLogic = ({ controlsRef }) => {
-  const { camera } = useThree();
-  const [debugInfo, setDebugInfo] = useState({ pos: [0, 0, 0], target: [0, 0, 0] });
-
-  useFrame(() => {
-    const target = controlsRef.current ? controlsRef.current.target : { x: 0, y: 0, z: 0 };
-    setDebugInfo({
-      pos: [camera.position.x.toFixed(2), camera.position.y.toFixed(2), camera.position.z.toFixed(2)],
-      target: [target.x.toFixed(2), target.y.toFixed(2), target.z.toFixed(2)]
-    });
-  });
-
-  return (
-    <Html fullscreen pointerEvents="none">
-      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 bg-black/80 text-white p-4 rounded-xl border border-[#a600ff] pointer-events-auto select-text font-geist min-w-[300px]">
-        <h4 className="text-[#a600ff] font-bold mb-2 uppercase tracking-widest text-sm">Camera Debugger</h4>
-        <div className="space-y-1">
-          <p className="text-xs font-mono"><span className="text-gray-400">Position:</span> [{debugInfo.pos.join(", ")}]</p>
-          <p className="text-xs font-mono"><span className="text-gray-400">Target:</span> [{debugInfo.target.join(", ")}]</p>
-        </div>
-        <p className="text-[9px] text-[#a600ff] mt-3 italic font-semibold text-center tracking-widest uppercase opacity-80">Rotation & Float Frozen</p>
-      </div>
-    </Html>
-  );
-};
 
 const BASE_POSITION = { x: -2, y: -0, z: -63 };
 const MOBILE_POSITION = { x: -2, y: 24, z: -60 };
@@ -43,73 +17,70 @@ const degToRad = (deg) => (deg * Math.PI) / 180;
 
 const MODEL_CENTER = [BASE_POSITION.x, BASE_POSITION.y, BASE_POSITION.z];
 
+// Annotation data sourced from the original Sketchfab model.
+// localPosition = hotspot in model local space.
+// camera.position = Sketchfab eye + island world offset (-2, 0, -63).
+// camera.target   = Sketchfab target + island world offset (-2, 0, -63).
 const ANNOTATIONS = [
   {
     id: 1,
-    localPosition: [-67.22, -5.74, -19.56],
-    title: "The Stranded Pilot",
+    localPosition: [36.13, -33.61, 35.53],
+    title: "Dinner with Cats",
     description:
-      "Having crashed in this remote forest, the pilot has found a strange peace among the voxel trees. They now spend their evenings sharing stories and meals with the curious forest dwellers.",
-    modelRotationY: degToRad(210),
+      "Lost in the forest with his broken robot — ended with a dinner with cats. The full diorama seen from a bird's eye view.",
+    modelRotationY: 0,
     camera: {
-      position: [-10.46, -29.06, -142.89],
+      position: [-165.61, -73.60, 24.37],
+      target:   [-14.85,  -43.76, -36.29],
     },
   },
   {
     id: 2,
-    localPosition: [35.47, 46.5, -66.73],
-    markerScale: 1.5,
-    title: "Dinner Table",
+    localPosition: [-80.82, -21.54, 26.93],
+    title: "Awakened",
     description:
-      "The heart of the scene — a cozy dinner setup where the traveler shares a meal with friendly forest cats. Warm light spills from lanterns, creating an intimate atmosphere amid the wilderness.",
-    modelRotationY: degToRad(180),
+      "I saw something big, a big monster. I can't see its form. But I see a big canine and bright red eyes. I was unconscious, and then I woke up and met you guys here.",
+    modelRotationY: 0,
     camera: {
-      position: [-59.59, 51.2, -127.2],
+      position: [-95.45, 2.40, -26.57],
+      target:   [-61.90, -27.30, -48.54],
     },
   },
   {
     id: 3,
-    localPosition: [-59.52, -28.19, 26.29],
-    title: "The Forest Cats",
+    localPosition: [40.38, -111.46, 17.48],
+    title: "Who is he?",
     description:
-      "Curious cats have gathered around the campsite, drawn by the warmth and food. These forest dwellers have made friends with the stranded traveler, keeping them company through the night.",
-    modelRotationY: degToRad(100),
+      "What is this big thing? And who is he? He can talk with cats?",
+    modelRotationY: 0,
     camera: {
-      position: [-4.29, -26.91, 29.85],
+      position: [-26.40, -120.48, -44.47],
+      target:   [27.96,  -108.64, -50.43],
     },
   },
   {
     id: 4,
-    localPosition: [23.41, -28.62, 64.61],
-    title: "The Treetops",
+    localPosition: [-0.65, 41.00, 10.68],
+    title: "Broken Arms",
     description:
-      "Towering voxel trees create a canopy overhead, their pixelated leaves filtering moonlight into the clearing below. The forest seems to close in protectively around the small campsite.",
-    modelRotationY: degToRad(210),
+      "Both of the arms are broken while the monster was pulling this robot into the forest. A glimpse into the wreckage of the crash.",
+    modelRotationY: 0,
     camera: {
-      position: [35.89, -15.24, 36.67],
+      position: [-70.11, 9.27, 90.70],
+      target:   [-10.90, -2.92, -14.55],
     },
   },
   {
     id: 5,
-    localPosition: [-1.4, -5.88, -7.84],
-    markerScale: 1.15,
-    title: "Full Diorama",
+    localPosition: [22.10, 23.13, 80.99],
+    markerScale: 1.2,
+    title: "Meoow!",
     description:
-      "The complete scene: a voxel masterpiece depicting a stranded pilot finding unexpected companionship. Made with MagicaVoxel and Blender by @ediediedi for the 'Robots are Coming' challenge.",
-    modelRotationY: degToRad(145),
+      "Somebody, help me please! One of the forest cats finds itself in a precarious spot, calling out from the treetops of the voxel wilderness.",
+    modelRotationY: 0,
     camera: {
-      position: [44.79, 8.34, -54.95],
-    },
-  },
-  {
-    id: 6,
-    localPosition: [-38.87, -29.31, 67.93],
-    title: "The Hidden Signal",
-    description:
-      "A rhythmic signal pulses from the dense overgrowth. It appears to be an automated distress beacon, long forgotten but still operational in the digital wilderness.",
-    modelRotationY: degToRad(45),
-    camera: {
-      position: [28.74, -25.4, 56.71],
+      position: [42.42, 24.80, 38.16],
+      target:   [16.66, 21.79, 17.33],
     },
   },
 ];
@@ -229,7 +200,6 @@ function useDragRotation(targetRef, rotateSpeed = 0.005, isLocked = false) {
 export default function Home() {
   const islandRef = useRef(null);
   const cameraRef = useRef(null);
-  const controlsRef = useRef(null);
   const introRef = useRef(null);
   const canvasSectionRef = useRef(null);
 
@@ -612,26 +582,6 @@ export default function Home() {
           <ambientLight intensity={2} />
           <directionalLight position={[1, 10, 1]} intensity={2} />
 
-          <OrbitControls
-            ref={controlsRef}
-            makeDefault
-            enableDamping={true}
-            dampingFactor={0.05}
-            minDistance={5}
-            maxDistance={1000}
-            enablePan={true}
-            screenSpacePanning={true}
-            panSpeed={2}
-            rotateSpeed={1.0}
-            zoomSpeed={1.5}
-            mouseButtons={{
-              LEFT: THREE.MOUSE.ROTATE,
-              MIDDLE: THREE.MOUSE.DOLLY,
-              RIGHT: THREE.MOUSE.PAN
-            }}
-          />
-          <CameraDebugLogic controlsRef={controlsRef} />
-
           <Suspense fallback={null}>
             <Bvh firstHitOnly>
               <CameraController
@@ -640,17 +590,19 @@ export default function Home() {
                 islandRef={islandRef}
                 defaultCameraPosition={[0, 0, 50]}
               />
-              <Island
-                ref={islandRef}
-                cameraRef={cameraRef}
-                isIntersecting={false}
-                position={position}
-                scale={scale}
-                rotation={islandRotation}
-                annotations={ANNOTATIONS}
-                activeAnnotation={activeAnnotation}
-                onAnnotationClick={handleAnnotationClick}
-              />
+              <Float speed={2} rotationIntensity={0.5} floatIntensity={0.5} floatingRange={[0, 1.5]}>
+                <Island
+                  ref={islandRef}
+                  cameraRef={cameraRef}
+                  isIntersecting={isIntersecting}
+                  position={position}
+                  scale={scale}
+                  rotation={islandRotation}
+                  annotations={ANNOTATIONS}
+                  activeAnnotation={activeAnnotation}
+                  onAnnotationClick={handleAnnotationClick}
+                />
+              </Float>
             </Bvh>
             <Preload all />
           </Suspense>
