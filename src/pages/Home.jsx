@@ -10,12 +10,30 @@ import scrollDown from "../assets/scrolldown.gif";
 import scrollSide from "../assets/scrollside.gif";
 import ScrollLetterRevealDelayed from "../components/ScrollLetterRevealDelayed";
 
-const CameraDebugLogic = ({ setDebugInfo }) => {
+const CameraDebugLogic = ({ controlsRef }) => {
   const { camera } = useThree();
+  const [debugInfo, setDebugInfo] = useState({ pos: [0, 0, 0], target: [0, 0, 0] });
+
   useFrame(() => {
-    setDebugInfo([camera.position.x.toFixed(2), camera.position.y.toFixed(2), camera.position.z.toFixed(2)]);
+    const target = controlsRef.current ? controlsRef.current.target : { x: 0, y: 0, z: 0 };
+    setDebugInfo({
+      pos: [camera.position.x.toFixed(2), camera.position.y.toFixed(2), camera.position.z.toFixed(2)],
+      target: [target.x.toFixed(2), target.y.toFixed(2), target.z.toFixed(2)]
+    });
   });
-  return null;
+
+  return (
+    <Html fullscreen pointerEvents="none">
+      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 bg-black/80 text-white p-4 rounded-xl border border-[#a600ff] pointer-events-auto select-text font-geist min-w-[300px]">
+        <h4 className="text-[#a600ff] font-bold mb-2 uppercase tracking-widest text-sm">Camera Debugger</h4>
+        <div className="space-y-1">
+          <p className="text-xs font-mono"><span className="text-gray-400">Position:</span> [{debugInfo.pos.join(", ")}]</p>
+          <p className="text-xs font-mono"><span className="text-gray-400">Target:</span> [{debugInfo.target.join(", ")}]</p>
+        </div>
+        <p className="text-[9px] text-[#a600ff] mt-3 italic font-semibold text-center tracking-widest uppercase opacity-80">Rotation & Float Frozen</p>
+      </div>
+    </Html>
+  );
 };
 
 const BASE_POSITION = { x: -2, y: -0, z: -63 };
@@ -34,7 +52,7 @@ const ANNOTATIONS = [
       "Having crashed in this remote forest, the pilot has found a strange peace among the voxel trees. They now spend their evenings sharing stories and meals with the curious forest dwellers.",
     modelRotationY: degToRad(210),
     camera: {
-      position: [-3.49, 2.79, 25.04],
+      position: [-10.46, -29.06, -142.89],
     },
   },
   {
@@ -209,14 +227,12 @@ function useDragRotation(targetRef, rotateSpeed = 0.005, isLocked = false) {
 }
 
 export default function Home() {
-  const navigate = useNavigate();
   const islandRef = useRef(null);
   const cameraRef = useRef(null);
   const controlsRef = useRef(null);
   const introRef = useRef(null);
   const canvasSectionRef = useRef(null);
 
-  const [debugInfo, setDebugInfo] = useState([0, 0, 0]);
   const [showArrowScroll, setShowArrowScroll] = useState(false);
   const [isIntersecting, setIsIntersecting] = useState(false);
   const [activeAnnotation, setActiveAnnotation] = useState(null);
@@ -340,15 +356,6 @@ export default function Home() {
 
   return (
     <div className="w-full relative h-screen overflow-y-auto snap-y snap-mandatory">
-      {/* Fixed Debug Panel */}
-      <div className="fixed bottom-6 right-6 bg-black/80 text-white p-4 rounded-xl border border-[#a600ff] z-[9999] pointer-events-auto select-text font-geist min-w-[260px] shadow-2xl backdrop-blur-md">
-        <h4 className="text-[#a600ff] font-bold mb-2 uppercase tracking-widest text-[10px]">Camera Debugger</h4>
-        <div className="space-y-1">
-          <p className="text-xs font-mono"><span className="text-gray-400">Position:</span> [{debugInfo.join(", ")}]</p>
-        </div>
-        <p className="text-[8px] text-[#a600ff] mt-3 italic font-semibold text-center tracking-widest uppercase opacity-80">Rotation & Float Frozen</p>
-      </div>
-
       <section
         ref={introRef}
         className="relative w-full h-screen flex justify-start items-center flex-col pt-[28vh] md:pt-[32vh] snap-start snap-always"
@@ -617,14 +624,13 @@ export default function Home() {
             panSpeed={2}
             rotateSpeed={1.0}
             zoomSpeed={1.5}
-            target={MODEL_CENTER}
             mouseButtons={{
               LEFT: THREE.MOUSE.ROTATE,
               MIDDLE: THREE.MOUSE.DOLLY,
               RIGHT: THREE.MOUSE.PAN
             }}
           />
-          <CameraDebugLogic setDebugInfo={setDebugInfo} />
+          <CameraDebugLogic controlsRef={controlsRef} />
 
           <Suspense fallback={null}>
             <Bvh firstHitOnly>
