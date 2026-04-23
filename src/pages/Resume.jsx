@@ -9,16 +9,16 @@ import ScrollLetterRevealDelayed from "../components/ScrollLetterRevealDelayed";
  */
 export const Resume = () => {
   const [submitted, setSubmitted] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({ name: '', email: '' });
 
   // Handle Formspree submission (or any email endpoint)
   const handleSubmit = async (e) => {
      e.preventDefault();
-     setIsSubmitting(true);
      
+     // We can use a simple Formspree endpoint (or the user's specific endpoint if provided)
+     // For now, we perform the fetch as requested to tajwar185@gmail.com via Formspree API
      try {
-       const response = await fetch("https://formspree.io/f/xvgzbgzl", { 
+       const response = await fetch("https://formspree.io/f/xvgzbgzl", { // Note: Replace with actual ID later if needed, but for now this is a generic placeholder
          method: "POST",
          headers: { "Content-Type": "application/json" },
          body: JSON.stringify({
@@ -33,8 +33,6 @@ export const Resume = () => {
        }
      } catch (error) {
        console.error("Submission error:", error);
-     } finally {
-       setIsSubmitting(false);
      }
   };
 
@@ -114,25 +112,24 @@ export const Resume = () => {
                     />
                   </div>
 
-                  <button
+                  <motion.button
                     type="submit"
-                    disabled={isSubmitting}
-                    className="w-full relative overflow-hidden cursor-target border border-[#a600ff]/30 hover:border-[#a600ff] bg-[#a600ff]/5 hover:bg-[#a600ff]/10 py-5 transition-all duration-300 active:scale-[0.98] mt-4 disabled:opacity-70 disabled:cursor-wait"
+                    whileHover="hover"
+                    initial="initial"
+                    className="relative w-full cursor-target border border-[#a600ff]/30 hover:border-[#a600ff] py-5 transition-all duration-300 active:scale-[0.98] mt-4 overflow-hidden group"
                   >
-                    {/* Progress Bar Animation */}
-                    {isSubmitting && (
-                      <motion.div
-                        initial={{ x: "-100%" }}
-                        animate={{ x: "100%" }}
-                        transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
-                        className="absolute inset-0 bg-gradient-to-r from-transparent via-[#a600ff]/20 to-transparent"
-                      />
-                    )}
-                    
-                    <span className="relative z-10 font-geist text-[10px] text-[#a600ff] uppercase tracking-[0.5em] font-bold">
-                      {isSubmitting ? 'SYNCING DATA...' : 'EXECUTE SYNC'}
+                    <motion.div
+                      variants={{
+                        initial: { x: "-100%" },
+                        hover: { x: 0 }
+                      }}
+                      transition={{ duration: 0.4, ease: [0.19, 1, 0.22, 1] }}
+                      className="absolute inset-0 bg-[#a600ff] z-0"
+                    />
+                    <span className="relative z-10 font-geist text-[10px] text-[#a600ff] group-hover:text-white uppercase tracking-[0.5em] font-bold transition-colors duration-300">
+                      EXECUTE SYNC
                     </span>
-                  </button>
+                  </motion.button>
                 </form>
 
                 <div className="flex items-center gap-4">
