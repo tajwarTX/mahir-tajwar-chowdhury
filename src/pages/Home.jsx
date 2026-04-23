@@ -11,13 +11,11 @@ import ScrollLetterRevealDelayed from "../components/ScrollLetterRevealDelayed";
 
 const CameraDebugger = ({ controlsRef }) => {
   const { camera } = useThree();
-  const [debugInfo, setDebugInfo] = useState({ pos: [0, 0, 0], target: [0, 0, 0] });
+  const [debugInfo, setDebugInfo] = useState({ pos: [0, 0, 0] });
 
   useFrame(() => {
-    const target = controlsRef.current ? controlsRef.current.target : { x: 0, y: 0, z: 0 };
     setDebugInfo({
-      pos: [camera.position.x.toFixed(2), camera.position.y.toFixed(2), camera.position.z.toFixed(2)],
-      target: [target.x.toFixed(2), target.y.toFixed(2), target.z.toFixed(2)]
+      pos: [camera.position.x.toFixed(2), camera.position.y.toFixed(2), camera.position.z.toFixed(2)]
     });
   });
 
@@ -27,9 +25,8 @@ const CameraDebugger = ({ controlsRef }) => {
         <h4 className="text-[#a600ff] font-bold mb-2 uppercase tracking-widest text-sm">Camera Debugger</h4>
         <div className="space-y-1">
           <p className="text-xs font-mono"><span className="text-gray-400">Position:</span> [{debugInfo.pos.join(", ")}]</p>
-          <p className="text-xs font-mono"><span className="text-gray-400">Target:</span> [{debugInfo.target.join(", ")}]</p>
         </div>
-        <p className="text-[9px] text-[#a600ff] mt-3 italic font-semibold">ROTATION & FLOAT DISABLED FOR CALIBRATION</p>
+        <p className="text-[9px] text-[#a600ff] mt-3 italic font-semibold text-center tracking-widest uppercase">Rotation & Float Frozen</p>
       </div>
     </Html>
   );
@@ -52,7 +49,6 @@ const ANNOTATIONS = [
     modelRotationY: degToRad(210),
     camera: {
       position: [-110, 20, -50],
-      target: [-67, -5, -20],
     },
   },
   {
@@ -65,7 +61,6 @@ const ANNOTATIONS = [
     modelRotationY: degToRad(180),
     camera: {
       position: [20, 70, -100],
-      target: [35, 46, -66],
     },
   },
   {
@@ -77,7 +72,6 @@ const ANNOTATIONS = [
     modelRotationY: degToRad(100),
     camera: {
       position: [-90, -10, 50],
-      target: [-60, -28, 26],
     },
   },
   {
@@ -89,7 +83,6 @@ const ANNOTATIONS = [
     modelRotationY: degToRad(210),
     camera: {
       position: [50, 0, 90],
-      target: [23, -28, 64],
     },
   },
   {
@@ -102,7 +95,6 @@ const ANNOTATIONS = [
     modelRotationY: degToRad(145),
     camera: {
       position: [0, 40, 40],
-      target: [-1, -5, -8],
     },
   },
   {
@@ -114,7 +106,6 @@ const ANNOTATIONS = [
     modelRotationY: degToRad(45),
     camera: {
       position: [-70, 0, 100],
-      target: [-39, -29, 68],
     },
   },
 ];

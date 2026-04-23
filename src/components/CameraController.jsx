@@ -22,6 +22,9 @@ export default function CameraController({
       const ann = annotations.find((a) => a.id === activeAnnotation);
       if (!ann || !islandRef.current) return;
 
+      const worldTarget = new THREE.Vector3(...ann.localPosition);
+      islandRef.current.localToWorld(worldTarget);
+
       hasActiveAnnotation.current = true;
       isAnimating.current = true;
 
@@ -43,9 +46,9 @@ export default function CameraController({
       }, 0);
 
       tl.to(lookAtTarget.current, {
-        x: ann.camera.target[0],
-        y: ann.camera.target[1],
-        z: ann.camera.target[2],
+        x: worldTarget.x,
+        y: worldTarget.y,
+        z: worldTarget.z,
         duration: 1.5,
         ease: "power3.inOut",
         onComplete: () => {
