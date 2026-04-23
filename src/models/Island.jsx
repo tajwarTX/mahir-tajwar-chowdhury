@@ -105,6 +105,7 @@ const Island = forwardRef(
               position={ann.localPosition}
               center
               distanceFactor={90} 
+              occlude
               zIndexRange={[10, 0]}
               style={{ 
                 pointerEvents: "auto",
