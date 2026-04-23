@@ -22,23 +22,21 @@ export default function CameraController({
       const ann = annotations.find((a) => a.id === activeAnnotation);
       if (!ann || !islandRef.current) return;
 
-      const simulatedIsland = new THREE.Object3D();
-      simulatedIsland.position.copy(islandRef.current.position);
-      simulatedIsland.scale.copy(islandRef.current.scale);
-      simulatedIsland.rotation.copy(islandRef.current.rotation);
-      simulatedIsland.rotation.y = ann.modelRotationY;
-      simulatedIsland.updateMatrixWorld();
+      const baseRotationY = (124 * Math.PI) / 180;
+      const rotationDelta = ann.modelRotationY - baseRotationY;
 
-      const targetWorldPos = new THREE.Vector3(...ann.localPosition);
-      targetWorldPos.applyMatrix4(simulatedIsland.matrixWorld);
+      // The calibrated camera position from Home.jsx
+      const calibPos = new THREE.Vector3(...ann.camera.position);
 
-      // "right above the annotations"
-      const cameraDestX = targetWorldPos.x;
-      const cameraDestY = targetWorldPos.y + 60; // Adjust this height if needed
-      const cameraDestZ = targetWorldPos.z;
+      // Rotate the calibrated position so it matches the island's new rotation
+      calibPos.applyAxisAngle(new THREE.Vector3(0, 1, 0), rotationDelta);
 
-      // "focusing in the centre of the model"
-      const focusTarget = islandRef.current.position.clone();
+      const cameraDestX = calibPos.x;
+      const cameraDestY = calibPos.y;
+      const cameraDestZ = calibPos.z;
+
+      // Default orbit controls target during calibration was [0,0,0]
+      const focusTarget = new THREE.Vector3(0, 0, 0);
 
       hasActiveAnnotation.current = true;
       isAnimating.current = true;
