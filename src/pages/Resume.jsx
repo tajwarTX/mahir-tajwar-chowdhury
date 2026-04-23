@@ -189,9 +189,9 @@ export const Resume = () => {
                   animate={{ opacity: 1 }}
                   transition={{ delay: 1.2, duration: 1 }}
                   onClick={() => setSubmitted(false)}
-                  className="mt-16 font-geist text-[9px] text-[#a600ff]/60 hover:text-[#a600ff] uppercase tracking-[0.5em] transition-all duration-300"
+                  className="mt-16 px-8 py-4 cursor-target border border-[#a600ff]/30 hover:border-[#a600ff] bg-transparent hover:bg-[#a600ff]/5 font-geist text-[9px] text-[#a600ff] uppercase tracking-[0.4em] transition-all duration-300"
                 >
-                  [ RETURN_TO_SYSTEM ]
+                  RETURN TO HOME
                 </motion.button>
               </motion.div>
             )}
