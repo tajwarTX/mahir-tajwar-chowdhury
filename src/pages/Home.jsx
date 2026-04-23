@@ -612,8 +612,14 @@ export default function Home() {
           <OrbitControls 
             ref={controlsRef} 
             makeDefault 
+            enableDamping={true}
+            dampingFactor={0.05}
+            minDistance={10}
+            maxDistance={500}
             enablePan={true}
-            screenSpacePanning={true}
+            panSpeed={1.5}
+            rotateSpeed={1.0}
+            zoomSpeed={1.5}
           />
           <CameraDebugger controlsRef={controlsRef} />
 
