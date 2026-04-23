@@ -123,7 +123,7 @@ export const Resume = () => {
                         initial: { x: "-100%" },
                         hover: { x: 0 }
                       }}
-                      transition={{ duration: 0.4, ease: [0.19, 1, 0.22, 1] }}
+                      transition={{ duration: 0.25, ease: [0.19, 1, 0.22, 1] }}
                       className="absolute inset-0 bg-[#a600ff] z-0"
                     />
                     <span className="relative z-10 font-geist text-[10px] text-[#a600ff] group-hover:text-white uppercase tracking-[0.5em] font-bold transition-colors duration-300">
