@@ -45,6 +45,7 @@ const LocationWatcher = ({ setLoading }) => {
 
 const App = () => {
   const [loading, setLoading] = useState(true);
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const ditherRef = useRef(null);
@@ -66,7 +67,15 @@ const App = () => {
         <div className="fixed inset-0 pointer-events-none z-[15] bg-[radial-gradient(circle,transparent_40%,rgba(0,0,0,0.8)_100%)]" />
 
         {/* Global Loader (triggered every page change) */}
-        {loading && <Loader onFinish={() => setLoading(false)} />}
+        {loading && (
+          <Loader 
+            isInitial={isInitialLoad} 
+            onFinish={() => {
+              setLoading(false);
+              setIsInitialLoad(false);
+            }} 
+          />
+        )}
 
         {/* Global Cursor (only on non-mobile) */}
         {!isMobile && (
