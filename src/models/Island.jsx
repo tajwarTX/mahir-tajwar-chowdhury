@@ -83,32 +83,15 @@ const Island = forwardRef(
       }
     });
 
-    const [lastClick, setLastClick] = React.useState(null);
-
     const onModelClick = (e) => {
       e.stopPropagation();
       if (e.point) {
         const localPoint = islandRef.current.worldToLocal(e.point.clone());
-        const coords = [
-          parseFloat(localPoint.x.toFixed(2)),
-          parseFloat(localPoint.y.toFixed(2)),
-          parseFloat(localPoint.z.toFixed(2))
-        ];
-        console.log(`[Surface Click] localPosition:`, coords);
-        setLastClick(coords);
       }
     };
 
     return (
       <group ref={islandRef} position={position} {...props}>
-        {lastClick && (
-          <Html position={lastClick} center pointerEvents="none">
-            <div className="bg-[#a600ff] text-white px-2 py-1 rounded text-[10px] font-bold whitespace-nowrap border border-white/50 shadow-lg">
-              LAST_CLICK: [{lastClick.join(", ")}]
-            </div>
-          </Html>
-        )}
-
         <Center>
           <primitive 
             object={optimizedScene} 

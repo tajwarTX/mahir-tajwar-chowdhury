@@ -19,7 +19,7 @@ const MODEL_CENTER = [BASE_POSITION.x, BASE_POSITION.y, BASE_POSITION.z];
 const ANNOTATIONS = [
   {
     id: 1,
-    localPosition: [-35, 32, 2],
+    localPosition: [-67.22, -10.74, -19.56],
     title: "The Stranded Pilot",
     description:
       "Having crashed in this remote forest, the pilot has found a strange peace among the voxel trees. They now spend their evenings sharing stories and meals with the curious forest dwellers.",
@@ -31,7 +31,7 @@ const ANNOTATIONS = [
   },
   {
     id: 2,
-    localPosition: [-35, 17, 2],
+    localPosition: [35.47, 41.5, -66.73],
     title: "Dinner Table",
     description:
       "The heart of the scene — a cozy dinner setup where the traveler shares a meal with friendly forest cats. Warm light spills from lanterns, creating an intimate atmosphere amid the wilderness.",
@@ -43,7 +43,7 @@ const ANNOTATIONS = [
   },
   {
     id: 3,
-    localPosition: [-53, -1.5, -2],
+    localPosition: [-59.52, -38.19, 26.29],
     title: "The Forest Cats",
     description:
       "Curious cats have gathered around the campsite, drawn by the warmth and food. These forest dwellers have made friends with the stranded traveler, keeping them company through the night.",
@@ -55,7 +55,7 @@ const ANNOTATIONS = [
   },
   {
     id: 4,
-    localPosition: [68, -13, 34],
+    localPosition: [23.41, -32.62, 64.61],
     title: "The Treetops",
     description:
       "Towering voxel trees create a canopy overhead, their pixelated leaves filtering moonlight into the clearing below. The forest seems to close in protectively around the small campsite.",
@@ -67,7 +67,7 @@ const ANNOTATIONS = [
   },
   {
     id: 5,
-    localPosition: [0, 5, 25],
+    localPosition: [-1.4, -12.88, -7.84],
     title: "Full Diorama",
     description:
       "The complete scene: a voxel masterpiece depicting a stranded pilot finding unexpected companionship. Made with MagicaVoxel and Blender by @ediediedi for the 'Robots are Coming' challenge.",
@@ -75,6 +75,18 @@ const ANNOTATIONS = [
     camera: {
       position: [5, 72, -25],
       target: [-2, 43, -60],
+    },
+  },
+  {
+    id: 6,
+    localPosition: [-38.87, -39.31, 67.93],
+    title: "The Hidden Signal",
+    description:
+      "A rhythmic signal pulses from the dense overgrowth. It appears to be an automated distress beacon, long forgotten but still operational in the digital wilderness.",
+    modelRotationY: degToRad(45),
+    camera: {
+      position: [-40, 30, 100],
+      target: [-38, -39, 67],
     },
   },
 ];
