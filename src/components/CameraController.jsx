@@ -22,21 +22,8 @@ export default function CameraController({
       const ann = annotations.find((a) => a.id === activeAnnotation);
       if (!ann || !islandRef.current) return;
 
-      const baseRotationY = (124 * Math.PI) / 180;
-      const rotationDelta = ann.modelRotationY - baseRotationY;
-
-      // The calibrated camera position from Home.jsx
-      const calibPos = new THREE.Vector3(...ann.camera.position);
-
-      // Rotate the calibrated position so it matches the island's new rotation
-      calibPos.applyAxisAngle(new THREE.Vector3(0, 1, 0), rotationDelta);
-
-      const cameraDestX = calibPos.x;
-      const cameraDestY = calibPos.y;
-      const cameraDestZ = calibPos.z;
-
-      // Default orbit controls target during calibration was [0,0,0]
-      const focusTarget = new THREE.Vector3(0, 0, 0);
+      const worldTarget = new THREE.Vector3(...ann.localPosition);
+      islandRef.current.localToWorld(worldTarget);
 
       hasActiveAnnotation.current = true;
       isAnimating.current = true;
@@ -51,17 +38,17 @@ export default function CameraController({
       }, 0);
 
       tl.to(camera.position, {
-        x: cameraDestX,
-        y: cameraDestY,
-        z: cameraDestZ,
+        x: ann.camera.position[0],
+        y: ann.camera.position[1],
+        z: ann.camera.position[2],
         duration: 1.5,
         ease: "power3.inOut",
       }, 0);
 
       tl.to(lookAtTarget.current, {
-        x: focusTarget.x,
-        y: focusTarget.y,
-        z: focusTarget.z,
+        x: worldTarget.x,
+        y: worldTarget.y,
+        z: worldTarget.z,
         duration: 1.5,
         ease: "power3.inOut",
         onComplete: () => {
