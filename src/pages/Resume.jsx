@@ -45,7 +45,7 @@ export const Resume = () => {
       <div className="max-w-[1400px] w-full grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center relative z-[20]">
         
         {/* Left Side: Typography and Info */}
-        <div className="flex flex-col z-10 w-full relative">
+        <div className="flex flex-col items-center text-center lg:items-start lg:text-left z-10 w-full relative">
           <h1 className="font-orbitron text-[50px] md:text-[75px] lg:text-[90px] font-extrabold text-white uppercase leading-[0.8] tracking-tighter">
             <ScrollLetterRevealDelayed text="REQUEST" duration={200} delay={0} />
             <br />
@@ -54,18 +54,18 @@ export const Resume = () => {
             </span>
           </h1>
           
-          <div className="mt-8 flex items-center gap-4">
+          <div className="mt-8 flex flex-col lg:flex-row items-center gap-4">
              <div className="h-[1px] w-12 bg-[#a600ff]" />
              <span className="font-geist text-[10px] md:text-[11px] text-white/60 uppercase tracking-[0.4em] font-medium">
                ARCHIVE_002 // DATA_SYNC
              </span>
           </div>
 
-          <p className="font-geist text-white/80 text-xs md:text-sm uppercase tracking-[0.3em] font-medium leading-relaxed max-w-lg mt-8">
+          <p className="font-geist text-white/80 text-xs md:text-sm uppercase tracking-[0.3em] font-medium leading-relaxed max-w-lg mt-8 mx-auto lg:mx-0">
             PROVIDE YOUR DETAILS TO RECEIVE A DIRECT COPY OF MAHIR TAJWAR'S DIGITAL DOSSIER AND ENGINEERING RESUME.
           </p>
 
-          <div className="mt-12 hidden md:flex flex-col items-start gap-4">
+          <div className="mt-12 hidden md:flex flex-col items-center lg:items-start gap-4">
             <div className="w-[1.5px] h-24 bg-[#a600ff] opacity-40"></div>
             <div className="text-[#a600ff] text-2xl md:text-3xl font-orbitron font-bold opacity-30 tracking-widest mt-2">(02)</div>
           </div>
