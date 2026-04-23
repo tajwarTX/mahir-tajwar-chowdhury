@@ -617,6 +617,7 @@ export default function Home() {
             minDistance={10}
             maxDistance={500}
             enablePan={true}
+            screenSpacePanning={true}
             panSpeed={1.5}
             rotateSpeed={1.0}
             zoomSpeed={1.5}
