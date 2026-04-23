@@ -19,10 +19,13 @@ export const Resume = () => {
      
      try {
        // Using Formspree's email endpoint. 
-       // Once you submit for the first time, check tajwar185@gmail.com for a confirmation email to 'activate' the form.
+       // Once you submit for the first time, check tajwar185@gmail.com (and Spam) for a confirmation email to 'activate' the form.
        const response = await fetch("https://formspree.io/f/tajwar185@gmail.com", { 
          method: "POST",
-         headers: { "Content-Type": "application/json" },
+         headers: { 
+           "Content-Type": "application/json",
+           "Accept": "application/json"
+         },
          body: JSON.stringify({
            name: formData.name,
            email: formData.email,
@@ -30,11 +33,17 @@ export const Resume = () => {
          })
        });
        
+       const data = await response.json();
+       console.log("Formspree Response:", data);
+
        if (response.ok) {
          setSubmitted(true);
+       } else {
+         alert("Submission failed. Please try again or check your connection.");
        }
      } catch (error) {
        console.error("Submission error:", error);
+       alert("An error occurred. Please try again.");
      } finally {
        setIsSubmitting(false);
      }
