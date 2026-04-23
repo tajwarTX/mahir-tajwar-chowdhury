@@ -69,6 +69,7 @@ const ANNOTATIONS = [
   {
     id: 5,
     localPosition: [-1.4, -5.88, -7.84],
+    markerScale: 1.4,
     title: "Full Diorama",
     description:
       "The complete scene: a voxel masterpiece depicting a stranded pilot finding unexpected companionship. Made with MagicaVoxel and Blender by @ediediedi for the 'Robots are Coming' challenge.",
