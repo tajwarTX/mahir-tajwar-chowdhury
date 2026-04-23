@@ -46,14 +46,14 @@ const Loader = ({ onFinish, isInitial }) => {
             <motion.img 
               src="/logo.png" 
               alt="Background Logo" 
-              className="w-[120vw] max-w-none opacity-[0.03] grayscale invert brightness-200"
+              className="w-[80vw] max-w-[500px] opacity-[0.1] grayscale brightness-[1.5] contrast-[1.1]"
               animate={{ 
                 rotate: 360,
-                scale: [1, 1.1, 1]
+                scale: [1, 1.05, 1]
               }}
               transition={{ 
-                rotate: { duration: 80, repeat: Infinity, ease: "linear" },
-                scale: { duration: 15, repeat: Infinity, ease: "easeInOut" }
+                rotate: { duration: 60, repeat: Infinity, ease: "linear" },
+                scale: { duration: 10, repeat: Infinity, ease: "easeInOut" }
               }}
             />
           </div>
