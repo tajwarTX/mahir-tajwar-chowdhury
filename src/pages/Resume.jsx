@@ -191,7 +191,6 @@ export const Resume = () => {
                   animate={{ opacity: 1 }}
                   transition={{ delay: 1.2, duration: 1 }}
                   onClick={() => {
-                    setSubmitted(false);
                     navigate('/');
                   }}
                   className="mt-16 px-8 py-4 cursor-target border border-[#a600ff]/30 hover:border-[#a600ff] bg-transparent hover:bg-[#a600ff]/5 font-geist text-[11px] text-[#a600ff] uppercase tracking-[0.4em] transition-all duration-300"
