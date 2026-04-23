@@ -623,7 +623,7 @@ export default function Home() {
               <Island
                 ref={islandRef}
                 cameraRef={cameraRef}
-                isIntersecting={false}
+                isIntersecting={isIntersecting}
                 position={position}
                 scale={scale}
                 rotation={islandRotation}
