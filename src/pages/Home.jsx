@@ -32,7 +32,7 @@ const ANNOTATIONS = [
   {
     id: 2,
     localPosition: [35.47, 46.5, -66.73],
-    markerScale: 1.8,
+    markerScale: 1.5,
     title: "Dinner Table",
     description:
       "The heart of the scene — a cozy dinner setup where the traveler shares a meal with friendly forest cats. Warm light spills from lanterns, creating an intimate atmosphere amid the wilderness.",
@@ -69,7 +69,7 @@ const ANNOTATIONS = [
   {
     id: 5,
     localPosition: [-1.4, -5.88, -7.84],
-    markerScale: 1.4,
+    markerScale: 1.15,
     title: "Full Diorama",
     description:
       "The complete scene: a voxel masterpiece depicting a stranded pilot finding unexpected companionship. Made with MagicaVoxel and Blender by @ediediedi for the 'Robots are Coming' challenge.",
