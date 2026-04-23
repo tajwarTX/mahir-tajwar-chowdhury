@@ -2,12 +2,34 @@ import React, { useRef, Suspense, useState, useEffect, useCallback } from "react
 import { useNavigate } from "react-router-dom";
 import IntroBlock from "../components/IntroBlock";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { PerformanceMonitor, AdaptiveDpr, AdaptiveEvents, Bvh, Preload, Float } from "@react-three/drei";
+import { PerformanceMonitor, AdaptiveDpr, AdaptiveEvents, Bvh, Preload, Float, OrbitControls, Html } from "@react-three/drei";
 import Island from "../models/Island";
 import CameraController from "../components/CameraController";
 import scrollDown from "../assets/scrolldown.gif";
 import scrollSide from "../assets/scrollside.gif";
 import ScrollLetterRevealDelayed from "../components/ScrollLetterRevealDelayed";
+
+const CameraDebugger = () => {
+  const { camera } = useThree();
+  const [debugInfo, setDebugInfo] = useState({ pos: [0, 0, 0], target: [0, 0, 0] });
+
+  useFrame(() => {
+    setDebugInfo({
+      pos: [camera.position.x.toFixed(2), camera.position.y.toFixed(2), camera.position.z.toFixed(2)],
+      target: [0, 0, 0] 
+    });
+  });
+
+  return (
+    <Html fullscreen pointerEvents="none">
+      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 bg-black/80 text-white p-4 rounded-xl border border-[#a600ff] pointer-events-auto select-text font-geist">
+        <h4 className="text-[#a600ff] font-bold mb-2">DEBUG CAMERA</h4>
+        <p className="text-xs">Position: [{debugInfo.pos.join(", ")}]</p>
+        <p className="text-[10px] opacity-50 mt-2 italic">Move camera and copy these values for ANNOTATIONS</p>
+      </div>
+    </Html>
+  );
+};
 
 const BASE_POSITION = { x: -2, y: -0, z: -63 };
 const MOBILE_POSITION = { x: -2, y: 24, z: -60 };
@@ -590,6 +612,10 @@ export default function Home() {
           <AdaptiveEvents />
           <ambientLight intensity={2} />
           <directionalLight position={[1, 10, 1]} intensity={2} />
+
+          <OrbitControls makeDefault />
+          <CameraDebugger />
+
           <Suspense fallback={null}>
             <Bvh firstHitOnly>
               <CameraController
