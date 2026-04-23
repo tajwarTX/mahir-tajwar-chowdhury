@@ -9,22 +9,24 @@ import ScrollLetterRevealDelayed from "../components/ScrollLetterRevealDelayed";
  */
 export const Resume = () => {
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({ name: '', email: '' });
 
   // Handle Formspree submission (or any email endpoint)
   const handleSubmit = async (e) => {
      e.preventDefault();
+     setIsSubmitting(true);
      
-     // We can use a simple Formspree endpoint (or the user's specific endpoint if provided)
-     // For now, we perform the fetch as requested to tajwar185@gmail.com via Formspree API
      try {
-       const response = await fetch("https://formspree.io/f/xvgzbgzl", { // Note: Replace with actual ID later if needed, but for now this is a generic placeholder
+       // Using Formspree's email endpoint. 
+       // Once you submit for the first time, check tajwar185@gmail.com for a confirmation email to 'activate' the form.
+       const response = await fetch("https://formspree.io/f/tajwar185@gmail.com", { 
          method: "POST",
          headers: { "Content-Type": "application/json" },
          body: JSON.stringify({
            name: formData.name,
            email: formData.email,
-           message: "REQUESTING RESUME ACCESS"
+           message: `RESUME REQUEST FROM: ${formData.name} (${formData.email})`
          })
        });
        
@@ -33,6 +35,8 @@ export const Resume = () => {
        }
      } catch (error) {
        console.error("Submission error:", error);
+     } finally {
+       setIsSubmitting(false);
      }
   };
 
@@ -124,7 +128,7 @@ export const Resume = () => {
                       className="absolute inset-0 bg-[#a600ff] z-0"
                     />
                     <span className="relative z-10 font-geist text-[11px] text-[#a600ff] group-hover:text-white uppercase tracking-[0.5em] font-bold transition-colors duration-300">
-                      EXECUTE SYNC
+                      {isSubmitting ? "SYNCING..." : "EXECUTE SYNC"}
                     </span>
                   </motion.button>
                 </form>
