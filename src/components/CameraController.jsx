@@ -22,8 +22,23 @@ export default function CameraController({
       const ann = annotations.find((a) => a.id === activeAnnotation);
       if (!ann || !islandRef.current) return;
 
-      const worldTarget = new THREE.Vector3(...ann.localPosition);
-      islandRef.current.localToWorld(worldTarget);
+      const simulatedIsland = new THREE.Object3D();
+      simulatedIsland.position.copy(islandRef.current.position);
+      simulatedIsland.scale.copy(islandRef.current.scale);
+      simulatedIsland.rotation.copy(islandRef.current.rotation);
+      simulatedIsland.rotation.y = ann.modelRotationY;
+      simulatedIsland.updateMatrixWorld();
+
+      const targetWorldPos = new THREE.Vector3(...ann.localPosition);
+      targetWorldPos.applyMatrix4(simulatedIsland.matrixWorld);
+
+      // "right above the annotations"
+      const cameraDestX = targetWorldPos.x;
+      const cameraDestY = targetWorldPos.y + 60; // Adjust this height if needed
+      const cameraDestZ = targetWorldPos.z;
+
+      // "focusing in the centre of the model"
+      const focusTarget = islandRef.current.position.clone();
 
       hasActiveAnnotation.current = true;
       isAnimating.current = true;
@@ -38,17 +53,17 @@ export default function CameraController({
       }, 0);
 
       tl.to(camera.position, {
-        x: ann.camera.position[0],
-        y: ann.camera.position[1],
-        z: ann.camera.position[2],
+        x: cameraDestX,
+        y: cameraDestY,
+        z: cameraDestZ,
         duration: 1.5,
         ease: "power3.inOut",
       }, 0);
 
       tl.to(lookAtTarget.current, {
-        x: worldTarget.x,
-        y: worldTarget.y,
-        z: worldTarget.z,
+        x: focusTarget.x,
+        y: focusTarget.y,
+        z: focusTarget.z,
         duration: 1.5,
         ease: "power3.inOut",
         onComplete: () => {
