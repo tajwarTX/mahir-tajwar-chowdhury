@@ -141,31 +141,58 @@ export const Resume = () => {
                   </p>
                 </div>
               </motion.div>
-            ) : (
+             : (
               <motion.div
                 key="success-message"
-                initial={{ scale: 0.95, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.6, ease: [0.19, 1, 0.22, 1] }}
-                className="space-y-8"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="fixed inset-0 z-[2000] bg-black flex flex-col items-center justify-center text-center p-8"
               >
-                <h2 className="font-orbitron text-3xl md:text-4xl font-bold text-white uppercase tracking-tighter">
-                  RESUME <br/>
-                  <span className="text-[#a600ff]">DISPATCHED</span>
-                </h2>
-                
-                <div className="w-12 h-[1px] bg-[#a600ff]/50" />
-                
-                <p className="font-geist text-white/80 text-[10px] md:text-sm uppercase tracking-[0.3em] leading-relaxed">
-                  TRANSFER INITIATED. THE RESUME.PDF HAS BEEN SENT TO YOUR INBOX.
-                </p>
-                
-                <button
-                  onClick={() => setSubmitted(false)}
-                  className="pt-8 font-geist text-[9px] text-[#a600ff]/60 uppercase tracking-[0.4em] hover:text-[#a600ff] transition-colors duration-300 flex items-center gap-2"
+                <motion.div 
+                  initial={{ scale: 0.5, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.2, duration: 0.5, ease: [0.19, 1, 0.22, 1] }}
+                  className="mb-8"
                 >
-                  <span className="text-[12px]">←</span> RETURN
-                </button>
+                  <svg className="w-20 h-20 text-[#a600ff]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                    <motion.path
+                      initial={{ pathLength: 0 }}
+                      animate={{ pathLength: 1 }}
+                      transition={{ duration: 0.8, ease: "easeInOut", delay: 0.4 }}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
+                </motion.div>
+                
+                <motion.h2 
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.6, duration: 0.8 }}
+                  className="font-orbitron text-3xl md:text-5xl font-bold text-white uppercase tracking-tighter mb-4"
+                >
+                  REQUEST <span className="text-[#a600ff]">RECEIVED</span>
+                </motion.h2>
+                
+                <motion.p 
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.8, duration: 0.8 }}
+                  className="font-geist text-white/60 text-[10px] md:text-xs uppercase tracking-[0.3em] leading-relaxed max-w-sm"
+                >
+                  DATA SYNC COMPLETE. THE DIGITAL DOSSIER WILL BE DISPATCHED TO YOUR INBOX WITHIN 1-2 BUSINESS DAYS.
+                </motion.p>
+                
+                <motion.button
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 1.2, duration: 1 }}
+                  onClick={() => setSubmitted(false)}
+                  className="mt-16 font-geist text-[9px] text-[#a600ff]/60 hover:text-[#a600ff] uppercase tracking-[0.5em] transition-all duration-300"
+                >
+                  [ RETURN_TO_SYSTEM ]
+                </motion.button>
               </motion.div>
             )}
           </AnimatePresence>
