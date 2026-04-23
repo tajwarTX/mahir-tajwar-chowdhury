@@ -65,9 +65,9 @@ export const Resume = () => {
             PROVIDE YOUR DETAILS TO RECEIVE A DIRECT COPY OF MAHIR TAJWAR'S DIGITAL DOSSIER AND ENGINEERING RESUME.
           </p>
 
-          <div className="mt-12 hidden md:flex items-start gap-4">
+          <div className="mt-12 hidden md:flex flex-col items-start gap-4">
             <div className="w-[1.5px] h-24 bg-[#a600ff] opacity-40"></div>
-            <div className="text-[#a600ff] text-2xl md:text-3xl font-orbitron font-bold opacity-30 tracking-widest">(02)</div>
+            <div className="text-[#a600ff] text-2xl md:text-3xl font-orbitron font-bold opacity-30 tracking-widest mt-2">(02)</div>
           </div>
         </div>
 
@@ -85,7 +85,7 @@ export const Resume = () => {
               >
                 <form onSubmit={handleSubmit} className="space-y-8">
                   <div className="space-y-2 group">
-                    <label className="block font-geist text-[9px] text-white/70 uppercase tracking-[0.4em] transition-colors duration-200 group-focus-within:text-[#a600ff]">
+                    <label className="block font-geist text-[9px] text-white/90 uppercase tracking-[0.4em] transition-colors duration-200 group-focus-within:text-[#a600ff]">
                       FULL NAME
                     </label>
                     <input
@@ -99,7 +99,7 @@ export const Resume = () => {
                   </div>
 
                   <div className="space-y-2 group">
-                    <label className="block font-geist text-[9px] text-white/70 uppercase tracking-[0.4em] transition-colors duration-200 group-focus-within:text-[#a600ff]">
+                    <label className="block font-geist text-[9px] text-white/90 uppercase tracking-[0.4em] transition-colors duration-200 group-focus-within:text-[#a600ff]">
                       CONTACT EMAIL
                     </label>
                     <input
