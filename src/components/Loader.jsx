@@ -1,5 +1,6 @@
 // components/Loader.jsx
 import React, { useEffect } from "react";
+import loaderVideo from "../assets/loader.mp4";
 
 const Loader = ({ onFinish }) => {
   useEffect(() => {
@@ -13,7 +14,7 @@ const Loader = ({ onFinish }) => {
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black z-[9999]">
       <video
-        src="/src/assets/loader.mp4"
+        src={loaderVideo}
         autoPlay
         muted
         className="w-full h-full object-cover"
