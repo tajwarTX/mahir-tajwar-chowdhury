@@ -9,16 +9,16 @@ import ScrollLetterRevealDelayed from "../components/ScrollLetterRevealDelayed";
  */
 export const Resume = () => {
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({ name: '', email: '' });
 
   // Handle Formspree submission (or any email endpoint)
   const handleSubmit = async (e) => {
      e.preventDefault();
+     setIsSubmitting(true);
      
-     // We can use a simple Formspree endpoint (or the user's specific endpoint if provided)
-     // For now, we perform the fetch as requested to tajwar185@gmail.com via Formspree API
      try {
-       const response = await fetch("https://formspree.io/f/xvgzbgzl", { // Note: Replace with actual ID later if needed, but for now this is a generic placeholder
+       const response = await fetch("https://formspree.io/f/xvgzbgzl", { 
          method: "POST",
          headers: { "Content-Type": "application/json" },
          body: JSON.stringify({
@@ -33,6 +33,8 @@ export const Resume = () => {
        }
      } catch (error) {
        console.error("Submission error:", error);
+     } finally {
+       setIsSubmitting(false);
      }
   };
 
@@ -71,126 +73,99 @@ export const Resume = () => {
           </div>
         </div>
 
-        {/* Right Side: High-Tech Minimalist Form (Refined Scale) */}
-        <div className="relative w-full max-w-xl mx-auto lg:mx-0 lg:ml-auto z-10">
+        {/* Right Side: Minimal Interactive Form */}
+        <div className="relative w-full max-w-md mx-auto lg:mx-0 lg:ml-auto z-10">
           <AnimatePresence mode="wait">
             {!submitted ? (
               <motion.div
                 key="request-form"
-                initial={{ opacity: 0, x: -50 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 50 }}
-                transition={{ duration: 0.8, ease: [0.19, 1, 0.22, 1] }}
-                className="relative p-1 px-1"
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: -20, opacity: 0 }}
+                transition={{ duration: 0.6, ease: [0.19, 1, 0.22, 1] }}
+                className="space-y-12"
               >
-                {/* Clean technical frame */}
-                <div className="absolute inset-0 border border-[#a600ff]/10 bg-white/[0.01] pointer-events-none" />
-                <div className="absolute top-0 left-0 w-6 h-[1px] bg-[#a600ff]" />
-                <div className="absolute top-0 left-0 w-[1px] h-6 bg-[#a600ff]" />
-                <div className="absolute bottom-0 right-0 w-6 h-[1px] bg-[#a600ff]" />
-                <div className="absolute bottom-0 right-0 w-[1px] h-6 bg-[#a600ff]" />
-
-                <form onSubmit={handleSubmit} className="relative p-12 lg:p-16 space-y-16">
-                  <div className="flex items-center gap-4 mb-6">
-                    <div className="w-2 h-2 bg-[#a600ff] animate-pulse" />
-                    <span className="font-geist text-[10px] text-[#a600ff] uppercase tracking-[0.5em] font-bold">
-                      DATA_REQUEST_TERMINAL
-                    </span>
-                  </div>
-
-                  <div className="space-y-6 group">
-                    <div className="flex justify-between items-end">
-                      <label className="block font-geist text-xs text-white/90 uppercase tracking-[0.3em] font-bold">
-                        IDENT_NAME
-                      </label>
-                      <span className="font-geist text-[9px] text-[#a600ff]/50 uppercase">REQUIRED</span>
-                    </div>
+                <form onSubmit={handleSubmit} className="space-y-8">
+                  <div className="space-y-2 group">
+                    <label className="block font-geist text-[9px] text-white/90 uppercase tracking-[0.4em] transition-colors duration-200 group-focus-within:text-[#a600ff]">
+                      FULL NAME
+                    </label>
                     <input
                       required
                       type="text"
                       value={formData.name}
-                      placeholder="ENTER FULL NAME"
+                      placeholder="ENTER NAME"
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full bg-transparent border-b border-white/10 py-5 font-geist text-base md:text-lg text-white uppercase tracking-[0.1em] focus:outline-none focus:border-[#a600ff] transition-all duration-500 placeholder:text-white/5"
+                      className="w-full bg-transparent border-b border-white/20 py-3 font-geist text-sm text-white uppercase tracking-[0.2em] focus:outline-none focus:border-[#a600ff] transition-all duration-300 placeholder:text-white/30"
                     />
                   </div>
 
-                  <div className="space-y-6 group">
-                    <div className="flex justify-between items-end">
-                      <label className="block font-geist text-xs text-white/90 uppercase tracking-[0.3em] font-bold">
-                        IDENT_EMAIL
-                      </label>
-                      <span className="font-geist text-[9px] text-[#a600ff]/50 uppercase">REQUIRED</span>
-                    </div>
+                  <div className="space-y-2 group">
+                    <label className="block font-geist text-[9px] text-white/90 uppercase tracking-[0.4em] transition-colors duration-200 group-focus-within:text-[#a600ff]">
+                      CONTACT EMAIL
+                    </label>
                     <input
                       required
                       type="email"
                       value={formData.email}
                       placeholder="ENTER EMAIL ADDRESS"
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full bg-transparent border-b border-white/10 py-5 font-geist text-base md:text-lg text-white uppercase tracking-[0.1em] focus:outline-none focus:border-[#a600ff] transition-all duration-500 placeholder:text-white/5"
+                      className="w-full bg-transparent border-b border-white/20 py-3 font-geist text-sm text-white uppercase tracking-[0.2em] focus:outline-none focus:border-[#a600ff] transition-all duration-300 placeholder:text-white/30"
                     />
                   </div>
 
                   <button
                     type="submit"
-                    className="group relative w-full overflow-hidden border border-[#a600ff]/30 hover:border-[#a600ff] bg-[#a600ff]/5 py-7 transition-all duration-500 active:scale-[0.99] mt-12"
+                    disabled={isSubmitting}
+                    className="w-full relative overflow-hidden cursor-target border border-[#a600ff]/30 hover:border-[#a600ff] bg-[#a600ff]/5 hover:bg-[#a600ff]/10 py-5 transition-all duration-300 active:scale-[0.98] mt-4 disabled:opacity-70 disabled:cursor-wait"
                   >
-                    <div className="absolute inset-0 bg-[#a600ff] translate-x-[-101%] group-hover:translate-x-0 transition-transform duration-700 ease-[0.19, 1, 0.22, 1]" />
-                    <span className="relative z-10 font-geist text-xs md:text-sm text-[#a600ff] group-hover:text-white uppercase tracking-[0.8em] font-black transition-colors duration-500">
-                      EXECUTE_SYNC
+                    {/* Progress Bar Animation */}
+                    {isSubmitting && (
+                      <motion.div
+                        initial={{ x: "-100%" }}
+                        animate={{ x: "100%" }}
+                        transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
+                        className="absolute inset-0 bg-gradient-to-r from-transparent via-[#a600ff]/20 to-transparent"
+                      />
+                    )}
+                    
+                    <span className="relative z-10 font-geist text-[10px] text-[#a600ff] uppercase tracking-[0.5em] font-bold">
+                      {isSubmitting ? 'SYNCING DATA...' : 'EXECUTE SYNC'}
                     </span>
                   </button>
-
-                  <div className="flex justify-between items-center pt-8 border-t border-white/5">
-                    <div className="flex items-center gap-3">
-                      <div className="h-[1px] w-6 bg-[#a600ff]/30" />
-                      <p className="font-geist text-white/40 text-[8px] uppercase tracking-[0.5em]">
-                        SECURE_UPLINK
-                      </p>
-                    </div>
-                    <p className="font-geist text-white/20 text-[8px] uppercase tracking-[0.5em]">
-                      v2.1 // ENCRYPTED
-                    </p>
-                  </div>
                 </form>
+
+                <div className="flex items-center gap-4">
+                  <div className="h-[1px] w-6 bg-white/20" />
+                  <p className="font-geist text-white/50 text-[8px] uppercase tracking-[0.3em]">
+                    SECURE // ENCRYPTED
+                  </p>
+                </div>
               </motion.div>
             ) : (
               <motion.div
                 key="success-message"
-                initial={{ opacity: 0, x: -30 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.8, ease: [0.19, 1, 0.22, 1] }}
-                className="relative p-16 text-center border border-[#a600ff]/20 bg-white/[0.01]"
+                initial={{ scale: 0.95, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.6, ease: [0.19, 1, 0.22, 1] }}
+                className="space-y-8"
               >
-                <div className="absolute top-0 right-0 w-3 h-3 border-t border-r border-[#a600ff]" />
-                <div className="absolute bottom-0 left-0 w-3 h-3 border-b border-l border-[#a600ff]" />
-
-                <div className="mb-10 flex justify-center">
-                  <div className="w-20 h-20 border border-[#a600ff]/30 rounded-full flex items-center justify-center relative overflow-hidden">
-                    <motion.div 
-                      initial={{ y: "100%" }}
-                      animate={{ y: "-100%" }}
-                      transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                      className="absolute inset-0 bg-[#a600ff]/20"
-                    />
-                    <span className="text-[#a600ff] text-3xl font-bold">✓</span>
-                  </div>
-                </div>
-
-                <h2 className="font-orbitron text-3xl md:text-4xl font-bold text-white uppercase tracking-[0.1em] mb-6">
-                  SYNC <span className="text-[#a600ff]">COMPLETE</span>
+                <h2 className="font-orbitron text-3xl md:text-4xl font-bold text-white uppercase tracking-tighter">
+                  RESUME <br/>
+                  <span className="text-[#a600ff]">DISPATCHED</span>
                 </h2>
                 
-                <p className="font-geist text-white/70 text-xs uppercase tracking-[0.3em] leading-relaxed mb-12 max-w-sm mx-auto">
-                  ENCRYPTED DATA PACKET HAS BEEN DISPATCHED TO YOUR SPECIFIED TERMINAL.
+                <div className="w-12 h-[1px] bg-[#a600ff]/50" />
+                
+                <p className="font-geist text-white/80 text-[10px] md:text-sm uppercase tracking-[0.3em] leading-relaxed">
+                  TRANSFER INITIATED. THE RESUME.PDF HAS BEEN SENT TO YOUR INBOX.
                 </p>
                 
                 <button
                   onClick={() => setSubmitted(false)}
-                  className="mx-auto font-geist text-[10px] text-[#a600ff]/70 hover:text-[#a600ff] uppercase tracking-[0.5em] hover:tracking-[0.7em] transition-all duration-300 flex items-center gap-4"
+                  className="pt-8 font-geist text-[9px] text-[#a600ff]/60 uppercase tracking-[0.4em] hover:text-[#a600ff] transition-colors duration-300 flex items-center gap-2"
                 >
-                  <span className="text-xl">←</span> RETURN_TO_ENTRY
+                  <span className="text-[12px]">←</span> RETURN
                 </button>
               </motion.div>
             )}
