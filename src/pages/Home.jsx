@@ -416,7 +416,7 @@ export default function Home() {
         <div className="absolute left-6 md:left-24 max-w-lg z-20 top-1/2 -translate-y-[150%] md:-translate-y-[140%] flex flex-col space-y-4">
           <div className="flex flex-col gap-1">
             <ScrollLetterRevealDelayed
-              text="OPEN_WORLD_MODULE 
+              text="OPEN_WORLD_MODULE"
               duration={100}
               delay={0}
               className="text-[#a600ff] font-geist text-[9px] md:text-[10px] uppercase tracking-[0.5em] font-bold"
