@@ -8,7 +8,7 @@ const Loader = ({ onFinish, isInitial }) => {
 
   useEffect(() => {
     // Longer duration for initial GIF, shorter for page transitions
-    const duration = isInitial ? 3000 : 2000; 
+    const duration = isInitial ? 3000 : 1200; 
     
     if (!isInitial) {
       const interval = setInterval(() => {
@@ -17,7 +17,7 @@ const Loader = ({ onFinish, isInitial }) => {
       
       const timer = setTimeout(() => {
         onFinish();
-      }, duration + 200); // Small buffer
+      }, duration + 100); // Small buffer
 
       return () => {
         clearTimeout(timer);
@@ -32,7 +32,7 @@ const Loader = ({ onFinish, isInitial }) => {
   }, [onFinish, isInitial]);
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black z-[10000]">
+    <div className="fixed inset-0 flex items-center justify-center bg-black z-[9999]">
       {isInitial ? (
         <img
           src={loaderGif}
@@ -49,7 +49,7 @@ const Loader = ({ onFinish, isInitial }) => {
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="flex items-baseline justify-center"
+              className="flex items-baseline"
             >
               <span className="font-orbitron text-[48px] md:text-[64px] font-black text-white leading-none tracking-tighter select-none">
                 {progress.toString().padStart(2, '0')}
@@ -66,9 +66,9 @@ const Loader = ({ onFinish, isInitial }) => {
                 x: [0, -3, 3, -1, 0]
               }}
               transition={{ duration: 0.2, repeat: Infinity, repeatDelay: 0.8 }}
-              className="absolute inset-0 flex items-baseline justify-center pointer-events-none select-none"
+              className="absolute inset-0 flex items-baseline justify-center pointer-events-none select-none mix-blend-screen"
             >
-              <span className="font-orbitron text-[48px] md:text-[64px] font-black text-[#a600ff]/20 leading-none tracking-tighter">
+              <span className="font-orbitron text-[48px] md:text-[64px] font-black text-[#a600ff]/30 leading-none tracking-tighter">
                 {progress.toString().padStart(2, '0')}
               </span>
             </motion.div>
