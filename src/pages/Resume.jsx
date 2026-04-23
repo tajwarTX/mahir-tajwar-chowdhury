@@ -69,7 +69,7 @@ export const Resume = () => {
         </div>
 
         {/* Right Side: Minimal Interactive Form */}
-        <div className="relative w-full max-w-md mx-auto z-10">
+        <div className="relative w-full max-w-md mx-auto lg:mx-0 lg:ml-auto z-10">
           <AnimatePresence mode="wait">
             {!submitted ? (
               <motion.div
@@ -78,11 +78,11 @@ export const Resume = () => {
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: -20, opacity: 0 }}
                 transition={{ duration: 0.6, ease: [0.19, 1, 0.22, 1] }}
-                className="space-y-12"
+                className="space-y-12 relative"
               >
                 <form onSubmit={handleSubmit} className="space-y-8">
-                  <div className="space-y-2 group flex flex-col items-center">
-                    <label className="block font-geist text-[9px] text-white/90 uppercase tracking-[0.4em] transition-colors duration-200 group-focus-within:text-[#a600ff] text-center">
+                  <div className="space-y-2 group">
+                    <label className="block font-geist text-[9px] text-white/90 uppercase tracking-[0.4em] transition-colors duration-200 group-focus-within:text-[#a600ff]">
                       FULL NAME
                     </label>
                     <input
@@ -91,12 +91,12 @@ export const Resume = () => {
                       value={formData.name}
                       placeholder="ENTER NAME"
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full bg-transparent border-b border-white/20 py-3 font-geist text-sm text-white uppercase tracking-[0.2em] focus:outline-none focus:border-[#a600ff] transition-all duration-300 placeholder:text-white/30 text-center"
+                      className="w-full bg-transparent border-b border-white/20 py-3 font-geist text-sm text-white uppercase tracking-[0.2em] focus:outline-none focus:border-[#a600ff] transition-all duration-300 placeholder:text-white/30"
                     />
                   </div>
 
-                  <div className="space-y-2 group flex flex-col items-center">
-                    <label className="block font-geist text-[9px] text-white/90 uppercase tracking-[0.4em] transition-colors duration-200 group-focus-within:text-[#a600ff] text-center">
+                  <div className="space-y-2 group">
+                    <label className="block font-geist text-[9px] text-white/90 uppercase tracking-[0.4em] transition-colors duration-200 group-focus-within:text-[#a600ff]">
                       CONTACT EMAIL
                     </label>
                     <input
@@ -105,7 +105,7 @@ export const Resume = () => {
                       value={formData.email}
                       placeholder="ENTER EMAIL ADDRESS"
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full bg-transparent border-b border-white/20 py-3 font-geist text-sm text-white uppercase tracking-[0.2em] focus:outline-none focus:border-[#a600ff] transition-all duration-300 placeholder:text-white/30 text-center"
+                      className="w-full bg-transparent border-b border-white/20 py-3 font-geist text-sm text-white uppercase tracking-[0.2em] focus:outline-none focus:border-[#a600ff] transition-all duration-300 placeholder:text-white/30"
                     />
                   </div>
 
@@ -129,7 +129,7 @@ export const Resume = () => {
                   </motion.button>
                 </form>
 
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 absolute -bottom-16 left-0">
                   <div className="h-[1px] w-6 bg-white/20" />
                   <p className="font-geist text-white/50 text-[8px] uppercase tracking-[0.3em]">
                     SECURE // ENCRYPTED
@@ -144,20 +144,20 @@ export const Resume = () => {
                 transition={{ duration: 0.6, ease: [0.19, 1, 0.22, 1] }}
                 className="space-y-8"
               >
-                <h2 className="font-orbitron text-3xl md:text-4xl font-bold text-white uppercase tracking-tighter text-center">
+                <h2 className="font-orbitron text-3xl md:text-4xl font-bold text-white uppercase tracking-tighter">
                   RESUME <br/>
                   <span className="text-[#a600ff]">DISPATCHED</span>
                 </h2>
                 
-                <div className="w-12 h-[1px] bg-[#a600ff]/50 mx-auto" />
+                <div className="w-12 h-[1px] bg-[#a600ff]/50" />
                 
-                <p className="font-geist text-white/80 text-[10px] md:text-sm uppercase tracking-[0.3em] leading-relaxed text-center">
+                <p className="font-geist text-white/80 text-[10px] md:text-sm uppercase tracking-[0.3em] leading-relaxed">
                   TRANSFER INITIATED. THE RESUME.PDF HAS BEEN SENT TO YOUR INBOX.
                 </p>
                 
                 <button
                   onClick={() => setSubmitted(false)}
-                  className="pt-8 font-geist text-[9px] text-[#a600ff]/60 uppercase tracking-[0.4em] hover:text-[#a600ff] transition-colors duration-300 flex items-center justify-center gap-2"
+                  className="pt-8 font-geist text-[9px] text-[#a600ff]/60 uppercase tracking-[0.4em] hover:text-[#a600ff] transition-colors duration-300 flex items-center gap-2"
                 >
                   <span className="text-[12px]">←</span> RETURN
                 </button>
