@@ -51,10 +51,10 @@ const Loader = ({ onFinish, isInitial }) => {
               animate={{ opacity: 1, y: 0 }}
               className="flex items-baseline"
             >
-              <span className="font-orbitron text-[80px] md:text-[120px] font-black text-white leading-none tracking-tighter select-none">
+              <span className="font-orbitron text-[32px] md:text-[48px] font-black text-white leading-none tracking-tighter select-none">
                 {progress.toString().padStart(2, '0')}
               </span>
-              <span className="font-geist text-[14px] md:text-[18px] text-[#a600ff] font-bold ml-2 uppercase tracking-widest">
+              <span className="font-geist text-[12px] md:text-[14px] text-[#a600ff] font-bold ml-1 uppercase tracking-widest">
                 %
               </span>
             </motion.div>
@@ -63,40 +63,26 @@ const Loader = ({ onFinish, isInitial }) => {
             <motion.div
               animate={{ 
                 opacity: [0, 0.4, 0, 0.2, 0],
-                x: [0, -5, 5, -2, 0]
+                x: [0, -3, 3, -1, 0]
               }}
               transition={{ duration: 0.2, repeat: Infinity, repeatDelay: 0.8 }}
-              className="absolute inset-0 flex items-baseline pointer-events-none select-none mix-blend-screen"
+              className="absolute inset-0 flex items-baseline justify-center pointer-events-none select-none mix-blend-screen"
             >
-              <span className="font-orbitron text-[80px] md:text-[120px] font-black text-[#a600ff]/30 leading-none tracking-tighter">
+              <span className="font-orbitron text-[32px] md:text-[48px] font-black text-[#a600ff]/30 leading-none tracking-tighter">
                 {progress.toString().padStart(2, '0')}
               </span>
             </motion.div>
 
             {/* Progress Bar */}
-            <div className="mt-8 w-64 h-[1px] bg-white/5 relative">
+            <div className="mt-4 w-32 h-[1px] bg-white/5 relative">
               <motion.div 
-                className="absolute top-0 left-0 h-full bg-[#a600ff] shadow-[0_0_15px_#a600ff]"
+                className="absolute top-0 left-0 h-full bg-[#a600ff] shadow-[0_0_10px_#a600ff]"
                 initial={{ width: "0%" }}
                 animate={{ width: `${progress}%` }}
                 transition={{ ease: "linear" }}
               />
             </div>
-
-            <div className="mt-6 flex items-center gap-3">
-               <div className="w-1.5 h-1.5 bg-[#a600ff] animate-pulse rounded-full" />
-               <span className="font-geist text-[9px] text-white/40 uppercase tracking-[0.5em]">
-                 Synchronizing_Data_Node
-               </span>
-            </div>
           </div>
-
-          {/* Horizontal Scanning Line */}
-          <motion.div 
-            className="fixed left-0 w-full h-[1px] bg-white/5 z-0"
-            animate={{ top: ["0%", "100%"] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-          />
         </div>
       )}
     </div>
