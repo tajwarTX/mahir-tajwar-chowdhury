@@ -45,7 +45,7 @@ export const Resume = () => {
       <div className="max-w-[1400px] w-full grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center relative z-[20]">
         
         {/* Left Side: Typography and Info */}
-        <div className="flex flex-col items-center text-center lg:items-start lg:text-left z-10 w-full relative lg:pt-40">
+        <div className="flex flex-col items-center text-center lg:items-start lg:text-left z-10 w-full relative">
           <h1 className="font-orbitron text-[50px] md:text-[75px] lg:text-[90px] font-extrabold text-white uppercase leading-[0.8] tracking-tighter">
             <ScrollLetterRevealDelayed text="REQUEST" duration={200} delay={0} />
             <br />
