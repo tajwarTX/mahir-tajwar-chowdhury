@@ -105,7 +105,7 @@ export const Resume = () => {
                       value={formData.email}
                       placeholder="ENTER EMAIL ADDRESS"
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full bg-transparent border-b border-white/20 py-3 font-geist text-[15px] text-white uppercase tracking-[0.2em] focus:outline-none focus:border-[#a600ff] transition-all duration-300 placeholder:text-white/30"
+                      className="w-full bg-transparent border-b border-white/20 py-3 font-geist text-[15px] text-white tracking-[0.2em] focus:outline-none focus:border-[#a600ff] transition-all duration-300 placeholder:text-white/30"
                     />
                   </div>
 
