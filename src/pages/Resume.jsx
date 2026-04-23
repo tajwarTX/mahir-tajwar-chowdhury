@@ -42,7 +42,7 @@ export const Resume = () => {
       {/* Cinematic Backdrop Glow - Replaced heavy CSS blur with a much lighter radial gradient */}
       <div className="absolute top-1/2 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[radial-gradient(circle_at_center,_rgba(166,0,255,0.15)_0%,_transparent_70%)] pointer-events-none" />
 
-      <div className="max-w-[1400px] w-full grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center relative z-10">
+      <div className="max-w-[1400px] w-full grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center relative z-[20]">
         
         {/* Left Side: Typography and Info */}
         <div className="flex flex-col z-10 w-full relative">
@@ -56,12 +56,12 @@ export const Resume = () => {
           
           <div className="mt-8 flex items-center gap-4">
              <div className="h-[1px] w-12 bg-[#a600ff]" />
-             <span className="font-geist text-[10px] md:text-[11px] text-white/40 uppercase tracking-[0.4em] font-medium">
+             <span className="font-geist text-[10px] md:text-[11px] text-white/60 uppercase tracking-[0.4em] font-medium">
                ARCHIVE_002 // DATA_SYNC
              </span>
           </div>
 
-          <p className="font-geist text-white/50 text-xs md:text-sm uppercase tracking-[0.3em] font-medium leading-relaxed max-w-lg mt-8">
+          <p className="font-geist text-white/80 text-xs md:text-sm uppercase tracking-[0.3em] font-medium leading-relaxed max-w-lg mt-8">
             PROVIDE YOUR DETAILS TO RECEIVE A DIRECT COPY OF MAHIR TAJWAR'S DIGITAL DOSSIER AND ENGINEERING RESUME.
           </p>
 
@@ -85,7 +85,7 @@ export const Resume = () => {
               >
                 <form onSubmit={handleSubmit} className="space-y-8">
                   <div className="space-y-2 group">
-                    <label className="block font-geist text-[9px] text-white/40 uppercase tracking-[0.4em] transition-colors duration-200 group-focus-within:text-[#a600ff]">
+                    <label className="block font-geist text-[9px] text-white/70 uppercase tracking-[0.4em] transition-colors duration-200 group-focus-within:text-[#a600ff]">
                       FULL NAME
                     </label>
                     <input
@@ -94,12 +94,12 @@ export const Resume = () => {
                       value={formData.name}
                       placeholder="ENTER NAME"
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full bg-transparent border-b border-white/20 py-3 font-geist text-sm text-white uppercase tracking-[0.2em] focus:outline-none focus:border-[#a600ff] transition-all duration-300 placeholder:text-white/10"
+                      className="w-full bg-transparent border-b border-white/20 py-3 font-geist text-sm text-white uppercase tracking-[0.2em] focus:outline-none focus:border-[#a600ff] transition-all duration-300 placeholder:text-white/30"
                     />
                   </div>
 
                   <div className="space-y-2 group">
-                    <label className="block font-geist text-[9px] text-white/40 uppercase tracking-[0.4em] transition-colors duration-200 group-focus-within:text-[#a600ff]">
+                    <label className="block font-geist text-[9px] text-white/70 uppercase tracking-[0.4em] transition-colors duration-200 group-focus-within:text-[#a600ff]">
                       CONTACT EMAIL
                     </label>
                     <input
@@ -108,7 +108,7 @@ export const Resume = () => {
                       value={formData.email}
                       placeholder="ENTER EMAIL ADDRESS"
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full bg-transparent border-b border-white/20 py-3 font-geist text-sm text-white uppercase tracking-[0.2em] focus:outline-none focus:border-[#a600ff] transition-all duration-300 placeholder:text-white/10"
+                      className="w-full bg-transparent border-b border-white/20 py-3 font-geist text-sm text-white uppercase tracking-[0.2em] focus:outline-none focus:border-[#a600ff] transition-all duration-300 placeholder:text-white/30"
                     />
                   </div>
 
@@ -124,7 +124,7 @@ export const Resume = () => {
 
                 <div className="flex items-center gap-4">
                   <div className="h-[1px] w-6 bg-white/20" />
-                  <p className="font-geist text-white/20 text-[8px] uppercase tracking-[0.3em]">
+                  <p className="font-geist text-white/50 text-[8px] uppercase tracking-[0.3em]">
                     SECURE // ENCRYPTED
                   </p>
                 </div>
@@ -144,7 +144,7 @@ export const Resume = () => {
                 
                 <div className="w-12 h-[1px] bg-[#a600ff]/50" />
                 
-                <p className="font-geist text-white/60 text-[10px] md:text-sm uppercase tracking-[0.3em] leading-relaxed">
+                <p className="font-geist text-white/80 text-[10px] md:text-sm uppercase tracking-[0.3em] leading-relaxed">
                   TRANSFER INITIATED. THE RESUME.PDF HAS BEEN SENT TO YOUR INBOX.
                 </p>
                 
