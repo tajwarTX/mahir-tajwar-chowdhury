@@ -9,6 +9,9 @@ const About = lazy(() => import("./pages/About"));
 const Projects = lazy(() => import("./pages/Projects"));
 const Contact = lazy(() => import("./pages/Contact"));
 const Resume = lazy(() => import("./pages/Resume"));
+const Blog = lazy(() => import("./pages/Blog").then(module => ({ default: module.Blog })));
+const BlogPost = lazy(() => import("./pages/BlogPost"));
+const Admin = lazy(() => import("./pages/Admin"));
 import Dither from "./components/Dither";
 import TargetCursor from "./components/TargetCursor";
 import Loader from "./components/Loader";
@@ -17,6 +20,7 @@ const menuItems = [
   { label: 'Home', ariaLabel: 'Go to home page', link: '/' },
   { label: 'About', ariaLabel: 'Learn more about me', link: '/about' },
   { label: 'Projects', ariaLabel: 'View my engineering projects', link: '/projects' },
+  { label: 'Blog', ariaLabel: 'Read my thoughts', link: '/blog' },
   { label: 'Contact', ariaLabel: 'Get in touch for collaboration', link: '/contact' }
 ];
 
@@ -131,6 +135,9 @@ const App = () => {
                 <Route path="/projects" element={<Projects />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/resume" element={<Resume />} />
+                <Route path="/blog" element={<Blog />} />
+                <Route path="/blog/:id" element={<BlogPost />} />
+                <Route path="/admin" element={<Admin />} />
               </Routes>
             </Suspense>
           </div>
