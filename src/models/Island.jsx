@@ -1,5 +1,5 @@
 import React, { useRef, useMemo, forwardRef, useEffect } from "react";
-import { useGLTF, Center, Html } from "@react-three/drei";
+import { useGLTF, Center, Billboard, Text } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";
 import * as THREE from "three";
@@ -103,43 +103,44 @@ const Island = forwardRef(
 
         <group name="annotations-container">
           {annotations.map((ann) => (
-            <Html
+            <Billboard
               key={ann.id}
               position={ann.localPosition}
-              center
-              distanceFactor={90} 
-              zIndexRange={[10, 0]}
-              style={{ 
-                pointerEvents: "auto",
-                userSelect: "none"
-              }}
+              follow={true}
             >
-              <div
-                className="annotation-marker-wrapper cursor-target"
+              <mesh
                 onClick={(e) => {
                   e.stopPropagation();
                   onAnnotationClick(ann);
                 }}
+                onPointerOver={() => {
+                  if (activeAnnotation !== ann.id) document.body.style.cursor = 'pointer';
+                }}
+                onPointerOut={() => {
+                  document.body.style.cursor = 'auto';
+                }}
+                visible={activeAnnotation !== ann.id}
+                scale={ann.markerScale ? ann.markerScale * 3.5 : 3.5}
               >
-                <div
-                  className={`annotation-dot ${
-                    activeAnnotation === ann.id ? "active" : ""
-                  }`}
-                  style={{
-                    transform: ann.markerScale ? `scale(${ann.markerScale})` : 'scale(1)',
-                    transition: 'transform 0.3s ease, opacity 0.3s ease',
-                    opacity: activeAnnotation === ann.id ? 0 : 1,
-                    pointerEvents: activeAnnotation === ann.id ? 'none' : 'auto'
-                  }}
+                <circleGeometry args={[1, 32]} />
+                <meshBasicMaterial 
+                  color="#a600ff" 
+                  transparent 
+                  opacity={0.8} 
+                  depthTest={false} 
+                />
+                <Text
+                  position={[0, 0, 0.1]}
+                  fontSize={0.8}
+                  color="white"
+                  anchorX="center"
+                  anchorY="middle"
+                  depthTest={false}
                 >
-                  <span>{ann.id}</span>
-                </div>
-                <div className="annotation-label" style={{
-                  opacity: activeAnnotation === ann.id ? 0 : undefined,
-                  pointerEvents: activeAnnotation === ann.id ? 'none' : 'auto'
-                }}>{ann.title}</div>
-              </div>
-            </Html>
+                  {ann.id}
+                </Text>
+              </mesh>
+            </Billboard>
           ))}
         </group>
       </group>

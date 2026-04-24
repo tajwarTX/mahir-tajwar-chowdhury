@@ -99,7 +99,7 @@ const InfiniteScrollText = React.memo(() => {
       if (!canvas) return;
       const ctx = canvas.getContext('2d');
 
-      const fontSize = 200;
+      const fontSize = 100; // Halved to prevent canvas exceeding max GPU texture size
       ctx.font = `800 ${fontSize}px "Orbitron", sans-serif`;
 
       const metrics = ctx.measureText(text);
@@ -118,9 +118,13 @@ const InfiniteScrollText = React.memo(() => {
       if (containerRef.current) {
         containerRef.current.style.backgroundImage = `url(${canvas.toDataURL()})`;
         containerRef.current.style.backgroundRepeat = 'repeat-x';
-        containerRef.current.style.backgroundSize = `${textWidth}px auto`;
+        containerRef.current.style.backgroundSize = `auto 100%`;
 
-        containerRef.current.style.width = `${textWidth * 2}px`;
+        // Calculate aspect ratio to set width properly based on the container height
+        const aspectRatio = textWidth / canvas.height;
+        // Since we scale to 100% height, width needs to be managed or just use background-position
+        containerRef.current.style.width = `2000vw`; // wide enough to scroll
+        containerRef.current.style.setProperty('--scroll-amount', `-${textWidth}px`);
       }
     };
 
@@ -146,7 +150,7 @@ const InfiniteScrollText = React.memo(() => {
         }
         @keyframes scrollCanvas {
           from { transform: translate3d(0, 0, 0); }
-          to { transform: translate3d(-50%, 0, 0); }
+          to { transform: translate3d(-100vw, 0, 0); }
         }
       `}</style>
     </div>
@@ -213,7 +217,6 @@ export default function Home() {
 
   const [scale, setScale] = useState([1, 1, 1]);
 
-  const [dpr, setDpr] = useState(1);
   const [position, setPosition] = useState([
     BASE_POSITION.x,
     BASE_POSITION.y,
@@ -298,23 +301,27 @@ export default function Home() {
 
   useEffect(() => {
     let fadeTimeout;
-    const checkIntroVisible = () => {
-      if (!introRef.current) return;
-      const rect = introRef.current.getBoundingClientRect();
-      const visible = rect.top < window.innerHeight && rect.bottom > 0;
-      if (visible) {
-        clearTimeout(fadeTimeout);
-        fadeTimeout = setTimeout(() => setShowArrowScroll(true), 800);
-      } else {
-        clearTimeout(fadeTimeout);
-        setShowArrowScroll(false);
-      }
-    };
-    window.addEventListener("scroll", checkIntroVisible);
-    checkIntroVisible();
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          clearTimeout(fadeTimeout);
+          fadeTimeout = setTimeout(() => setShowArrowScroll(true), 800);
+        } else {
+          clearTimeout(fadeTimeout);
+          setShowArrowScroll(false);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (introRef.current) {
+      observer.observe(introRef.current);
+    }
+
     fadeTimeout = setTimeout(() => setShowArrowScroll(true), 1500);
+
     return () => {
-      window.removeEventListener("scroll", checkIntroVisible);
+      observer.disconnect();
       clearTimeout(fadeTimeout);
     };
   }, []);
@@ -568,7 +575,6 @@ export default function Home() {
 
         <Canvas
           ref={cameraRef}
-          dpr={[1, dpr]}
           gl={{
             antialias: false,
             powerPreference: "high-performance",
@@ -579,10 +585,7 @@ export default function Home() {
           }}
           camera={{ position: [0, 0, 50], near: 0.1, far: 2000 }}
         >
-          <PerformanceMonitor 
-            onDecline={() => setDpr(0.7)} 
-            onIncline={() => setDpr(1)} 
-          />
+          <PerformanceMonitor />
           <AdaptiveDpr pixelated />
           <AdaptiveEvents />
           <ambientLight intensity={2} />

@@ -47,7 +47,9 @@ const ScrollLetterRevealDelayed = ({ text, duration = 2000, delay = 800, classNa
       lettersRef.current.forEach((span, i) => {
         if (!span) return;
         if (elapsed >= delays[i]) {
-          span.style.opacity = "1";
+          if (span.style.opacity !== "1") {
+            span.style.opacity = "1";
+          }
         } else {
           allDone = false;
         }
