@@ -1,12 +1,13 @@
 import { useRef, useState, useEffect, lazy, Suspense } from "react";
 import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import { Analytics } from "@vercel/analytics/react";
+import { AnimatePresence } from "framer-motion";
 
 import StaggeredMenu from "./components/StaggeredMenu";
 import Navbar from "./components/Navbar";
 const Home = lazy(() => import("./pages/Home"));
 const About = lazy(() => import("./pages/About"));
-const Projects = lazy(() => import("./pages/Projects"));
+import Projects from "./pages/Projects";
 const Contact = lazy(() => import("./pages/Contact"));
 const Resume = lazy(() => import("./pages/Resume"));
 const Blog = lazy(() => import("./pages/Blog").then(module => ({ default: module.Blog })));
@@ -67,15 +68,17 @@ const App = () => {
 
         <div className="fixed inset-0 pointer-events-none z-[15] bg-[radial-gradient(circle,transparent_40%,rgba(0,0,0,0.8)_100%)]" />
 
-        {loading && (
-          <Loader 
-            isInitial={isInitialLoad} 
-            onFinish={() => {
-              setLoading(false);
-              setIsInitialLoad(false);
-            }} 
-          />
-        )}
+        <AnimatePresence>
+          {loading && (
+            <Loader 
+              isInitial={isInitialLoad} 
+              onFinish={() => {
+                setLoading(false);
+                setIsInitialLoad(false);
+              }} 
+            />
+          )}
+        </AnimatePresence>
 
         {!isMobile && (
           <div className="fixed inset-0 z-[9999] pointer-events-none">
@@ -109,7 +112,9 @@ const App = () => {
           />
         </div>
 
-        <div className={loading ? "hidden" : "block"}>
+        <div 
+          className="opacity-100"
+        >
           <Navbar />
           <div className="fixed inset-0 z-[1010] pointer-events-none">
             <StaggeredMenu

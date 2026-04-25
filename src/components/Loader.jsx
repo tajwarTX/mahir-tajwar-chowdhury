@@ -1,38 +1,75 @@
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import loaderGif from "../assets/loading.gif";
+import { useProgress } from "@react-three/drei";
 
 const Loader = ({ onFinish, isInitial }) => {
   const [progress, setProgress] = useState(0);
+  const { active } = useProgress();
+  const activeRef = useRef(active);
+  activeRef.current = active;
 
   useEffect(() => {
+    const isProjectsRoute = typeof window !== 'undefined' && window.location.pathname === '/projects';
+    const minDuration = isInitial 
+      ? (isProjectsRoute ? 4000 : 3000) 
+      : 1200;
+      
+    const startTime = Date.now();
+    let interval;
+    let finishTimer;
 
-    const duration = isInitial ? 3000 : 1200; 
+    const checkFinish = () => {
+      const elapsed = Date.now() - startTime;
+      
+      // If we are on the projects route and models are still loading, wait
+      if (isProjectsRoute && activeRef.current) {
+        finishTimer = setTimeout(checkFinish, 100);
+        return;
+      }
+
+      if (elapsed < minDuration) {
+        finishTimer = setTimeout(checkFinish, 100);
+        return;
+      }
+      
+      // Additional small delay for shader compilation after active becomes false
+      if (isProjectsRoute) {
+        setProgress(100);
+        finishTimer = setTimeout(onFinish, 100);
+      } else {
+        setProgress(100);
+        finishTimer = setTimeout(onFinish, 100);
+      }
+    };
 
     if (!isInitial) {
-      const interval = setInterval(() => {
-        setProgress(prev => (prev < 100 ? prev + 1 : 100));
-      }, duration / 100);
-
-      const timer = setTimeout(() => {
-        onFinish();
-      }, duration + 100); 
-
-      return () => {
-        clearTimeout(timer);
-        clearInterval(interval);
-      };
-    } else {
-      const timer = setTimeout(() => {
-        onFinish();
-      }, duration);
-      return () => clearTimeout(timer);
+      interval = setInterval(() => {
+        setProgress(prev => {
+           if (isProjectsRoute && activeRef.current) {
+             return prev < 99 ? prev + 1 : 99; // Pause at 99% if still loading
+           }
+           return prev < 100 ? prev + 1 : 100;
+        });
+      }, minDuration / 100);
     }
+
+    checkFinish();
+
+    return () => {
+      clearTimeout(finishTimer);
+      clearInterval(interval);
+    };
   }, [onFinish, isInitial]);
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black z-[9999]">
+    <motion.div 
+      initial={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.3, ease: "easeInOut" }}
+      className="fixed inset-0 flex items-center justify-center bg-black z-[9999]"
+    >
       {isInitial ? (
         <img
           src={loaderGif}
@@ -81,7 +118,7 @@ const Loader = ({ onFinish, isInitial }) => {
           </div>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 };
 
