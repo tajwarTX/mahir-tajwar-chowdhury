@@ -1,9 +1,8 @@
 import React, { forwardRef, Suspense } from 'react';
 import * as THREE from 'three';
 import { useGLTF, Clone } from '@react-three/drei';
+import MODEL_PATH from '../assets/3d/k-vrc.glb';
 
-// Using the transformed model
-const MODEL_PATH = '/src/assets/3d/k-vrc.glb';
 
 const KVRCModel = ({ ...props }) => {
   const { scene, materials } = useGLTF(MODEL_PATH);
