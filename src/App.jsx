@@ -83,7 +83,7 @@ const App = () => {
               spinDuration={4.1}
               hideDefaultCursor
               parallaxOn
-              hoverDuration={0.5}
+              hoverDuration={0.05}
               containerRef={ditherRef}
             />
           </div>

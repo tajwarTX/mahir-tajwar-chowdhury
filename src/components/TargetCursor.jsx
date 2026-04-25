@@ -252,7 +252,7 @@ const TargetCursor = ({
         gsap.to(corner, {
           x: targetCornerPositionsRef.current[i].x - cursorX,
           y: targetCornerPositionsRef.current[i].y - cursorY,
-          duration: 0.2,
+          duration: 0.08,
           ease: 'power2.out'
         });
       });
