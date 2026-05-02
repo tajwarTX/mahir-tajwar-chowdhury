@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import React, { Suspense, useRef, useState, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { ScrollControls, Scroll, useScroll, PerspectiveCamera, Environment, ContactShadows, Bvh, Preload, PerformanceMonitor, AdaptiveDpr, AdaptiveEvents, useProgress } from '@react-three/drei';
@@ -70,7 +71,6 @@ const HackerTerminal = () => {
   const [logs, setLogs] = useState([]);
   const [selectedProject, setSelectedProject] = useState(null);
   const [sortBy, setSortBy] = useState('type');
-  const [isSortOpen, setIsSortOpen] = useState(false);
   const [hasScrolled, setHasScrolled] = useState(false);
   
   const projectData = {
@@ -194,7 +194,7 @@ const HackerTerminal = () => {
         <span className="text-white font-bold tracking-widest uppercase">{item.title}</span>
         <div className="flex justify-between items-end">
           <span className="text-white/40">{item.date}</span>
-          <span className="text-white opacity-0 group-hover:opacity-100 font-bold tracking-widest hidden md:block transition-opacity duration-300">EXEC_></span>
+          <span className="text-white opacity-0 group-hover:opacity-100 font-bold tracking-widest hidden md:block transition-opacity duration-300">EXEC_&gt;</span>
         </div>
       </div>
     </div>
@@ -458,14 +458,8 @@ const Projects = () => {
   const [isLocked, setIsLocked] = useState(false);
   const [isUnmounted, setIsUnmounted] = useState(false);
   const { progress, active } = useProgress();
-  const [isReady, setIsReady] = useState(false);
 
-  useEffect(() => {
-    if (!active && progress === 100) {
-      const timer = setTimeout(() => setIsReady(true), 500);
-      return () => clearTimeout(timer);
-    }
-  }, [active, progress]);
+
 
   useEffect(() => {
     if (isLocked) {

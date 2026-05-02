@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+/* eslint-disable react-refresh/only-export-components */
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
@@ -43,17 +45,13 @@ export const getAllPosts = () => {
     
     // Combine and sort (newest custom posts first, though they don't have dates easily comparable unless we parse them)
     return [...customPosts, ...filteredStatic];
-  } catch (e) {
+  } catch {
     return posts;
   }
 };
 
 export const Blog = () => {
-  const [allPosts, setAllPosts] = useState([]);
-
-  useEffect(() => {
-    setAllPosts(getAllPosts());
-  }, []);
+  const [allPosts, setAllPosts] = useState(() => getAllPosts());
 
   return (
     <div className="w-full min-h-screen flex items-center justify-center bg-black px-6 md:px-24 py-20 md:py-32 overflow-hidden selection:bg-[#a600ff] selection:text-white">

@@ -1,7 +1,7 @@
 import React, { useRef, Suspense, useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import IntroBlock from "../components/IntroBlock";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Canvas } from "@react-three/fiber";
 import * as THREE from "three";
 import { PerformanceMonitor, AdaptiveDpr, AdaptiveEvents, Bvh, Preload, Float } from "@react-three/drei";
 import Island from "../models/Island";
@@ -14,8 +14,14 @@ const BASE_POSITION = { x: -2, y: -0, z: -63 };
 const MOBILE_POSITION = { x: -2, y: 24, z: -60 };
 const BASE_ROTATION_DEG = { x: -8, y: 124, z: 0 };
 const degToRad = (deg) => (deg * Math.PI) / 180;
+const ISLAND_ROTATION = [
+  degToRad(BASE_ROTATION_DEG.x),
+  degToRad(BASE_ROTATION_DEG.y),
+  degToRad(BASE_ROTATION_DEG.z),
+];
 
 const MODEL_CENTER = [BASE_POSITION.x, BASE_POSITION.y, BASE_POSITION.z];
+const DEFAULT_CAMERA_POSITION = [0, 0, 50];
 
 const ANNOTATIONS = [
   {
@@ -24,10 +30,15 @@ const ANNOTATIONS = [
     title: "The Stranded Pilot",
     description:
       "Having crashed in this remote forest, the pilot has found a strange peace among the voxel trees. They now spend their evenings sharing stories and meals with the curious forest dwellers.",
-    modelRotationY: degToRad(210),
-    camera: {
-      position: [-10.46, -29.06, -142.89],
+    model: {
+      position: [6.79, 104.28, 17.57],
+      rotation: [0.136814692820414, 3.36681469282041, 0.186814692820414],
+      scale: 0.73
     },
+    camera: {
+      position: [-13.51, 71.51, -142.89]
+    },
+    lookAt: [-0.25, 96.88, 21.63]
   },
   {
     id: 2,
@@ -36,10 +47,15 @@ const ANNOTATIONS = [
     title: "Dinner Table",
     description:
       "The heart of the scene — a cozy dinner setup where the traveler shares a meal with friendly forest cats. Warm light spills from lanterns, creating an intimate atmosphere amid the wilderness.",
-    modelRotationY: degToRad(180),
-    camera: {
-      position: [-2, 150, -63],
+    model: {
+      position: [-200, 22.47, -25.83],
+      rotation: [-0.063185307179586, 3.07681469282041, -0.443185307179586],
+      scale: 1.72
     },
+    camera: {
+      position: [237, 97.39, 144.2]
+    },
+    lookAt: [-0.88, -11.47, -12.29]
   },
   {
     id: 3,
@@ -47,10 +63,15 @@ const ANNOTATIONS = [
     title: "The Forest Cats",
     description:
       "Curious cats have gathered around the campsite, drawn by the warmth and food. These forest dwellers have made friends with the stranded traveler, keeping them company through the night.",
-    modelRotationY: degToRad(100),
-    camera: {
-      position: [-4.29, -26.91, 29.85],
+    model: {
+      position: [48.44, 157.22, -9.98],
+      rotation: [-0.013185307179586, 1.7453292519943295, 0.056814692820414],
+      scale: 2.23
     },
+    camera: {
+      position: [26.96, 54.57, -290.76]
+    },
+    lookAt: [0, 0, 0]
   },
   {
     id: 4,
@@ -58,10 +79,15 @@ const ANNOTATIONS = [
     title: "The Treetops",
     description:
       "Towering voxel trees create a canopy overhead, their pixelated leaves filtering moonlight into the clearing below. The forest seems to close in protectively around the small campsite.",
-    modelRotationY: degToRad(210),
-    camera: {
-      position: [35.89, -15.24, 36.67],
+    model: {
+      position: [200, 173.84, -200],
+      rotation: [0.106814692820414, 4.42681469282041, -0.123185307179586],
+      scale: 4.4
     },
+    camera: {
+      position: [-154.55, 86.65, 227.84]
+    },
+    lookAt: [0, 0, 0]
   },
   {
     id: 5,
@@ -70,10 +96,15 @@ const ANNOTATIONS = [
     title: "Full Diorama",
     description:
       "The complete scene: a voxel masterpiece depicting a stranded pilot finding unexpected companionship. Made with MagicaVoxel and Blender by @ediediedi for the 'Robots are Coming' challenge.",
-    modelRotationY: degToRad(145),
-    camera: {
-      position: [44.79, 8.34, -54.95],
+    model: {
+      position: [1.94, 1.81, 30.67],
+      rotation: [0, 1.92681469282041, 0.076814692820414],
+      scale: 1
     },
+    camera: {
+      position: [44.79, 1.28, -107.35]
+    },
+    lookAt: [0, 0, 0]
   },
   {
     id: 6,
@@ -81,15 +112,19 @@ const ANNOTATIONS = [
     title: "The Hidden Signal",
     description:
       "A rhythmic signal pulses from the dense overgrowth. It appears to be an automated distress beacon, long forgotten but still operational in the digital wilderness.",
-    modelRotationY: degToRad(45),
-    camera: {
-      position: [28.74, -25.4, 56.71],
+    model: {
+      position: [21.98, 52.46, 15.33],
+      rotation: [0.006814692820414, -1.53318530717959, 0.036814692820414],
+      scale: 1.67
     },
+    camera: {
+      position: [15.54, 20.07, 95.69]
+    },
+    lookAt: [0, 0, 0]
   },
 ];
 
-const InfiniteScrollText = React.memo(() => {
-  const text = "ROBOTICS • CREATIVE DEVELOPER • 3D DESIGNING • CINEMATIC • ";
+const InfiniteScrollText = React.memo(({ text = "ROBOTICS • CREATIVE DEVELOPER • 3D DESIGNING • CINEMATIC • " }) => {
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
 
@@ -121,10 +156,9 @@ const InfiniteScrollText = React.memo(() => {
         containerRef.current.style.backgroundSize = `auto 100%`;
 
         // Calculate aspect ratio to set width properly based on the container height
-        const aspectRatio = textWidth / canvas.height;
         // Since we scale to 100% height, width needs to be managed or just use background-position
-        containerRef.current.style.width = `2000vw`; // wide enough to scroll
-        containerRef.current.style.setProperty('--scroll-amount', `-${textWidth}px`);
+        containerRef.current.style.width = `100vw`; 
+        containerRef.current.style.setProperty('--scroll-amount', `-${textWidth * 2}px`); // Use 2x for smoother tiling if needed, or just textWidth
       }
     };
 
@@ -134,23 +168,25 @@ const InfiniteScrollText = React.memo(() => {
     } else {
       setTimeout(initCanvas, 500);
     }
-  }, []);
+  }, [text]);
 
   return (
     <div className="absolute left-0 top-[55%] md:top-[45%] w-full h-[150px] md:h-[300px] overflow-hidden pointer-events-none z-0 select-none">
       <canvas ref={canvasRef} className="hidden" />
       <div
         ref={containerRef}
-        className="marquee-optimized h-full flex transform-gpu"
+        className="marquee-optimized h-full w-full"
       />
       <style>{`
         .marquee-optimized {
-          animation: scrollCanvas 30s linear infinite;
-          will-change: transform;
+          animation: scrollCanvas 120s linear infinite;
+          background-repeat: repeat-x;
+          background-position: 0 center;
+          will-change: background-position;
         }
         @keyframes scrollCanvas {
-          from { transform: translate3d(0, 0, 0); }
-          to { transform: translate3d(-100vw, 0, 0); }
+          from { background-position: 0 center; }
+          to { background-position: var(--scroll-amount, -2000px) center; }
         }
       `}</style>
     </div>
@@ -201,10 +237,12 @@ function useDragRotation(targetRef, rotateSpeed = 0.005, isLocked = false) {
       window.removeEventListener("touchmove", handleTouchMove);
       window.removeEventListener("touchend", onEnd);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isLocked]);
 }
 
 export default function Home() {
+  const navigate = useNavigate();
   const islandRef = useRef(null);
   const cameraRef = useRef(null);
   const introRef = useRef(null);
@@ -214,7 +252,6 @@ export default function Home() {
   const [isIntersecting, setIsIntersecting] = useState(false);
   const [activeAnnotation, setActiveAnnotation] = useState(null);
   const [showInfoPanel, setShowInfoPanel] = useState(false);
-
   const [scale, setScale] = useState([1, 1, 1]);
 
   const [position, setPosition] = useState([
@@ -247,10 +284,8 @@ export default function Home() {
           (currentIdx - 1 + ANNOTATIONS.length) % ANNOTATIONS.length;
       }
       setShowInfoPanel(false);
-      setTimeout(() => {
-        setActiveAnnotation(ANNOTATIONS[nextIdx].id);
-        setTimeout(() => setShowInfoPanel(true), 600);
-      }, 200);
+      setActiveAnnotation(ANNOTATIONS[nextIdx].id);
+      setTimeout(() => setShowInfoPanel(true), 600);
     },
     [activeAnnotation]
   );
@@ -288,7 +323,11 @@ export default function Home() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Debug mode logic removed
+
   useDragRotation(islandRef, 0.007, activeAnnotation !== null);
+
+  // Floating intensity is now handled via props in the Float component
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -326,11 +365,7 @@ export default function Home() {
     };
   }, []);
 
-  const islandRotation = [
-    degToRad(BASE_ROTATION_DEG.x),
-    degToRad(BASE_ROTATION_DEG.y),
-    degToRad(BASE_ROTATION_DEG.z),
-  ];
+  // islandRotation moved outside
 
   const activeAnn = ANNOTATIONS.find((a) => a.id === activeAnnotation);
 
@@ -575,6 +610,7 @@ export default function Home() {
 
         <Canvas
           ref={cameraRef}
+          dpr={[1, 2]}
           gl={{
             antialias: false,
             powerPreference: "high-performance",
@@ -597,12 +633,13 @@ export default function Home() {
                 activeAnnotation={activeAnnotation}
                 annotations={ANNOTATIONS}
                 islandRef={islandRef}
-                defaultCameraPosition={[0, 0, 50]}
+                defaultCameraPosition={DEFAULT_CAMERA_POSITION}
+                initialRotationY={ISLAND_ROTATION[1]}
               />
               <Float
-                speed={2} 
-                rotationIntensity={0.5} 
-                floatIntensity={0.5} 
+                speed={activeAnnotation ? ([4, 5, 6].includes(activeAnnotation) ? 1.4 : 0.8) : 2} 
+                rotationIntensity={activeAnnotation ? ([4, 5, 6].includes(activeAnnotation) ? 0.3 : 0.1) : 0.5} 
+                floatIntensity={activeAnnotation ? ([4, 5, 6].includes(activeAnnotation) ? 0.6 : 0.3) : 0.5} 
                 floatingRange={[0, 1.5]} 
               >
                 <Island
@@ -611,7 +648,7 @@ export default function Home() {
                   isIntersecting={isIntersecting}
                   position={position}
                   scale={scale}
-                  rotation={islandRotation}
+                  rotation={ISLAND_ROTATION}
                   annotations={ANNOTATIONS}
                   activeAnnotation={activeAnnotation}
                   onAnnotationClick={handleAnnotationClick}

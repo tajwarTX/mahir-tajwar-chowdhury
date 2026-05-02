@@ -13,7 +13,7 @@ async function sha256(message) {
     const hashArray = Array.from(new Uint8Array(hashBuffer));
     const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     return hashHex;
-  } catch (e) {
+  } catch {
     return message;
   }
 }
@@ -57,7 +57,7 @@ const Admin = () => {
       } else {
         setError('Invalid credentials.');
       }
-    } catch (err) {
+    } catch {
       setError('System Error.');
     } finally {
       setIsLoading(false);
