@@ -123,30 +123,40 @@ function WarpRect({ velocityRef, index, containerRef }) {
       const cTB = c * sdFactor.current * 0.4;
       const cS  = c; // Side curve always
 
+      // ── Flag/Cloth wave logic ──────────────────────────────────────
+      const time = performance.now() * 0.001;
+      const flapBase = Math.min(0.04, Math.abs(v) * 0.003);
+      
+      // Wave offsets for control points
+      const w1 = Math.sin(time * 18) * flapBase;
+      const w2 = Math.sin(time * 18 + 2) * flapBase;
+      const w3 = Math.cos(time * 15) * flapBase;
+      const w4 = Math.cos(time * 15 + 2) * flapBase;
+
       const x1 = 0.10, x2 = 0.90, y1 = 0.02, y2 = 0.98;
 
       // Corners stay fixed - no side shrinking/stretching
-      const TRx = x2,  TRy = y1;
-      const BRx = x2,  BRy = y2;
-      const TLx = x1,  TLy = y1;
-      const BLx = x1,  BLy = y2;
+      const TRx = x2,  TRy = y1 + w1;
+      const BRx = x2,  BRy = y2 + w2;
+      const TLx = x1,  TLy = y1 + w3;
+      const BLx = x1,  BLy = y2 + w4;
 
-      // Right side: from TR → BR — bow OUT when leading, IN when trailing
+      // Right side: TR → BR — bow OUT when leading, IN when trailing + ripple
       const bowDir = v > 0 ? cS : -cS;
-      const rc1x = x2 + bowDir,  rc1y = y1 + 0.23;
-      const rc2x = x2 + bowDir,  rc2y = y2 - 0.23;
+      const rc1x = x2 + bowDir + w1,  rc1y = y1 + 0.23 + w2;
+      const rc2x = x2 + bowDir - w2,  rc2y = y2 - 0.23 + w1;
 
-      // Bottom side: from BR → BL — bow UP (toward center)
-      const bc1x = BRx + (BLx - BRx) * 0.33, bc1y = BRy - cTB * 0.5;
-      const bc2x = BRx + (BLx - BRx) * 0.66, bc2y = BRy - cTB * 0.5;
+      // Bottom side: BR → BL — bow UP (toward center) + ripple
+      const bc1x = BRx + (BLx - BRx) * 0.33, bc1y = BRy - cTB * 0.5 + w3;
+      const bc2x = BRx + (BLx - BRx) * 0.66, bc2y = BRy - cTB * 0.5 - w4;
 
-      // Left side: from BL → TL — bow IN when trailing, OUT when leading
-      const lc1x = x1 + bowDir,  lc1y = y2 - 0.23;
-      const lc2x = x1 + bowDir,  lc2y = y1 + 0.23;
+      // Left side: BL → TL — bow IN when trailing, OUT when leading + ripple
+      const lc1x = x1 + bowDir - w3,  lc1y = y2 - 0.23 + w4;
+      const lc2x = x1 + bowDir + w4,  lc2y = y1 + 0.23 - w3;
 
-      // Top side: from TL → TR — bow DOWN (toward center)
-      const tc1x = TLx + (TRx - TLx) * 0.33, tc1y = TLy + cTB * 0.5;
-      const tc2x = TLx + (TRx - TLx) * 0.66, tc2y = TLy + cTB * 0.5;
+      // Top side: TL → TR — bow DOWN (toward center) + ripple
+      const tc1x = TLx + (TRx - TLx) * 0.33, tc1y = TLy + cTB * 0.5 - w1;
+      const tc2x = TLx + (TRx - TLx) * 0.66, tc2y = TLy + cTB * 0.5 + w2;
 
       const d =
         `M ${TLx} ${TLy} ` +
