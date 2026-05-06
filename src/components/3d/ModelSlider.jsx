@@ -74,21 +74,22 @@ function WarpRect({ velocityRef, index, containerRef }) {
         const elementCenterX = rect.left + rect.width / 2;
         const relX = (elementCenterX - screenCenterX) / (window.innerWidth / 2);
         
-        // Only scale elements "entering" from the edges
+        // Only scale the single element strictly "entering" from the far edge
         const vThreshold = Math.abs(v) > 2 ? v : 0;
         let edgeWeight = 0;
         
-        // If dragging right (v > 0), target left-edge elements (relX < -0.4)
-        if (vThreshold > 0 && relX < -0.2) {
-          edgeWeight = Math.pow(Math.max(0, (Math.abs(relX) - 0.2) / 0.8), 3);
-        } 
-        // If dragging left (v < 0), target right-edge elements (relX > 0.4)
-        else if (vThreshold < 0 && relX > 0.2) {
-          edgeWeight = Math.pow(Math.max(0, (relX - 0.2) / 0.8), 3);
+        const absRelX = Math.abs(relX);
+        if (absRelX > 0.82) {
+          // Check if this specific item is on the "incoming" side based on drag direction
+          const isIncoming = (vThreshold > 0 && relX < 0) || (vThreshold < 0 && relX > 0);
+          if (isIncoming) {
+            // Very sharp falloff: only starts scaling at 0.82, reaches max at 1.0
+            edgeWeight = Math.pow((absRelX - 0.82) / 0.18, 3);
+          }
         }
         
-        const rawScale = 1 + (edgeWeight * Math.abs(vThreshold) * 0.022);
-        wakeScale = Math.min(1.25, rawScale);
+        const rawScale = 1 + (edgeWeight * Math.abs(vThreshold) * 0.025);
+        wakeScale = Math.min(1.3, rawScale);
       }
 
       const x1 = 0.10, x2 = 0.90, y1 = 0.02, y2 = 0.98;
