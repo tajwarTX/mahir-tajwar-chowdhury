@@ -115,23 +115,18 @@ function WarpRect({ velocityRef, index, containerRef }) {
       const TLx = x1,  TLy = y1;
       const BLx = x1,  BLy = y2;
 
-      // Calculate side offsets: 
-      // During active scroll (sdFactor low): shift both sides in drag direction.
-      // During scale-down (sdFactor high): bow both sides inward (concave).
-      const rOffset = (v > 0 && sdFactor.current < 0.5) ? cS : -cS;
-      const lOffset = (v < 0 && sdFactor.current < 0.5) ? -cS : cS;
+      // Right side: from TR → BR — bow OUT when leading, IN when trailing
+      const bowDir = v > 0 ? cS : -cS;
+      const rc1x = x2 + bowDir,  rc1y = y1 + 0.23;
+      const rc2x = x2 + bowDir,  rc2y = y2 - 0.23;
 
-      // Right side: TR → BR
-      const rc1x = x2 + rOffset,  rc1y = y1 + 0.23;
-      const rc2x = x2 + rOffset,  rc2y = y2 - 0.23;
-
-      // Bottom side: BR → BL — bow UP (toward center)
+      // Bottom side: from BR → BL — bow UP (toward center)
       const bc1x = BRx + (BLx - BRx) * 0.33, bc1y = BRy - cTB * 0.5;
       const bc2x = BRx + (BLx - BRx) * 0.66, bc2y = BRy - cTB * 0.5;
 
-      // Left side: BL → TL
-      const lc1x = x1 + lOffset,  lc1y = y2 - 0.23;
-      const lc2x = x1 + lOffset,  lc2y = y1 + 0.23;
+      // Left side: from BL → TL — bow IN when trailing, OUT when leading
+      const lc1x = x1 + bowDir,  lc1y = y2 - 0.23;
+      const lc2x = x1 + bowDir,  lc2y = y1 + 0.23;
 
       // Top side: from TL → TR — bow DOWN (toward center)
       const tc1x = TLx + (TRx - TLx) * 0.33, tc1y = TLy + cTB * 0.5;
@@ -328,7 +323,7 @@ export default function ModelSlider() {
       velocityRef.current = ((e.clientX - lastX) / dt) * 16; // normalise to ~60 fps
       lastX = e.clientX; lastT = now;
     };
-    const onUp = () => { dragging = false; velocityRef.current = 0; };
+    const onUp = () => { dragging = false; };
 
     window.addEventListener('pointerdown', onDown);
     window.addEventListener('pointermove', onMove);
@@ -354,18 +349,21 @@ export default function ModelSlider() {
         // Capture a fraction of the velocity to use as inertia
         inertia = velocityRef.current * 0.001;
       } else {
+        // Let the warp velocity decay naturally with inertia
+        velocityRef.current *= 0.92;
+
         // Apply the decaying inertia to the target position
         slider.target += inertia;
         inertia *= 0.92; // Friction
         
         // When nearly stopped, slowly pull to the nearest center (snap)
         if (Math.abs(inertia) < 0.01) {
-          // Apply a smaller velocity-dependent bias so it only favors the "next" model if it has speed
           const bias = Math.max(-0.2, Math.min(0.2, inertia * 5));
           const nearest = Math.round(slider.target + bias);
           
           slider.target += (nearest - slider.target) * 0.038; // Snap speed
-          inertia *= 0.8; // Quickly damp out remaining inertia once snapping kicks in
+          inertia *= 0.8; 
+          velocityRef.current *= 0.8; // Match snap damping
         }
       }
 
