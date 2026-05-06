@@ -41,6 +41,10 @@ function WarpRect({ velocityRef, index, containerRef }) {
   const sdFactor = useRef(0);
   const wakeS = useRef(1);
   const wakeSV = useRef(0);
+  const skew = useRef(0);
+  const skewV = useRef(0);
+  const sway = useRef(0);
+  const swayV = useRef(0);
 
   useEffect(() => {
     let id;
@@ -55,6 +59,10 @@ function WarpRect({ velocityRef, index, containerRef }) {
       const targetLag   = targetLead * 0.18;
       const targetCurve = Math.min(0.11, Math.max(0, Math.abs(v) - 7) * 0.012);
 
+      // ── Cloth-like skew and sway targets ────────────────────────────
+      const targetSkew = Math.max(-10, Math.min(10, v * 0.4));
+      const targetSway = Math.max(-4, Math.min(4, v * 0.12));
+
       // ── snappier springs: higher stiffness for better tracking ──────
       leadV.current  += (targetLead  - lead.current)  * 0.15 - leadV.current  * 0.75;
       lead.current   += leadV.current;
@@ -64,6 +72,12 @@ function WarpRect({ velocityRef, index, containerRef }) {
 
       curveV.current += (targetCurve - curve.current) * 0.15 - curveV.current * 0.7;
       curve.current  += curveV.current;
+
+      skewV.current += (targetSkew - skew.current) * 0.06 - skewV.current * 0.7;
+      skew.current  += skewV.current;
+
+      swayV.current += (targetSway - sway.current) * 0.05 - swayV.current * 0.75;
+      sway.current  += swayV.current;
 
       // ── build path in objectBoundingBox space (0–1) ─────────────────
       const lo = lead.current;  // leading  side offset (right side when +)
@@ -83,15 +97,15 @@ function WarpRect({ velocityRef, index, containerRef }) {
         let edgeWeight = 0;
         
         if (vThreshold > 0 && relX < 0) {
-          // Start scaling down much sooner (after half is inside, approx relX > -0.8)
-          edgeWeight = Math.min(1, Math.max(0, (Math.abs(relX) - 0.1) / 0.7));
+          // Shift peak off-screen so it's already shrinking when it enters (peak at relX ≈ 1.5)
+          edgeWeight = Math.min(1, Math.max(0, (Math.abs(relX) - 0.25) / 1.25));
         } else if (vThreshold < 0 && relX > 0) {
-          edgeWeight = Math.min(1, Math.max(0, (relX - 0.1) / 0.7));
+          edgeWeight = Math.min(1, Math.max(0, (relX - 0.25) / 1.25));
         }
         edgeWeight = Math.pow(edgeWeight, 2);
         
-        targetWakeScale = 1 + (edgeWeight * Math.abs(vThreshold) * 0.02);
-        targetWakeScale = Math.min(1.2, targetWakeScale);
+        targetWakeScale = 1 + (edgeWeight * Math.abs(vThreshold) * 0.015);
+        targetWakeScale = Math.min(1.15, targetWakeScale);
       }
 
       // Smooth the wakeScale with a faster spring for snappier scale-down
@@ -143,10 +157,10 @@ function WarpRect({ velocityRef, index, containerRef }) {
 
       if (pathRef.current) pathRef.current.setAttribute('d', d);
       
-      // Apply smoothed wake scale
+      // Apply smoothed wake scale, skew, and sway
       const gradDiv = containerRef.current?.querySelector('.warp-gradient');
       if (gradDiv) {
-        gradDiv.style.transform = `scale(${curWS})`;
+        gradDiv.style.transform = `scale(${curWS}) skewX(${skew.current}deg) rotateZ(${sway.current}deg)`;
       }
 
       id = requestAnimationFrame(tick);
