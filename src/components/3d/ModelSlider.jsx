@@ -74,18 +74,21 @@ function WarpRect({ velocityRef, index, containerRef }) {
         const elementCenterX = rect.left + rect.width / 2;
         const relX = (elementCenterX - screenCenterX) / (window.innerWidth / 2);
         
-        // Only scale the one "coming out of the edge"
-        // v > 0 (moving right): entry edge is left (relX < -0.6)
-        // v < 0 (moving left): entry edge is right (relX > 0.6)
-        const isEnteringLeft = v > 2 && relX < -0.6;
-        const isEnteringRight = v < -2 && relX > 0.6;
-
-        if (isEnteringLeft || isEnteringRight) {
-          const edgeDist = Math.abs(relX) - 0.6;
-          const progress = Math.max(0, Math.min(1, edgeDist / 0.6)); 
-          wakeScale = 1 + progress * Math.abs(v) * 0.025;
-          wakeScale = Math.min(1.35, wakeScale);
+        // Only scale elements "entering" from the edges
+        const vThreshold = Math.abs(v) > 2 ? v : 0;
+        let edgeWeight = 0;
+        
+        // If dragging right (v > 0), target left-edge elements (relX < -0.4)
+        if (vThreshold > 0 && relX < -0.2) {
+          edgeWeight = Math.pow(Math.max(0, (Math.abs(relX) - 0.2) / 0.8), 3);
+        } 
+        // If dragging left (v < 0), target right-edge elements (relX > 0.4)
+        else if (vThreshold < 0 && relX > 0.2) {
+          edgeWeight = Math.pow(Math.max(0, (relX - 0.2) / 0.8), 3);
         }
+        
+        const rawScale = 1 + (edgeWeight * Math.abs(vThreshold) * 0.022);
+        wakeScale = Math.min(1.25, rawScale);
       }
 
       const x1 = 0.10, x2 = 0.90, y1 = 0.02, y2 = 0.98;
