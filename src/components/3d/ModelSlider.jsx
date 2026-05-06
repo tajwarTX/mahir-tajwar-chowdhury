@@ -104,12 +104,9 @@ function WarpRect({ velocityRef, index, containerRef }) {
       lastWake.current = curWS;
       sdFactor.current = sdFactor.current * 0.85 + (isScalingDown ? 0.15 : 0);
 
-      // Top/bottom curve depends on both scaling down AND general motion
-      const velInfluence = Math.min(1, Math.abs(v) * 0.08);
-      const combinedFactor = Math.max(sdFactor.current * 1.8, velInfluence * 0.4);
-      
-      const cTB = c * combinedFactor; // Top/Bottom curve
-      const cS  = c;                 // Side curve
+      // Top/bottom curve only when scaling down
+      const cTB = c * (sdFactor.current * 1.8); 
+      const cS  = c; // Side curve
 
       const x1 = 0.10, x2 = 0.90, y1 = 0.02, y2 = 0.98;
 
