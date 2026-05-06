@@ -115,18 +115,23 @@ function WarpRect({ velocityRef, index, containerRef }) {
       const TLx = x1,  TLy = y1;
       const BLx = x1,  BLy = y2;
 
-      // Right side: from TR → BR — bow OUT when leading, IN when trailing
-      const bowDir = v > 0 ? cS : -cS;
-      const rc1x = x2 + bowDir,  rc1y = y1 + 0.23;
-      const rc2x = x2 + bowDir,  rc2y = y2 - 0.23;
+      // Calculate side offsets: 
+      // During active scroll (sdFactor low): shift both sides in drag direction.
+      // During scale-down (sdFactor high): bow both sides inward (concave).
+      const rOffset = (v > 0 && sdFactor.current < 0.5) ? cS : -cS;
+      const lOffset = (v < 0 && sdFactor.current < 0.5) ? -cS : cS;
 
-      // Bottom side: from BR → BL — bow UP (toward center)
+      // Right side: TR → BR
+      const rc1x = x2 + rOffset,  rc1y = y1 + 0.23;
+      const rc2x = x2 + rOffset,  rc2y = y2 - 0.23;
+
+      // Bottom side: BR → BL — bow UP (toward center)
       const bc1x = BRx + (BLx - BRx) * 0.33, bc1y = BRy - cTB * 0.5;
       const bc2x = BRx + (BLx - BRx) * 0.66, bc2y = BRy - cTB * 0.5;
 
-      // Left side: from BL → TL — bow IN when trailing, OUT when leading
-      const lc1x = x1 + bowDir,  lc1y = y2 - 0.23;
-      const lc2x = x1 + bowDir,  lc2y = y1 + 0.23;
+      // Left side: BL → TL
+      const lc1x = x1 + lOffset,  lc1y = y2 - 0.23;
+      const lc2x = x1 + lOffset,  lc2y = y1 + 0.23;
 
       // Top side: from TL → TR — bow DOWN (toward center)
       const tc1x = TLx + (TRx - TLx) * 0.33, tc1y = TLy + cTB * 0.5;
