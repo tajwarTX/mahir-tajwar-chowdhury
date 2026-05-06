@@ -105,9 +105,9 @@ function WarpRect({ velocityRef, index, containerRef }) {
       lastWake.current = curWS;
       sdFactor.current = sdFactor.current * 0.85 + (isScalingDown ? 0.15 : 0);
 
-      // Side curve (always okay), Top/bottom curve (disabled)
+      // Side curve (always okay), Top/bottom curve (only when scaling down, subtle)
       const cS  = c;
-      const cTB = 0; 
+      const cTB = c * (sdFactor.current * 0.6);
 
       const x1 = 0.10, x2 = 0.90, y1 = 0.02, y2 = 0.98;
 
