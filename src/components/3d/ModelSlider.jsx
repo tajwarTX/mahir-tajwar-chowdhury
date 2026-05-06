@@ -83,10 +83,10 @@ function WarpRect({ velocityRef, index, containerRef }) {
         let edgeWeight = 0;
         
         if (vThreshold > 0 && relX < 0) {
-          // Start scaling down earlier (when half portion is out, approx relX > -0.75)
-          edgeWeight = Math.min(1, Math.max(0, (Math.abs(relX) - 0.1) / 0.65));
+          // Start scaling down once halfway in (relX > -0.5)
+          edgeWeight = Math.min(1, Math.max(0, (Math.abs(relX) - 0.02) / 0.48));
         } else if (vThreshold < 0 && relX > 0) {
-          edgeWeight = Math.min(1, Math.max(0, (relX - 0.1) / 0.65));
+          edgeWeight = Math.min(1, Math.max(0, (relX - 0.02) / 0.48));
         }
         edgeWeight = Math.pow(edgeWeight, 2);
         
@@ -94,20 +94,20 @@ function WarpRect({ velocityRef, index, containerRef }) {
         targetWakeScale = Math.min(1.2, targetWakeScale);
       }
 
-      // Smooth the wakeScale with a spring
-      wakeSV.current += (targetWakeScale - wakeS.current) * 0.08 - wakeSV.current * 0.75;
+      // Smooth the wakeScale with a faster spring for snappier scale-down
+      wakeSV.current += (targetWakeScale - wakeS.current) * 0.14 - wakeSV.current * 0.7;
       wakeS.current += wakeSV.current;
       const curWS = wakeS.current;
 
-      // Track scaling down state for top/bottom curvature
-      // Only allow scaling down detection if the element was actually scaled up (> 1.01)
-      const isScalingDown = (curWS > 1.01) && (curWS < lastWake.current - 0.0001);
+      // Track scaling down state — only if element was actually expanded (> 1.02)
+      const isScalingDown = (curWS > 1.02) && (curWS < lastWake.current - 0.0002);
       lastWake.current = curWS;
-      sdFactor.current = sdFactor.current * 0.85 + (isScalingDown ? 0.15 : 0);
+      // Faster decay so the curve snaps back quickly
+      sdFactor.current = sdFactor.current * 0.78 + (isScalingDown ? 0.22 : 0);
 
-      // Side curve (always okay), Top/bottom curve (only when scaling down, subtle)
-      const cS  = c;
-      const cTB = c * (sdFactor.current * 0.6);
+      // Top/bottom curve — subtle, ONLY on elements actively scaling down
+      const cTB = c * sdFactor.current * 0.4;
+      const cS  = c; // Side curve always
 
       const x1 = 0.10, x2 = 0.90, y1 = 0.02, y2 = 0.98;
 
@@ -310,44 +310,34 @@ function SlideItem({ slide, index, velocityRef }) {
 
 // ─── Root slider ──────────────────────────────────────────────────────────────
 export default function ModelSlider() {
-  const wrapperRef    = useRef(null);
-  const sliderRootRef = useRef(null);
-  const velocityRef   = useRef(0);   // shared across all slides
+  const wrapperRef   = useRef(null);
+  const velocityRef  = useRef(0);   // shared across all slides
 
-  // ── Custom target cursor that chases the real mouse ──────────────────────────
-  const cursorRef     = useRef(null);
-  const mouseX        = useRef(0);
-  const mouseY        = useRef(0);
-  const targetX       = useRef(0);
-  const targetY       = useRef(0);
-  const lastTargetX   = useRef(0);
-  const insideSlider  = useRef(false);
-
+  // Track pointer velocity for warp effect
   useEffect(() => {
-    const root = sliderRootRef.current;
-    if (!root) return;
+    let lastX = 0, lastT = 0, dragging = false;
 
-    const onMouseMove = (e) => {
-      mouseX.current = e.clientX;
-      mouseY.current = e.clientY;
+    const onDown = (e) => { dragging = true; lastX = e.clientX; lastT = Date.now(); };
+    const onMove = (e) => {
+      if (!dragging) return;
+      const now = Date.now();
+      const dt  = Math.max(now - lastT, 1);
+      velocityRef.current = ((e.clientX - lastX) / dt) * 16; // normalise to ~60 fps
+      lastX = e.clientX; lastT = now;
     };
-    const onMouseEnter = () => { insideSlider.current = true; };
-    const onMouseLeave = () => {
-      insideSlider.current = false;
-      if (cursorRef.current) cursorRef.current.style.opacity = '0';
-    };
+    const onUp = () => { dragging = false; };
 
-    root.addEventListener('mousemove', onMouseMove);
-    root.addEventListener('mouseenter', onMouseEnter);
-    root.addEventListener('mouseleave', onMouseLeave);
+    window.addEventListener('pointerdown', onDown);
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup',   onUp);
     return () => {
-      root.removeEventListener('mousemove', onMouseMove);
-      root.removeEventListener('mouseenter', onMouseEnter);
-      root.removeEventListener('mouseleave', onMouseLeave);
+      window.removeEventListener('pointerdown', onDown);
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup',   onUp);
     };
   }, []);
 
-  // ── Slider init + target cursor animation loop ─────────────────────────────
+  // Slider init
   useEffect(() => {
     if (!wrapperRef.current) return;
     const slider = new Core(wrapperRef.current, {
@@ -356,49 +346,26 @@ export default function ModelSlider() {
     });
 
     let inertia = 0;
-    let dragging = false;
-    let lastMouseDownX = 0;
-
-    const onPointerDown = (e) => {
-      dragging = true;
-      lastMouseDownX = targetX.current; // anchor to target cursor
-    };
-    const onPointerUp = () => { dragging = false; };
-
-    window.addEventListener('pointerdown', onPointerDown);
-    window.addEventListener('pointerup', onPointerUp);
-
     const loop = () => {
-      // ── Lerp target cursor toward real mouse (lazy chase) ───────────────
-      const lerpFactor = 0.055; // lower = slower chase, more lag
-      targetX.current += (mouseX.current - targetX.current) * lerpFactor;
-      targetY.current += (mouseY.current - targetY.current) * lerpFactor;
-
-      // ── Drive velocityRef from target cursor delta ───────────────────────
-      const deltaX = targetX.current - lastTargetX.current;
-      velocityRef.current = deltaX * 16; // normalise to ~60fps equivalent
-      lastTargetX.current = targetX.current;
-
-      // ── Update custom cursor element ─────────────────────────────────────
-      if (cursorRef.current && insideSlider.current) {
-        cursorRef.current.style.transform = `translate(${targetX.current}px, ${targetY.current}px)`;
-        cursorRef.current.style.opacity = '1';
-      }
-
-      // ── Slider scrolling driven by target cursor ─────────────────────────
-      if (dragging) {
-        inertia = deltaX * 0.007;
+      if (slider.isDragging) {
+        // Capture a fraction of the velocity to use as inertia
+        inertia = velocityRef.current * 0.001;
       } else {
+        // Let the warp velocity decay naturally with inertia
         velocityRef.current *= 0.92;
-        slider.target += inertia;
-        inertia *= 0.92;
 
+        // Apply the decaying inertia to the target position
+        slider.target += inertia;
+        inertia *= 0.92; // Friction
+        
+        // When nearly stopped, slowly pull to the nearest center (snap)
         if (Math.abs(inertia) < 0.01) {
           const bias = Math.max(-0.2, Math.min(0.2, inertia * 5));
           const nearest = Math.round(slider.target + bias);
-          slider.target += (nearest - slider.target) * 0.038;
-          inertia *= 0.8;
-          velocityRef.current *= 0.8;
+          
+          slider.target += (nearest - slider.target) * 0.038; // Snap speed
+          inertia *= 0.8; 
+          velocityRef.current *= 0.8; // Match snap damping
         }
       }
 
@@ -407,40 +374,18 @@ export default function ModelSlider() {
     };
 
     const id = requestAnimationFrame(loop);
-    return () => {
-      cancelAnimationFrame(id);
-      slider.destroy();
-      window.removeEventListener('pointerdown', onPointerDown);
-      window.removeEventListener('pointerup', onPointerUp);
-    };
+    return () => { cancelAnimationFrame(id); slider.destroy(); };
   }, []);
 
   return (
-    <div ref={sliderRootRef} className="w-full select-none" style={{ padding:'100px 0', position:'relative', cursor:'none' }}>
+    <div className="w-full select-none" style={{ padding:'100px 0' }}>
       <style>{`
         @keyframes gradientWave {
           0%   { background-position: 0% 50%; }
           50%  { background-position: 100% 50%; }
           100% { background-position: 0% 50%; }
         }
-        .slider-cursor {
-          position: fixed;
-          top: 0; left: 0;
-          width: 12px; height: 12px;
-          border-radius: 50%;
-          background: rgba(255,255,255,0.9);
-          pointer-events: none;
-          z-index: 9999;
-          opacity: 0;
-          margin-left: -6px; margin-top: -6px;
-          transition: opacity 0.2s ease;
-          mix-blend-mode: difference;
-          box-shadow: 0 0 12px rgba(255,255,255,0.6);
-        }
       `}</style>
-
-      {/* Target cursor dot */}
-      <div ref={cursorRef} className="slider-cursor" />
 
       <div className="flex items-center justify-end px-6 md:px-12 mb-8">
         <span style={{ fontFamily:'monospace', fontSize:'10px', letterSpacing:'0.4em' }}
