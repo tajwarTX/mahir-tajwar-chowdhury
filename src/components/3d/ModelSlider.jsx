@@ -47,22 +47,22 @@ function WarpRect({ velocityRef, index, containerRef }) {
 
     const tick = () => {
       // ── smooth the raw velocity slightly for a responsive feel ──────
-      smoothV.current = smoothV.current * 0.82 + velocityRef.current * 0.18;
+      smoothV.current = smoothV.current * 0.75 + velocityRef.current * 0.25;
       const v = smoothV.current;
 
-      // ── targets: increased multipliers for a stronger effect ────────
-      const targetLead  = Math.max(-0.22, Math.min(0.22, v * 0.012));
-      const targetLag   = targetLead * 0.15;
-      const targetCurve = Math.max(0, Math.min(0.12, Math.abs(v) * 0.008 - 0.02));
+      // ── targets: more aggressive response to inertia ────────────────
+      const targetLead  = Math.max(-0.25, Math.min(0.25, v * 0.015));
+      const targetLag   = targetLead * 0.18;
+      const targetCurve = Math.min(0.18, Math.abs(v) * 0.012);
 
-      // ── snappier springs: higher stiffness, balanced damping ────────
-      leadV.current  += (targetLead  - lead.current)  * 0.12 - leadV.current  * 0.8;
+      // ── snappier springs: higher stiffness for better tracking ──────
+      leadV.current  += (targetLead  - lead.current)  * 0.15 - leadV.current  * 0.75;
       lead.current   += leadV.current;
 
-      lagV.current   += (targetLag   - lag.current)   * 0.1 - lagV.current  * 0.82;
+      lagV.current   += (targetLag   - lag.current)   * 0.12 - lagV.current  * 0.78;
       lag.current    += lagV.current;
 
-      curveV.current += (targetCurve - curve.current) * 0.12 - curveV.current * 0.8;
+      curveV.current += (targetCurve - curve.current) * 0.15 - curveV.current * 0.7;
       curve.current  += curveV.current;
 
       // ── build path in objectBoundingBox space (0–1) ─────────────────
@@ -103,9 +103,13 @@ function WarpRect({ velocityRef, index, containerRef }) {
       const isScalingDown = curWS < lastWake.current - 0.0001;
       lastWake.current = curWS;
       sdFactor.current = sdFactor.current * 0.85 + (isScalingDown ? 0.15 : 0);
+
+      // Top/bottom curve depends on both scaling down AND general motion
+      const velInfluence = Math.min(1, Math.abs(v) * 0.08);
+      const combinedFactor = Math.max(sdFactor.current, velInfluence * 0.5);
       
-      const cTB = c * sdFactor.current; // Top/Bottom curve (only when scaling down)
-      const cS  = c;                    // Side curve (always okay)
+      const cTB = c * combinedFactor; // Top/Bottom curve
+      const cS  = c;                 // Side curve
 
       const x1 = 0.10, x2 = 0.90, y1 = 0.02, y2 = 0.98;
 
