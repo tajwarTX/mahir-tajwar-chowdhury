@@ -45,6 +45,8 @@ function WarpRect({ velocityRef, index, containerRef }) {
   const skewV = useRef(0);
   const sway = useRef(0);
   const swayV = useRef(0);
+  const flap = useRef(0);
+  const flapV = useRef(0);
 
   useEffect(() => {
     let id;
@@ -62,6 +64,7 @@ function WarpRect({ velocityRef, index, containerRef }) {
       // ── Cloth-like skew and sway targets ────────────────────────────
       const targetSkew = Math.max(-10, Math.min(10, v * 0.4));
       const targetSway = Math.max(-4, Math.min(4, v * 0.12));
+      const targetFlap = Math.min(0.03, Math.abs(v) * 0.002);
 
       // ── snappier springs: higher stiffness for better tracking ──────
       leadV.current  += (targetLead  - lead.current)  * 0.15 - leadV.current  * 0.75;
@@ -79,10 +82,14 @@ function WarpRect({ velocityRef, index, containerRef }) {
       swayV.current += (targetSway - sway.current) * 0.05 - swayV.current * 0.75;
       sway.current  += swayV.current;
 
+      flapV.current += (targetFlap - flap.current) * 0.04 - flapV.current * 0.82;
+      flap.current  += flapV.current;
+
       // ── build path in objectBoundingBox space (0–1) ─────────────────
       const lo = lead.current;  // leading  side offset (right side when +)
       const la = lag.current;   // lagging  side offset (left  side when +)
       const c  = curve.current; // bow amount (always ≥ 0)
+      const f  = flap.current;  // smoothed flap amplitude
 
       // Calculate relative screen position for wake scaling
       const rect = containerRef.current?.getBoundingClientRect();
@@ -125,13 +132,12 @@ function WarpRect({ velocityRef, index, containerRef }) {
 
       // ── Flag/Cloth wave logic ──────────────────────────────────────
       const time = performance.now() * 0.001;
-      const flapBase = Math.min(0.04, Math.abs(v) * 0.003);
       
-      // Wave offsets for control points
-      const w1 = Math.sin(time * 18) * flapBase;
-      const w2 = Math.sin(time * 18 + 2) * flapBase;
-      const w3 = Math.cos(time * 15) * flapBase;
-      const w4 = Math.cos(time * 15 + 2) * flapBase;
+      // Wave offsets for control points (using smoothed 'f')
+      const w1 = Math.sin(time * 10) * f;
+      const w2 = Math.sin(time * 10 + 2) * f;
+      const w3 = Math.cos(time * 8) * f;
+      const w4 = Math.cos(time * 8 + 2) * f;
 
       const x1 = 0.10, x2 = 0.90, y1 = 0.02, y2 = 0.98;
 
