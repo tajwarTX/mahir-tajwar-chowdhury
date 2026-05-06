@@ -83,10 +83,10 @@ function WarpRect({ velocityRef, index, containerRef }) {
         let edgeWeight = 0;
         
         if (vThreshold > 0 && relX < 0) {
-          // Start scaling down once halfway in (relX > -0.5)
-          edgeWeight = Math.min(1, Math.max(0, (Math.abs(relX) - 0.02) / 0.48));
+          // Start scaling down much sooner (after half is inside, approx relX > -0.8)
+          edgeWeight = Math.min(1, Math.max(0, (Math.abs(relX) - 0.1) / 0.7));
         } else if (vThreshold < 0 && relX > 0) {
-          edgeWeight = Math.min(1, Math.max(0, (relX - 0.02) / 0.48));
+          edgeWeight = Math.min(1, Math.max(0, (relX - 0.1) / 0.7));
         }
         edgeWeight = Math.pow(edgeWeight, 2);
         
