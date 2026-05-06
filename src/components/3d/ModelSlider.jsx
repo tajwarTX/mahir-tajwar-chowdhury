@@ -82,11 +82,13 @@ function WarpRect({ velocityRef, index, containerRef }) {
         const vThreshold = Math.abs(v) > 2 ? v : 0;
         let edgeWeight = 0;
         
-        if (vThreshold > 0 && relX < -0.2) {
-          edgeWeight = Math.pow(Math.max(0, (Math.abs(relX) - 0.2) / 0.8), 3);
-        } else if (vThreshold < 0 && relX > 0.2) {
-          edgeWeight = Math.pow(Math.max(0, (relX - 0.2) / 0.8), 3);
+        if (vThreshold > 0 && relX < 0) {
+          // Stay at peak while entering, start scaling down once significantly "out" (relX > -0.4)
+          edgeWeight = Math.min(1, Math.max(0, (Math.abs(relX) - 0.05) / 0.4));
+        } else if (vThreshold < 0 && relX > 0) {
+          edgeWeight = Math.min(1, Math.max(0, (relX - 0.05) / 0.4));
         }
+        edgeWeight = Math.pow(edgeWeight, 2);
         
         targetWakeScale = 1 + (edgeWeight * Math.abs(vThreshold) * 0.025);
         targetWakeScale = Math.min(1.25, targetWakeScale);
