@@ -53,7 +53,7 @@ function WarpRect({ velocityRef, index, containerRef }) {
       // ── targets: more aggressive response to inertia ────────────────
       const targetLead  = Math.max(-0.25, Math.min(0.25, v * 0.015));
       const targetLag   = targetLead * 0.18;
-      const targetCurve = Math.min(0.08, Math.max(0, Math.abs(v) - 2.5) * 0.007);
+      const targetCurve = Math.min(0.045, Math.max(0, Math.abs(v) - 4) * 0.004);
 
       // ── snappier springs: higher stiffness for better tracking ──────
       leadV.current  += (targetLead  - lead.current)  * 0.15 - leadV.current  * 0.75;
