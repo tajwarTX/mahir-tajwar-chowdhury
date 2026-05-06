@@ -37,6 +37,8 @@ function WarpRect({ velocityRef, index, containerRef }) {
   const curve  = useRef(0); // inward bow at high speed
   const curveV = useRef(0);
   const smoothV = useRef(0); // smoothed velocity input
+  const lastWake = useRef(1);
+  const sdFactor = useRef(0);
 
   useEffect(() => {
     let id;
@@ -78,18 +80,23 @@ function WarpRect({ velocityRef, index, containerRef }) {
         const vThreshold = Math.abs(v) > 2 ? v : 0;
         let edgeWeight = 0;
         
-        // If dragging right (v > 0), target left-edge elements (relX < -0.4)
         if (vThreshold > 0 && relX < -0.2) {
           edgeWeight = Math.pow(Math.max(0, (Math.abs(relX) - 0.2) / 0.8), 3);
-        } 
-        // If dragging left (v < 0), target right-edge elements (relX > 0.4)
-        else if (vThreshold < 0 && relX > 0.2) {
+        } else if (vThreshold < 0 && relX > 0.2) {
           edgeWeight = Math.pow(Math.max(0, (relX - 0.2) / 0.8), 3);
         }
         
         const rawScale = 1 + (edgeWeight * Math.abs(vThreshold) * 0.015);
         wakeScale = Math.min(1.15, rawScale);
       }
+
+      // Track scaling down state for top/bottom curvature
+      const isScalingDown = wakeScale < lastWake.current;
+      lastWake.current = wakeScale;
+      sdFactor.current = sdFactor.current * 0.85 + (isScalingDown ? 0.15 : 0);
+      
+      const cTB = c * sdFactor.current; // Top/Bottom curve (only when scaling down)
+      const cS  = c;                    // Side curve (always okay)
 
       const x1 = 0.10, x2 = 0.90, y1 = 0.02, y2 = 0.98;
 
@@ -100,21 +107,21 @@ function WarpRect({ velocityRef, index, containerRef }) {
       const BLx = x1,  BLy = y2;
 
       // Right side: from TR → BR — bow OUT when leading, IN when trailing
-      const bowDir = v > 0 ? c : -c;
+      const bowDir = v > 0 ? cS : -cS;
       const rc1x = x2 + bowDir,  rc1y = y1 + 0.23;
       const rc2x = x2 + bowDir,  rc2y = y2 - 0.23;
 
       // Bottom side: from BR → BL — bow UP (toward center)
-      const bc1x = BRx + (BLx - BRx) * 0.33, bc1y = BRy - c * 0.5;
-      const bc2x = BRx + (BLx - BRx) * 0.66, bc2y = BRy - c * 0.5;
+      const bc1x = BRx + (BLx - BRx) * 0.33, bc1y = BRy - cTB * 0.5;
+      const bc2x = BRx + (BLx - BRx) * 0.66, bc2y = BRy - cTB * 0.5;
 
       // Left side: from BL → TL — bow IN when trailing, OUT when leading
       const lc1x = x1 + bowDir,  lc1y = y2 - 0.23;
       const lc2x = x1 + bowDir,  lc2y = y1 + 0.23;
 
       // Top side: from TL → TR — bow DOWN (toward center)
-      const tc1x = TLx + (TRx - TLx) * 0.33, tc1y = TLy + c * 0.5;
-      const tc2x = TLx + (TRx - TLx) * 0.66, tc2y = TLy + c * 0.5;
+      const tc1x = TLx + (TRx - TLx) * 0.33, tc1y = TLy + cTB * 0.5;
+      const tc2x = TLx + (TRx - TLx) * 0.66, tc2y = TLy + cTB * 0.5;
 
       const d =
         `M ${TLx} ${TLy} ` +
