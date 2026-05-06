@@ -37,132 +37,63 @@ function WarpRect({ velocityRef, index, containerRef }) {
   const curve  = useRef(0); // inward bow at high speed
   const curveV = useRef(0);
   const smoothV = useRef(0); // smoothed velocity input
-  const lastWake = useRef(1);
-  const sdFactor = useRef(0);
   const wakeS = useRef(1);
   const wakeSV = useRef(0);
-  const skew = useRef(0);
-  const skewV = useRef(0);
-  const sway = useRef(0);
-  const swayV = useRef(0);
-  const flap = useRef(0);
-  const flapV = useRef(0);
 
   useEffect(() => {
     let id;
 
     const tick = () => {
       // ── smooth the raw velocity slightly for a responsive feel ──────
-      smoothV.current = smoothV.current * 0.75 + velocityRef.current * 0.25;
+      smoothV.current = smoothV.current * 0.72 + velocityRef.current * 0.28;
       const v = smoothV.current;
 
-      // ── targets: more aggressive response to inertia ────────────────
-      const targetLead  = Math.max(-0.25, Math.min(0.25, v * 0.015));
-      const targetLag   = targetLead * 0.18;
-      const targetCurve = Math.min(0.11, Math.max(0, Math.abs(v) - 7) * 0.012);
+      // ── targets: Smooothy-style momentum response ──────────────────
+      const targetSide = Math.max(-0.25, Math.min(0.25, v * 0.015));
+      const targetCurve = Math.min(0.15, Math.abs(v) * 0.01);
+      // Velocity-driven horizontal stretch (momentum-based scaling)
+      const targetStretch = 1 + Math.min(0.3, Math.abs(v) * 0.012);
 
-      // ── Cloth-like skew and sway targets ────────────────────────────
-      const targetSkew = Math.max(-10, Math.min(10, v * 0.4));
-      const targetSway = Math.max(-4, Math.min(4, v * 0.12));
-      const targetFlap = Math.min(0.03, Math.abs(v) * 0.002);
-
-      // ── snappier springs: higher stiffness for better tracking ──────
-      leadV.current  += (targetLead  - lead.current)  * 0.15 - leadV.current  * 0.75;
+      // ── snappier springs ───────────────────────────────────────────
+      leadV.current  += (targetSide  - lead.current)  * 0.14 - leadV.current  * 0.72;
       lead.current   += leadV.current;
 
-      lagV.current   += (targetLag   - lag.current)   * 0.12 - lagV.current  * 0.78;
-      lag.current    += lagV.current;
-
-      curveV.current += (targetCurve - curve.current) * 0.15 - curveV.current * 0.7;
+      curveV.current += (targetCurve - curve.current) * 0.1 - curveV.current * 0.65;
       curve.current  += curveV.current;
 
-      skewV.current += (targetSkew - skew.current) * 0.06 - skewV.current * 0.7;
-      skew.current  += skewV.current;
+      wakeSV.current += (targetStretch - wakeS.current) * 0.12 - wakeSV.current * 0.75;
+      wakeS.current  += wakeSV.current;
 
-      swayV.current += (targetSway - sway.current) * 0.05 - swayV.current * 0.75;
-      sway.current  += swayV.current;
-
-      flapV.current += (targetFlap - flap.current) * 0.04 - flapV.current * 0.82;
-      flap.current  += flapV.current;
+      const c = curve.current;
+      const s = wakeS.current;
 
       // ── build path in objectBoundingBox space (0–1) ─────────────────
-      const lo = lead.current;  // leading  side offset (right side when +)
-      const la = lag.current;   // lagging  side offset (left  side when +)
-      const c  = curve.current; // bow amount (always ≥ 0)
-      const f  = flap.current;  // smoothed flap amplitude
+      const x1 = 0.05, x2 = 0.95, y1 = 0.05, y2 = 0.95;
 
-      // Calculate relative screen position for wake scaling
-      const rect = containerRef.current?.getBoundingClientRect();
-      let targetWakeScale = 1;
-      if (rect) {
-        const screenCenterX = window.innerWidth / 2;
-        const elementCenterX = rect.left + rect.width / 2;
-        const relX = (elementCenterX - screenCenterX) / (window.innerWidth / 2);
-        
-        // Only scale elements "entering" from the edges
-        const vThreshold = Math.abs(v) > 2 ? v : 0;
-        let edgeWeight = 0;
-        
-        if (vThreshold > 0 && relX < 0) {
-          // Shift peak off-screen so it's already shrinking when it enters (peak at relX ≈ 1.5)
-          edgeWeight = Math.min(1, Math.max(0, (Math.abs(relX) - 0.25) / 1.25));
-        } else if (vThreshold < 0 && relX > 0) {
-          edgeWeight = Math.min(1, Math.max(0, (relX - 0.25) / 1.25));
-        }
-        edgeWeight = Math.pow(edgeWeight, 2);
-        
-        targetWakeScale = 1 + (edgeWeight * Math.abs(vThreshold) * 0.015);
-        targetWakeScale = Math.min(1.15, targetWakeScale);
-      }
+      // Leading IN, Trailing OUT logic
+      const bowDir = v > 0 ? -c : c;
 
-      // Smooth the wakeScale with a faster spring for snappier scale-down
-      wakeSV.current += (targetWakeScale - wakeS.current) * 0.14 - wakeSV.current * 0.7;
-      wakeS.current += wakeSV.current;
-      const curWS = wakeS.current;
+      // Corners stay fixed
+      const TRx = x2,  TRy = y1;
+      const BRx = x2,  BRy = y2;
+      const TLx = x1,  TLy = y1;
+      const BLx = x1,  BLy = y2;
 
-      // Track scaling down state — only if element was actually expanded (> 1.02)
-      const isScalingDown = (curWS > 1.02) && (curWS < lastWake.current - 0.0002);
-      lastWake.current = curWS;
-      // Faster decay so the curve snaps back quickly
-      sdFactor.current = sdFactor.current * 0.78 + (isScalingDown ? 0.22 : 0);
+      // Right side (TR → BR)
+      const rc1x = x2 + bowDir,  rc1y = y1 + 0.25;
+      const rc2x = x2 + bowDir,  rc2y = y2 - 0.25;
 
-      // Top/bottom curve — subtle, ONLY on elements actively scaling down
-      const cTB = c * sdFactor.current * 0.4;
-      const cS  = c; // Side curve always
+      // Bottom side (BR → BL) — Bow OUT (Barrel distortion)
+      const bc1x = BRx + (BLx - BRx) * 0.33, bc1y = BRy + c * 0.4;
+      const bc2x = BRx + (BLx - BRx) * 0.66, bc2y = BRy + c * 0.4;
 
-      // ── Flag/Cloth wave logic ──────────────────────────────────────
-      const time = performance.now() * 0.001;
-      
-      // Wave offsets for control points (using smoothed 'f')
-      const w1 = Math.sin(time * 10) * f;
-      const w2 = Math.sin(time * 10 + 2) * f;
-      const w3 = Math.cos(time * 8) * f;
-      const w4 = Math.cos(time * 8 + 2) * f;
+      // Left side (BL → TL)
+      const lc1x = x1 + bowDir,  lc1y = y2 - 0.25;
+      const lc2x = x1 + bowDir,  lc2y = y1 + 0.25;
 
-      const x1 = 0.10, x2 = 0.90, y1 = 0.02, y2 = 0.98;
-
-      // Corners stay fixed - no side shrinking/stretching
-      const TRx = x2,  TRy = y1 + w1;
-      const BRx = x2,  BRy = y2 + w2;
-      const TLx = x1,  TLy = y1 + w3;
-      const BLx = x1,  BLy = y2 + w4;
-
-      // Right side: TR → BR — bow OUT when leading, IN when trailing + ripple
-      const bowDir = v > 0 ? cS : -cS;
-      const rc1x = x2 + bowDir + w1,  rc1y = y1 + 0.23 + w2;
-      const rc2x = x2 + bowDir - w2,  rc2y = y2 - 0.23 + w1;
-
-      // Bottom side: BR → BL — bow UP (toward center) + ripple
-      const bc1x = BRx + (BLx - BRx) * 0.33, bc1y = BRy - cTB * 0.5 + w3;
-      const bc2x = BRx + (BLx - BRx) * 0.66, bc2y = BRy - cTB * 0.5 - w4;
-
-      // Left side: BL → TL — bow IN when trailing, OUT when leading + ripple
-      const lc1x = x1 + bowDir - w3,  lc1y = y2 - 0.23 + w4;
-      const lc2x = x1 + bowDir + w4,  lc2y = y1 + 0.23 - w3;
-
-      // Top side: TL → TR — bow DOWN (toward center) + ripple
-      const tc1x = TLx + (TRx - TLx) * 0.33, tc1y = TLy + cTB * 0.5 - w1;
-      const tc2x = TLx + (TRx - TLx) * 0.66, tc2y = TLy + cTB * 0.5 + w2;
+      // Top side (TL → TR) — Bow OUT (Barrel distortion)
+      const tc1x = TLx + (TRx - TLx) * 0.33, tc1y = TLy - c * 0.4;
+      const tc2x = TLx + (TRx - TLx) * 0.66, tc2y = TLy - c * 0.4;
 
       const d =
         `M ${TLx} ${TLy} ` +
@@ -173,10 +104,10 @@ function WarpRect({ velocityRef, index, containerRef }) {
 
       if (pathRef.current) pathRef.current.setAttribute('d', d);
       
-      // Apply smoothed wake scale, skew, and sway
+      // Apply smoothed horizontal stretch (momentum-based)
       const gradDiv = containerRef.current?.querySelector('.warp-gradient');
       if (gradDiv) {
-        gradDiv.style.transform = `scale(${curWS}) skewX(${skew.current}deg) rotateZ(${sway.current}deg)`;
+        gradDiv.style.transform = `scaleX(${s})`;
       }
 
       id = requestAnimationFrame(tick);
