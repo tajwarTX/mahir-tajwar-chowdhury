@@ -74,11 +74,18 @@ function WarpRect({ velocityRef, index, containerRef }) {
         const elementCenterX = rect.left + rect.width / 2;
         const relX = (elementCenterX - screenCenterX) / (window.innerWidth / 2);
         
-        // v > 0 (right): left items (relX < 0) scale up
-        // v < 0 (left): right items (relX > 0) scale up
-        const vThreshold = Math.abs(v) > 2 ? v : 0;
-        const rawScale = 1 + Math.max(0, -relX * vThreshold * 0.015);
-        wakeScale = Math.min(1.3, rawScale);
+        // Only scale the one "coming out of the edge"
+        // v > 0 (moving right): entry edge is left (relX < -0.6)
+        // v < 0 (moving left): entry edge is right (relX > 0.6)
+        const isEnteringLeft = v > 2 && relX < -0.6;
+        const isEnteringRight = v < -2 && relX > 0.6;
+
+        if (isEnteringLeft || isEnteringRight) {
+          const edgeDist = Math.abs(relX) - 0.6;
+          const progress = Math.max(0, Math.min(1, edgeDist / 0.6)); 
+          wakeScale = 1 + progress * Math.abs(v) * 0.025;
+          wakeScale = Math.min(1.35, wakeScale);
+        }
       }
 
       const x1 = 0.10, x2 = 0.90, y1 = 0.02, y2 = 0.98;
