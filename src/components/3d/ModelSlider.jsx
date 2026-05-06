@@ -39,6 +39,8 @@ function WarpRect({ velocityRef, index, containerRef }) {
   const smoothV = useRef(0); // smoothed velocity input
   const lastWake = useRef(1);
   const sdFactor = useRef(0);
+  const wakeS = useRef(1);
+  const wakeSV = useRef(0);
 
   useEffect(() => {
     let id;
@@ -70,7 +72,7 @@ function WarpRect({ velocityRef, index, containerRef }) {
 
       // Calculate relative screen position for wake scaling
       const rect = containerRef.current?.getBoundingClientRect();
-      let wakeScale = 1;
+      let targetWakeScale = 1;
       if (rect) {
         const screenCenterX = window.innerWidth / 2;
         const elementCenterX = rect.left + rect.width / 2;
@@ -86,13 +88,18 @@ function WarpRect({ velocityRef, index, containerRef }) {
           edgeWeight = Math.pow(Math.max(0, (relX - 0.2) / 0.8), 3);
         }
         
-        const rawScale = 1 + (edgeWeight * Math.abs(vThreshold) * 0.015);
-        wakeScale = Math.min(1.15, rawScale);
+        targetWakeScale = 1 + (edgeWeight * Math.abs(vThreshold) * 0.015);
+        targetWakeScale = Math.min(1.15, targetWakeScale);
       }
 
+      // Smooth the wakeScale with a spring
+      wakeSV.current += (targetWakeScale - wakeS.current) * 0.08 - wakeSV.current * 0.75;
+      wakeS.current += wakeSV.current;
+      const curWS = wakeS.current;
+
       // Track scaling down state for top/bottom curvature
-      const isScalingDown = wakeScale < lastWake.current;
-      lastWake.current = wakeScale;
+      const isScalingDown = curWS < lastWake.current - 0.0001;
+      lastWake.current = curWS;
       sdFactor.current = sdFactor.current * 0.85 + (isScalingDown ? 0.15 : 0);
       
       const cTB = c * sdFactor.current; // Top/Bottom curve (only when scaling down)
@@ -132,10 +139,10 @@ function WarpRect({ velocityRef, index, containerRef }) {
 
       if (pathRef.current) pathRef.current.setAttribute('d', d);
       
-      // Apply wake scale to the container or gradient
+      // Apply smoothed wake scale
       const gradDiv = containerRef.current?.querySelector('.warp-gradient');
       if (gradDiv) {
-        gradDiv.style.transform = `scale(${wakeScale})`;
+        gradDiv.style.transform = `scale(${curWS})`;
       }
 
       id = requestAnimationFrame(tick);
@@ -172,8 +179,7 @@ function WarpRect({ velocityRef, index, containerRef }) {
           backgroundSize: '300% 300%',
           animation: 'gradientWave 12s ease infinite',
           clipPath: `url(#${clipId})`,
-          willChange: 'clip-path, transform',
-          transition: 'transform 0.1s ease-out'
+          willChange: 'clip-path, transform'
         }} 
       />
     </div>
