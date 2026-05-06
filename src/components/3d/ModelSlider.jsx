@@ -90,8 +90,8 @@ function WarpRect({ velocityRef, index, containerRef }) {
         }
         edgeWeight = Math.pow(edgeWeight, 2);
         
-        targetWakeScale = 1 + (edgeWeight * Math.abs(vThreshold) * 0.025);
-        targetWakeScale = Math.min(1.25, targetWakeScale);
+        targetWakeScale = 1 + (edgeWeight * Math.abs(vThreshold) * 0.02);
+        targetWakeScale = Math.min(1.2, targetWakeScale);
       }
 
       // Smooth the wakeScale with a spring
