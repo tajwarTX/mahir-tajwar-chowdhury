@@ -100,7 +100,8 @@ function WarpRect({ velocityRef, index, containerRef }) {
       const curWS = wakeS.current;
 
       // Track scaling down state for top/bottom curvature
-      const isScalingDown = curWS < lastWake.current - 0.0001;
+      // Only allow scaling down detection if the element was actually scaled up (> 1.01)
+      const isScalingDown = (curWS > 1.01) && (curWS < lastWake.current - 0.0001);
       lastWake.current = curWS;
       sdFactor.current = sdFactor.current * 0.85 + (isScalingDown ? 0.15 : 0);
 
