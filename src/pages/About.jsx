@@ -81,21 +81,17 @@ const About = () => {
       </section>
 
       {/* Model Slider — smooothy style */}
-      <section className="relative mt-40 z-10">
-        <div className="px-6 md:px-24 max-w-[1200px] mx-auto mb-12">
-          <div className="w-full flex items-center gap-8 opacity-20">
-            <div className="h-[1px] flex-grow bg-white" />
-            <span style={{ fontFamily: 'monospace', fontSize: '10px', letterSpacing: '0.6em' }} className="text-white uppercase whitespace-nowrap">OBJECT_ARCHIVE</span>
-            <div className="h-[1px] flex-grow bg-white" />
-          </div>
+      <section className="relative mt-60 z-10">
+        <div className="absolute -top-10 left-[12.25%] z-20">
+          <h2 className="font-orbitron text-4xl md:text-6xl font-black text-white uppercase tracking-tighter leading-none">
+            Kind of <span className="text-[#a600ff]">projects</span> <br/>
+            i worked on
+          </h2>
         </div>
         <ModelSlider />
       </section>
 
       <footer className="mt-24 border-t border-white/10 pt-10 px-6 md:px-24 max-w-[1200px] mx-auto opacity-30 text-center">
-        <span className="font-geist text-[9px] text-white tracking-[0.5em] uppercase">
-          © 2026 // MAHIR_TAJWAR_CHOWDHURY
-        </span>
       </footer>
     </div>
   );

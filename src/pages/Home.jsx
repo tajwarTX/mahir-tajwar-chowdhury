@@ -382,24 +382,6 @@ export default function Home() {
             left: "160px",
           }}
         >
-          <ScrollLetterRevealDelayed
-            text="@mahir_tajwar_chowdhury"
-            duration={500}
-            delay={500}
-            className="block"
-          />
-          <ScrollLetterRevealDelayed
-            text="Personal Portfolio Website"
-            duration={500}
-            delay={500}
-            className="block"
-          />
-          <ScrollLetterRevealDelayed
-            text="2025-2026"
-            duration={500}
-            delay={500}
-            className="block"
-          />
         </div>
 
         <div className="relative flex flex-col z-20 items-center">
