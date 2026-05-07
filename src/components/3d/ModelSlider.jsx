@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, Suspense, useState } from 'react';
+import React, { useEffect, useRef, Suspense, useState, memo, useCallback } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { useGLTF, useAnimations, Environment, Bounds, Center, Html } from '@react-three/drei';
+import { useGLTF, useAnimations, Environment, Bounds, Center } from '@react-three/drei';
 import Core from 'smooothy';
 
 import armModel from '../../assets/3d/robotic_arm_opt.glb';
@@ -152,14 +152,18 @@ function WarpRect({ velocityRef, index, containerRef }) {
       const lc1x = BLx + bowDir, lc1y = BLy - (BLy - TLy) * 0.23;
       const lc2x = TLx + bowDir, lc2y = TLy + (BLy - TLy) * 0.23;
 
-      // ── High-Resolution Ocean Wave Path (7-9 Waves) ────────────────
+      // ── Ocean Wave Path (optimized resolution) ────────────────────
       const tOcean = performance.now() * 0.005;
-      const res = 60; // subdivision resolution
+      const res = 20; // reduced from 60 for performance — still visually smooth
       
       const getCubic = (p0, p1, p2, p3, f) => {
-        const cx = Math.pow(1-f,3)*p0.x + 3*Math.pow(1-f,2)*f*p1.x + 3*(1-f)*f*f*p2.x + f*f*f*p3.x;
-        const cy = Math.pow(1-f,3)*p0.y + 3*Math.pow(1-f,2)*f*p1.y + 3*(1-f)*f*f*p2.y + f*f*f*p3.y;
-        return {x:cx, y:cy};
+        const u = 1 - f;
+        const uu = u * u, uuu = uu * u;
+        const ff = f * f, fff = ff * f;
+        return {
+          x: uuu*p0.x + 3*uu*f*p1.x + 3*u*ff*p2.x + fff*p3.x,
+          y: uuu*p0.y + 3*uu*f*p1.y + 3*u*ff*p2.y + fff*p3.y
+        };
       };
 
       let d = `M ${TLx} ${TLy} `;
@@ -242,7 +246,7 @@ function WarpRect({ velocityRef, index, containerRef }) {
           backgroundSize: '300% 300%',
           animation: 'gradientWave 12s ease infinite',
           clipPath: `url(#${clipId})`,
-          willChange: 'clip-path, transform',
+          willChange: 'transform',
           opacity: 0.35
         }} 
       />
@@ -251,7 +255,7 @@ function WarpRect({ velocityRef, index, containerRef }) {
 }
 
 // ─── 3-D helpers ─────────────────────────────────────────────────────────────
-function GLBModel({ path }) {
+const GLBModel = memo(function GLBModel({ path }) {
   const { scene, animations } = useGLTF(path);
   const { actions } = useAnimations(animations, scene);
   useEffect(() => {
@@ -259,15 +263,22 @@ function GLBModel({ path }) {
       actions[Object.keys(actions)[0]]?.play();
   }, [actions, scene]);
   return <primitive object={scene} />;
-}
+});
 
-function DynamicTransformWrapper({ children, containerRef, centerScale = 0.85, edgeScale = 0.25, centerRot = [0,0,0], edgeRot = [0,0,0], centerPos = [0,0,0], edgePos = [0,0,0], float = true }) {
+function DynamicTransformWrapper({ children, containerRef, centerScale = 0.85, edgeScale = 0.25, centerRot = [0,0,0], edgeRot = [0,0,0], centerPos = [0,0,0], edgePos = [0,0,0], float = true, isRocket = false }) {
   const ref = useRef();
   const initialized = useRef(false);
+  const cachedRect = useRef(null);
+  const frameSkip = useRef(0);
 
   useFrame((state) => {
     if (!ref.current || !containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
+    // Throttle expensive getBoundingClientRect to every 2nd frame
+    if (frameSkip.current++ % 2 === 0) {
+      cachedRect.current = containerRef.current.getBoundingClientRect();
+    }
+    const rect = cachedRect.current;
+    if (!rect) return;
     const dist = Math.abs(window.innerWidth / 2 - (rect.left + rect.width / 2));
     let factor = Math.min(dist / (window.innerWidth / (1.5 * GLOBAL_SCALE)), 1);
     if (factor < 0.05) factor = 0;
@@ -289,8 +300,11 @@ function DynamicTransformWrapper({ children, containerRef, centerScale = 0.85, e
     const tX  = float ? Math.cos(t * 0.5) * 0.25 * factor : 0;
     const tZ  = float ? Math.sin(t * 0.6) * 0.25 * factor : 0;
     const pY  = float ? Math.sin(t * 0.4) * 0.2 * factor : 0;
-    const mX  = factor === 0 ? -state.pointer.x * 0.12 : 0;
-    const mY  = factor === 0 ? -state.pointer.y * 0.1 : 0;
+    
+    // Mouse follow effect — boosted if it's the rocket
+    const mouseMult = isRocket ? 0.6 : 0.12;
+    const mX  = -state.pointer.x * mouseMult * (1 - factor);
+    const mY  = -state.pointer.y * (mouseMult * 0.8) * (1 - factor);
 
     const finalScale = tScale * breathScale;
 
@@ -327,36 +341,49 @@ function SlideContent({ slide, containerRef, debugData, robotDebug }) {
   const ePos = isRobot ? robotDebug.edgePos   : (edgePos || cPos);
   const eRot = isRobot ? robotDebug.edgeRot   : (edgeRot || cRot);
 
+  const cachedRect2 = useRef(null);
+  const frameSkip2 = useRef(0);
+  const canvasDivRef = useRef(null);
+
   useFrame(() => {
     if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
+    // Cache the canvas-container DOM lookup
+    if (!canvasDivRef.current) {
+      canvasDivRef.current = containerRef.current.querySelector('.canvas-container');
+    }
+    // Throttle getBoundingClientRect to every 2nd frame
+    if (frameSkip2.current++ % 2 === 0) {
+      cachedRect2.current = containerRef.current.getBoundingClientRect();
+    }
+    const rect = cachedRect2.current;
+    if (!rect) return;
     const dist = Math.abs(window.innerWidth / 2 - (rect.left + rect.width / 2));
     let factor = Math.min(dist / (window.innerWidth / (1.5 * GLOBAL_SCALE)), 1);
     if (factor < 0.05) factor = 0;
     if (factor > 0.95) factor = 1;
 
-    // Spotlight lighting
-    if (ambientRef.current) ambientRef.current.intensity = 1.5 - (1.5 - 0.1) * factor;
-    if (directRef.current)  directRef.current.intensity  = 2.0 * (1 - factor);
+    // Spotlight lighting - high contrast, deep blacks
+    if (ambientRef.current) ambientRef.current.intensity = 0.5 - (0.5 - 0.1) * factor;
+    if (directRef.current)  directRef.current.intensity  = 4.5 * (1 - factor);
 
     // Spotlight grayscale filter
-    const canvasDiv = containerRef.current.querySelector('.canvas-container');
-    if (canvasDiv) {
-      canvasDiv.style.filter = `grayscale(${factor})`;
-      canvasDiv.style.opacity = 1 - (factor * 0.3); // Subtle dimming
+    if (canvasDivRef.current) {
+      canvasDivRef.current.style.filter = `grayscale(${factor})`;
+      canvasDivRef.current.style.opacity = 1 - (factor * 0.3);
     }
   });
 
   return (
     <>
-      <ambientLight ref={ambientRef} intensity={1.5} />
-      <directionalLight ref={directRef} position={[3,5,3]} intensity={2} />
+      <ambientLight ref={ambientRef} intensity={0.5} />
+      <directionalLight ref={directRef} position={[3,5,3]} intensity={4.5} />
       <Bounds fit clip margin={margin}>
         <DynamicTransformWrapper containerRef={containerRef}
           centerScale={cScale} edgeScale={eScale}
           centerPos={cPos} edgePos={ePos}
           centerRot={cRot} edgeRot={eRot}
           float={slide.title !== 'FPV Racing Drone'}
+          isRocket={slide.index === '0003'}
         >
           <group rotation={baseRotation}>
             <Center><GLBModel path={slide.path} /></Center>
@@ -389,11 +416,11 @@ function SlideItem({ slide, index, velocityRef, debugData, robotDebug }) {
         {/* Morphing background rect */}
         <WarpRect velocityRef={velocityRef} index={index} containerRef={containerRef} />
 
-        {/* 3-D canvas */}
+        {/* 3-D canvas — GPU-optimized settings */}
         <div className="canvas-container" style={{ position:'absolute', top:'-100%', bottom:'-100%', left:'-50%', right:'-50%', zIndex:1, pointerEvents:'none' }}>
           <Canvas camera={{ position:[0,0,3.5], fov:45 }}
-            gl={{ antialias:false, powerPreference:'high-performance', alpha:true }}
-            dpr={[1,1.2]} frameloop="always">
+            gl={{ antialias:false, powerPreference:'high-performance', alpha:true, stencil:false, depth:true }}
+            dpr={[1,1]} frameloop="always">
             <SlideContent slide={slide} containerRef={containerRef} debugData={debugData} robotDebug={robotDebug} />
           </Canvas>
         </div>
@@ -486,8 +513,20 @@ export default function ModelSlider() {
     if (!wrapperRef.current) return;
     const slider = new Core(wrapperRef.current, {
       infinite: true, snap: false,
-      dragSensitivity: 0.003, lerpFactor: 0.02, scrollInput: true,
+      dragSensitivity: 0.003, lerpFactor: 0.02, scrollInput: false,
     });
+
+    // Explicitly block wheel and touch-scroll events from affecting the slider
+    const blockScroll = (e) => {
+      // We don't preventDefault so the page can still scroll vertically if needed,
+      // but we stop propagation to ensure the slider's internal listeners (if any) don't trigger.
+      e.stopPropagation();
+    };
+    
+    const el = wrapperRef.current;
+    el.addEventListener('wheel', blockScroll, { passive: true, capture: true });
+    el.addEventListener('touchmove', blockScroll, { passive: true, capture: true });
+
     slider.target = -1;
     slider.current = -1;
 
@@ -512,8 +551,6 @@ export default function ModelSlider() {
 
     const observer = new IntersectionObserver(([entry]) => {
       if (!entry.isIntersecting) {
-        slider.target = -1;
-        slider.current = -1;
         inertia = 0;
         velocityRef.current = 0;
       }
