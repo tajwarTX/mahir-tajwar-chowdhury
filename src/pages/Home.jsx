@@ -373,7 +373,7 @@ export default function Home() {
     <div className="w-full relative h-screen overflow-y-auto snap-y snap-mandatory">
       <section
         ref={introRef}
-        className="relative w-full h-screen flex justify-start items-center flex-col pt-[28vh] md:pt-[32vh] snap-start snap-always"
+        className="relative w-full h-screen flex justify-center items-center flex-col pb-[5vh] snap-start snap-always"
       >
         <div
           className="absolute text-white text-xs font-light leading-none z-50 pointer-events-none"
@@ -398,40 +398,34 @@ export default function Home() {
       <section className="relative w-full h-screen flex items-center justify-center px-6 md:px-24 py-16 md:py-20 z-10 snap-start snap-always">
         <div className="grid grid-cols-1 md:grid-cols-2 w-full max-w-7xl items-center gap-12">
           <div className="flex flex-col">
-            <h2 className="text-[52px] md:text-[100px] lg:text-[130px] font-orbitron font-extrabold leading-[0.85] text-white uppercase tracking-tighter">
-              <ScrollLetterRevealDelayed text="THE" duration={200} delay={0} />
+            <h2 className="text-[68px] md:text-[130px] lg:text-[160px] font-orbitron font-extrabold leading-[0.8] text-white uppercase tracking-tighter">
+              <ScrollLetterRevealDelayed text="WHO" duration={200} delay={0} />
               <br />
-              <span className="text-[#a600ff]">
+              <span className="text-[#a600ff] text-[75px] md:text-[145px] lg:text-[185px]">
                 <ScrollLetterRevealDelayed
-                  text="IDENTITY"
+                  text="AM I ?"
                   duration={200}
                   delay={0.1}
                 />
               </span>
             </h2>
-            <div className="mt-6 flex items-center gap-4">
-              <div className="h-[1px] w-10 bg-[#a600ff]" />
-              <span className="font-geist text-[9px] md:text-[11px] text-white/40 uppercase tracking-[0.4em] font-medium">
-                ARCHIVE_001
-              </span>
-            </div>
+
           </div>
           <div className="flex flex-col items-end text-right self-center space-y-6">
             <div className="max-w-md md:max-w-lg lg:max-w-xl">
               <ScrollLetterRevealDelayed
-                text="CREATIVE DEVELOPER OPERATING AT THE INTERSECTION OF ELECTRICAL ENGINEERING AND CINEMATIC VISUALS."
+                text={"ELECTRICAL ENGINEERING STUDENT WITH A FOCUS ON ROBOTICS, CURRENTLY PURSUING MY BACHELOR’S DEGREE AT ROCHESTER\u00A0INSTITUTE\u00A0OF\u00A0TECHNOLOGY"}
                 duration={100}
                 delay={0.2}
                 className="block text-white text-base md:text-lg lg:text-xl font-geist font-medium uppercase tracking-[0.2em] leading-tight"
               />
               <ScrollLetterRevealDelayed
-                text="SYNCHRONIZING TECHNICAL ARCHITECTURE WITH ORGANIC STRATEGY TO BUILD AUTHENTIC DIGITAL EXPERIENCES."
+                text="WITH A CREATIVE APPROACH AND A PASSION FOR ROBOTICS, I BUILD CIRCUITS, AUTONOMOUS ROBOTS , UAVS, DRONES, AND WORK ON PASSION PROJECTS THAT TURN ENGINEERING IDEAS INTO REAL WORKING SYSTEMS."
                 duration={100}
                 delay={0.3}
                 className="block text-white/40 text-[11px] md:text-xs lg:text-sm font-geist font-light uppercase tracking-widest leading-relaxed mt-4"
               />
               <div className="mt-12 flex flex-col items-end">
-                <div className="w-[1.5px] h-16 bg-[#a600ff] opacity-40 mb-4"></div>
                 <span className="text-[#a600ff] text-2xl md:text-3xl font-orbitron font-bold">
                   (01)
                 </span>
@@ -445,23 +439,18 @@ export default function Home() {
         ref={canvasSectionRef}
         className="relative w-full overflow-hidden flex items-center h-screen snap-start snap-always"
       >
-        <div className="absolute left-6 md:left-24 max-w-lg z-20 top-1/2 -translate-y-[150%] md:-translate-y-[140%] flex flex-col space-y-4">
+        <div className="absolute left-6 md:left-24 max-w-lg z-20 top-1/2 -translate-y-[170%] md:-translate-y-[160%] flex flex-col space-y-4">
           <div className="flex flex-col gap-1">
-            <ScrollLetterRevealDelayed
-              text="OPEN_WORLD_MODULE"
-              duration={100}
-              delay={0}
-              className="text-[#a600ff] font-geist text-[9px] md:text-[10px] uppercase tracking-[0.5em] font-bold"
-            />
             <h3 className="text-white text-3xl md:text-5xl font-orbitron font-black uppercase tracking-tighter leading-none border-none outline-none">
               <ScrollLetterRevealDelayed
-                text="EXPLORE THE "
+                text="EXPLORE"
                 duration={200}
                 delay={0.1}
               />
+              <br />
               <span className="text-[#a600ff]">
                 <ScrollLetterRevealDelayed
-                  text="MATRIX"
+                  text="MY WORLD"
                   duration={200}
                   delay={0.2}
                 />
@@ -471,17 +460,17 @@ export default function Home() {
 
           <div className="space-y-1 max-w-sm lg:max-w-md">
             <ScrollLetterRevealDelayed
-              text="DISCOVER PROJECTS, MILESTONES, AND MY ENGINEERING LIFE."
+              text="FIND PROJECTS, MILESTONES, AND MY ENGINEERING LIFE STORY."
               duration={100}
               delay={0}
               className="text-white text-sm md:text-base font-geist font-medium uppercase tracking-[0.2em] leading-relaxed"
             />
             <div className="space-y-2">
               <ScrollLetterRevealDelayed
-                text="CLICK ANNOTATIONS TO EXPLORE • DRAG TO ROTATE"
+                text="CLICK ANNOTATIONS TO START • DRAG TO ROTATE"
                 duration={100}
                 delay={0.1}
-                className="text-white/40 text-[10px] md:text-xs font-geist uppercase tracking-[0.3em] font-medium block"
+                className="text-white/40 text-[10px] md:text-xs font-geist uppercase tracking-[0.3em] font-medium block whitespace-nowrap"
               />
             </div>
           </div>

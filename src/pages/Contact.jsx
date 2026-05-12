@@ -47,22 +47,17 @@ export const Contact = () => {
 
         <div className="flex flex-col items-center text-center lg:items-start lg:text-left z-10 w-full relative">
           <h1 className="font-orbitron text-[38px] md:text-[75px] lg:text-[90px] font-extrabold text-white uppercase leading-[0.9] lg:leading-[0.8] tracking-tighter">
-            <ScrollLetterRevealDelayed text="INITIATE" duration={200} delay={0} />
+            <ScrollLetterRevealDelayed text="GET" duration={200} delay={0} />
             <br />
             <span className="text-[#a600ff]">
-               <ScrollLetterRevealDelayed text="CONTACT" duration={200} delay={0.1} />
+               <ScrollLetterRevealDelayed text="IN TOUCH" duration={200} delay={0.1} />
             </span>
           </h1>
 
-          <div className="mt-8 flex flex-col lg:flex-row items-center gap-4">
-             <div className="h-[1px] w-12 bg-[#a600ff]" />
-             <span className="font-geist text-[10px] md:text-[11px] text-white/60 uppercase tracking-[0.4em] font-medium">
-               ARCHIVE_003 
-             </span>
-          </div>
+
 
           <p className="font-geist text-white/80 text-xs md:text-sm uppercase tracking-[0.3em] font-medium leading-relaxed max-w-lg mt-8 mx-auto lg:mx-0">
-            PROVIDE YOUR DETAILS AND MESSAGE TO INITIATE A SECURE COMMUNICATION CHANNEL WITH MAHIR TAJWAR.
+            SHARE YOUR DETAILS AND SEND A MESSAGE TO CONNECT, ASK QUESTIONS, SHARE IDEAS OR JUST SAY HELLO, I’D LOVE TO HEAR FROM YOU.
           </p>
 
           <div className="flex gap-6 mt-10 mx-auto lg:mx-0">
@@ -107,7 +102,7 @@ export const Contact = () => {
               </span>
             </motion.a>
             <motion.a 
-              href="https://www.youtube.com/@mahirtajwar_tx" 
+              href="https://www.youtube.com/@tajwarTX" 
               target="_blank" 
               rel="noreferrer" 
               initial="initial"
@@ -147,7 +142,7 @@ export const Contact = () => {
               </span>
             </motion.a>
             <motion.a 
-              href="mailto:tajwar185@gmail.com" 
+              href="mailto:mt5507@rit.edu" 
               target="_blank" 
               rel="noreferrer" 
               initial="initial"
@@ -204,7 +199,7 @@ export const Contact = () => {
                       required
                       type="email"
                       value={formData.email}
-                      placeholder="ENTER EMAIL ADDRESS"
+                      placeholder="ENTER VALID EMAIL ADDRESS"
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       className="w-full bg-transparent border-b border-white/20 py-3 font-geist text-[15px] text-white tracking-[0.2em] focus:outline-none focus:border-[#a600ff] transition-all duration-300 placeholder:text-white/30"
                     />
@@ -239,17 +234,12 @@ export const Contact = () => {
                       className="absolute inset-0 bg-[#a600ff] z-0"
                     />
                     <span className="relative z-10 font-geist text-[11px] text-[#a600ff] group-hover:text-white uppercase tracking-[0.5em] font-bold transition-colors duration-300">
-                      {isSubmitting ? "TRANSMITTING..." : "TRANSMIT MESSAGE"}
+                      {isSubmitting ? "SENDING..." : "SEND MESSAGE"}
                     </span>
                   </motion.button>
                 </form>
 
-                <div className="flex items-center gap-4 absolute -bottom-16 left-0">
-                  <div className="h-[1px] w-6 bg-white/20" />
-                  <p className="font-geist text-white/50 text-[8px] uppercase tracking-[0.3em]">
-                    SECURE 
-                  </p>
-                </div>
+
               </motion.div>
             ) : (
               <motion.div
@@ -282,7 +272,7 @@ export const Contact = () => {
                   transition={{ delay: 0.6, duration: 0.8 }}
                   className="font-orbitron text-2xl md:text-5xl font-bold text-white uppercase tracking-tighter mb-4"
                 >
-                  TRANSMISSION <span className="text-[#a600ff]">SUCCESSFUL</span>
+                  MESSAGE <span className="text-[#a600ff]">SENT</span>
                 </motion.h2>
 
                 <motion.p 
@@ -291,7 +281,7 @@ export const Contact = () => {
                   transition={{ delay: 0.8, duration: 0.8 }}
                   className="font-geist text-white/60 text-[10px] md:text-xs uppercase tracking-[0.3em] leading-relaxed max-w-sm"
                 >
-                  DATA SYNC COMPLETE. YOUR MESSAGE HAS BEEN SECURELY DELIVERED TO THE INBOX.
+                  YOUR MESSAGE HAS BEEN SECURELY DELIVERED TO MY INBOX. PLEASE ALLOW 1–2 BUSINESS DAYS FOR A RESPONSE.
                 </motion.p>
 
                 <motion.button

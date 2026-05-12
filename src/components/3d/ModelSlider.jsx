@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, Suspense, useState, memo, useCallback } from 'react';
+import React, { useEffect, useRef, useState, memo } from 'react';
+import { motion } from 'framer-motion';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { useGLTF, useAnimations, Environment, Bounds, Center } from '@react-three/drei';
 import Core from 'smooothy';
@@ -25,6 +26,24 @@ const SLIDES_DATA = [
 
 SLIDES_DATA.forEach(s => useGLTF.preload(s.path));
 
+// ─── Hoisted helpers (avoid re-creation per frame) ───────────────────────────
+const getCubic = (p0, p1, p2, p3, f) => {
+  const u = 1 - f;
+  const uu = u * u, uuu = uu * u;
+  const ff = f * f, fff = ff * f;
+  return {
+    x: uuu*p0.x + 3*uu*f*p1.x + 3*u*ff*p2.x + fff*p3.x,
+    y: uuu*p0.y + 3*uu*f*p1.y + 3*u*ff*p2.y + fff*p3.y
+  };
+};
+
+const WARP_COLORS = [
+  ['#4c1d95', '#a600ff'], // Deep Violet to Bright Purple
+  ['#581c87', '#d946ef'], // Dark Purple to Fuchsia
+  ['#2e1065', '#7c3aed'], // Rich Purple to Lavender
+  ['#1e1b4b', '#6d28d9'], // Indigo Purple
+];
+
 // ─── Velocity-warp background rectangle ───────────────────────────────────────
 function WarpRect({ velocityRef, index, containerRef }) {
   const clipId  = `warp-clip-${index}`;
@@ -42,6 +61,11 @@ function WarpRect({ velocityRef, index, containerRef }) {
   const sdFactor = useRef(0);
   const wakeS = useRef(1);
   const wakeSV = useRef(0);
+  const gradRef = useRef(null);
+  const cachedRect = useRef(null);
+  const frameCount = useRef(0);
+  const freq = 4 + (index % 3) * 1.5;
+  const indexOffset = index * 3;
 
   useEffect(() => {
     let id;
@@ -75,7 +99,11 @@ function WarpRect({ velocityRef, index, containerRef }) {
       const c  = curve.current; // bow amount (always ≥ 0)
 
       // Calculate relative screen position for wake scaling
-      const rect = containerRef.current?.getBoundingClientRect();
+      // Throttle getBoundingClientRect to every 3rd frame
+      if (frameCount.current++ % 3 === 0) {
+        cachedRect.current = containerRef.current?.getBoundingClientRect();
+      }
+      const rect = cachedRect.current;
       let targetWakeScale = 1;
       if (rect) {
         const screenCenterX = window.innerWidth / 2;
@@ -155,59 +183,50 @@ function WarpRect({ velocityRef, index, containerRef }) {
       // ── Ocean Wave Path (optimized resolution) ────────────────────
       const tOcean = performance.now() * 0.005;
       const res = 20; // reduced from 60 for performance — still visually smooth
-      
-      const getCubic = (p0, p1, p2, p3, f) => {
-        const u = 1 - f;
-        const uu = u * u, uuu = uu * u;
-        const ff = f * f, fff = ff * f;
-        return {
-          x: uuu*p0.x + 3*uu*f*p1.x + 3*u*ff*p2.x + fff*p3.x,
-          y: uuu*p0.y + 3*uu*f*p1.y + 3*u*ff*p2.y + fff*p3.y
-        };
-      };
 
-      let d = `M ${TLx} ${TLy} `;
+
+      // Build path using array join (faster than string += in hot loop)
+      const segments = [`M ${TLx} ${TLy}`];
 
       // Top Edge: TL -> TR
       for(let i=1; i<=res; i++) {
         const f = i/res;
         const p = getCubic({x:TLx,y:TLy}, {x:tc1x,y:tc1y}, {x:tc2x,y:tc2y}, {x:TRx,y:TRy}, f);
-        const freq = 4 + (index % 3) * 1.5;
-        const wave = Math.sin((p.x + p.y) * freq + tOcean + index * 3) * 0.002;
-        d += `L ${p.x} ${p.y + wave} `;
+        const wave = Math.sin((p.x + p.y) * freq + tOcean + indexOffset) * 0.002;
+        segments.push(`L ${p.x} ${p.y + wave}`);
       }
       // Right Edge: TR -> BR
       for(let i=1; i<=res; i++) {
         const f = i/res;
         const p = getCubic({x:TRx,y:TRy}, {x:rc1x,y:rc1y}, {x:rc2x,y:rc2y}, {x:BRx,y:BRy}, f);
-        const freq = 4 + (index % 3) * 1.5;
-        const wave = Math.sin((p.x + p.y) * freq + tOcean + index * 3) * 0.002;
-        d += `L ${p.x + wave} ${p.y} `;
+        const wave = Math.sin((p.x + p.y) * freq + tOcean + indexOffset) * 0.002;
+        segments.push(`L ${p.x + wave} ${p.y}`);
       }
       // Bottom Edge: BR -> BL
       for(let i=1; i<=res; i++) {
         const f = i/res;
         const p = getCubic({x:BRx,y:BRy}, {x:bc1x,y:bc1y}, {x:bc2x,y:bc2y}, {x:BLx,y:BLy}, f);
-        const freq = 4 + (index % 3) * 1.5;
-        const wave = Math.sin((p.x + p.y) * freq + tOcean + index * 3) * 0.002;
-        d += `L ${p.x} ${p.y + wave} `;
+        const wave = Math.sin((p.x + p.y) * freq + tOcean + indexOffset) * 0.002;
+        segments.push(`L ${p.x} ${p.y + wave}`);
       }
       // Left Edge: BL -> TL
       for(let i=1; i<=res; i++) {
         const f = i/res;
         const p = getCubic({x:BLx,y:BLy}, {x:lc1x,y:lc1y}, {x:lc2x,y:lc2y}, {x:TLx,y:TLy}, f);
-        const freq = 4 + (index % 3) * 1.5;
-        const wave = Math.sin((p.x + p.y) * freq + tOcean + index * 3) * 0.002;
-        d += `L ${p.x + wave} ${p.y} `;
+        const wave = Math.sin((p.x + p.y) * freq + tOcean + indexOffset) * 0.002;
+        segments.push(`L ${p.x + wave} ${p.y}`);
       }
-      d += 'Z';
+      segments.push('Z');
+      const d = segments.join(' ');
 
       if (pathRef.current) pathRef.current.setAttribute('d', d);
       
-      // Apply smoothed wake scale
-      const gradDiv = containerRef.current?.querySelector('.warp-gradient');
-      if (gradDiv) {
-        gradDiv.style.transform = `scale(${curWS})`;
+      // Apply smoothed wake scale via cached ref (avoid querySelector per frame)
+      if (!gradRef.current && containerRef.current) {
+        gradRef.current = containerRef.current.querySelector('.warp-gradient');
+      }
+      if (gradRef.current) {
+        gradRef.current.style.transform = `scale(${curWS})`;
       }
 
       id = requestAnimationFrame(tick);
@@ -217,13 +236,7 @@ function WarpRect({ velocityRef, index, containerRef }) {
     return () => cancelAnimationFrame(id);
   }, [velocityRef, containerRef]);
 
-  const colors = [
-    ['#4c1d95', '#a600ff'], // Deep Violet to Bright Purple
-    ['#581c87', '#d946ef'], // Dark Purple to Fuchsia
-    ['#2e1065', '#7c3aed'], // Rich Purple to Lavender
-    ['#1e1b4b', '#6d28d9'], // Indigo Purple
-  ];
-  const [c1, c2] = colors[index % colors.length];
+  const [c1, c2] = WARP_COLORS[index % WARP_COLORS.length];
 
   return (
     <div style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'visible' }}>
@@ -246,8 +259,9 @@ function WarpRect({ velocityRef, index, containerRef }) {
           backgroundSize: '300% 300%',
           animation: 'gradientWave 12s ease infinite',
           clipPath: `url(#${clipId})`,
-          willChange: 'transform',
-          opacity: 0.35
+          willChange: 'transform, opacity',
+          opacity: 0.35,
+          transition: 'opacity 0.8s ease-out'
         }} 
       />
     </div>
@@ -395,8 +409,8 @@ function SlideContent({ slide, containerRef, debugData, robotDebug }) {
   );
 }
 
-// ─── Slide item ───────────────────────────────────────────────────────────────
-function SlideItem({ slide, index, velocityRef, debugData, robotDebug }) {
+// ─── Slide item (memoized to prevent re-renders from debug state) ─────────────
+const SlideItem = memo(function SlideItem({ slide, index, velocityRef, debugData, robotDebug }) {
   const containerRef = useRef(null);
 
   return (
@@ -432,7 +446,7 @@ function SlideItem({ slide, index, velocityRef, debugData, robotDebug }) {
       </div>
     </div>
   );
-}
+});
 
 // ─── Root slider ──────────────────────────────────────────────────────────────
 export default function ModelSlider() {
@@ -566,7 +580,13 @@ export default function ModelSlider() {
   }, []);
 
   return (
-    <div className="w-full select-none" style={{ padding:'100px 0', position:'relative' }}>
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 1.2, ease: "easeOut" }}
+      className="w-full select-none" 
+      style={{ padding:'100px 0', position:'relative' }}
+    >
       {DEBUG && (
         <div style={{ 
           position:'fixed', top:'20px', left:'20px', zIndex:9999, 
@@ -646,6 +666,6 @@ export default function ModelSlider() {
           <div key={s.index} style={{ height:'1px', flex:1, background:'rgba(255,255,255,0.12)' }} />
         ))}
       </div>
-    </div>
+    </motion.div>
   );
 }

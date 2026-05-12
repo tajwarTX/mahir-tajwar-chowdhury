@@ -47,22 +47,17 @@ export const Resume = () => {
 
         <div className="flex flex-col items-center text-center lg:items-start lg:text-left z-10 w-full relative">
           <h1 className="font-orbitron text-[38px] md:text-[75px] lg:text-[90px] font-extrabold text-white uppercase leading-[0.9] lg:leading-[0.8] tracking-tighter">
-            <ScrollLetterRevealDelayed text="REQUEST" duration={200} delay={0} />
+            <ScrollLetterRevealDelayed text="GRAB MY" duration={200} delay={0} />
             <br />
             <span className="text-[#a600ff]">
                <ScrollLetterRevealDelayed text="RESUME.PDF" duration={200} delay={0.1} />
             </span>
           </h1>
 
-          <div className="mt-8 flex flex-col lg:flex-row items-center gap-4">
-             <div className="h-[1px] w-12 bg-[#a600ff]" />
-             <span className="font-geist text-[10px] md:text-[11px] text-white/60 uppercase tracking-[0.4em] font-medium">
-               ARCHIVE_002 
-             </span>
-          </div>
+
 
           <p className="font-geist text-white/80 text-xs md:text-sm uppercase tracking-[0.3em] font-medium leading-relaxed max-w-lg mt-8 mx-auto lg:mx-0">
-            PROVIDE YOUR DETAILS TO RECEIVE A DIRECT COPY OF MAHIR TAJWAR'S DIGITAL DOSSIER AND ENGINEERING RESUME.
+            SHARE YOUR DETAILS AND SEND A REQUEST TO RECEIVE A DIRECT COPY OF MY RESUME IN YOUR INBOX.
           </p>
 
         </div>
@@ -101,7 +96,7 @@ export const Resume = () => {
                       required
                       type="email"
                       value={formData.email}
-                      placeholder="ENTER EMAIL ADDRESS"
+                      placeholder="ENTER VALID EMAIL ADDRESS"
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       className="w-full bg-transparent border-b border-white/20 py-3 font-geist text-[15px] text-white tracking-[0.2em] focus:outline-none focus:border-[#a600ff] transition-all duration-300 placeholder:text-white/30"
                     />
@@ -122,17 +117,12 @@ export const Resume = () => {
                       className="absolute inset-0 bg-[#a600ff] z-0"
                     />
                     <span className="relative z-10 font-geist text-[11px] text-[#a600ff] group-hover:text-white uppercase tracking-[0.5em] font-bold transition-colors duration-300">
-                      {isSubmitting ? "SYNCING..." : "EXECUTE SYNC"}
+                      {isSubmitting ? "SENDING..." : "SEND REQUEST"}
                     </span>
                   </motion.button>
                 </form>
 
-                <div className="flex items-center gap-4 absolute -bottom-16 left-0">
-                  <div className="h-[1px] w-6 bg-white/20" />
-                  <p className="font-geist text-white/50 text-[8px] uppercase tracking-[0.3em]">
-                    SECURE 
-                  </p>
-                </div>
+
               </motion.div>
             ) : (
               <motion.div
@@ -174,7 +164,7 @@ export const Resume = () => {
                   transition={{ delay: 0.8, duration: 0.8 }}
                   className="font-geist text-white/60 text-[10px] md:text-xs uppercase tracking-[0.3em] leading-relaxed max-w-sm"
                 >
-                  DATA SYNC COMPLETE. THE DIGITAL DOSSIER WILL BE DISPATCHED TO YOUR INBOX WITHIN 1-2 BUSINESS DAYS.
+                  MY RESUME WILL BE SENT WITHIN 1–2 BUSINESS DAYS. IF YOU NEED ANY ADDITIONAL DETAILS IN THE MEANTIME, FEEL FREE TO REACH OUT.
                 </motion.p>
 
                 <motion.button

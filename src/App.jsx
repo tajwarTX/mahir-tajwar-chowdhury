@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect, lazy, Suspense } from "react";
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { Analytics } from "@vercel/analytics/react";
 import { AnimatePresence } from "framer-motion";
 
@@ -10,9 +10,7 @@ const About = lazy(() => import("./pages/About"));
 import Projects from "./pages/Projects";
 const Contact = lazy(() => import("./pages/Contact"));
 const Resume = lazy(() => import("./pages/Resume"));
-const Blog = lazy(() => import("./pages/Blog").then(module => ({ default: module.Blog })));
-const BlogPost = lazy(() => import("./pages/BlogPost"));
-const Admin = lazy(() => import("./pages/Admin"));
+const Awards = lazy(() => import("./pages/Awards"));
 import Dither from "./components/Dither";
 import TargetCursor from "./components/TargetCursor";
 import Loader from "./components/Loader";
@@ -21,14 +19,15 @@ const menuItems = [
   { label: 'Home', ariaLabel: 'Go to home page', link: '/' },
   { label: 'About', ariaLabel: 'Learn more about me', link: '/about' },
   { label: 'Projects', ariaLabel: 'View my engineering projects', link: '/projects' },
-  { label: 'Blog', ariaLabel: 'Read my thoughts', link: '/blog' },
+  { label: 'Awards', ariaLabel: 'View my honors and awards', link: '/awards' },
+  { label: 'Resume', ariaLabel: 'Request my resume', link: '/resume' },
   { label: 'Contact', ariaLabel: 'Get in touch for collaboration', link: '/contact' }
 ];
 
 const socialItems = [
-  { label: 'Twitter', link: 'https://twitter.com' },
-  { label: 'GitHub', link: 'https://github.com' },
-  { label: 'LinkedIn', link: 'https://linkedin.com' }
+  { label: 'Facebook', link: 'https://www.facebook.com/tajwar.tx' },
+  { label: 'GitHub', link: 'https://github.com/tajwarTX' },
+  { label: 'LinkedIn', link: 'https://www.linkedin.com/in/mahir-tajwar-chowdhury/' }
 ];
 
 const LocationWatcher = ({ setLoading }) => {
@@ -80,7 +79,7 @@ const App = () => {
           )}
         </AnimatePresence>
 
-        {!isMobile && (
+        {!isMobile && !loading && (
           <div className="fixed inset-0 z-[9999] pointer-events-none">
             <TargetCursor
               spinDuration={4.1}
@@ -140,9 +139,8 @@ const App = () => {
                 <Route path="/projects" element={<Projects />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/resume" element={<Resume />} />
-                <Route path="/blog" element={<Blog />} />
-                <Route path="/blog/:id" element={<BlogPost />} />
-                <Route path="/admin" element={<Admin />} />
+                <Route path="/awards" element={<Awards />} />
+                <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </Suspense>
           </div>

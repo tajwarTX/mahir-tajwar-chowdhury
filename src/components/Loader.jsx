@@ -68,7 +68,7 @@ const Loader = ({ onFinish, isInitial }) => {
       initial={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
-      className="fixed inset-0 flex items-center justify-center bg-black z-[9999]"
+      className="fixed inset-0 flex items-center justify-center bg-black z-[9999] cursor-none"
     >
       {isInitial ? (
         <img
