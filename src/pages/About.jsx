@@ -371,7 +371,7 @@ const About = () => {
   const isSliderInView = useInView(sliderRef, { margin: "200px 0px 200px 0px" });
 
   return (
-    <div ref={containerRef} className="w-full bg-black selection:bg-[#a600ff] selection:text-white pb-12">
+    <div ref={containerRef} className="w-full overflow-x-hidden bg-black selection:bg-[#a600ff] selection:text-white pb-12">
       <style>{MARQUEE_STYLES}</style>
 
       {/* Background Decor — static fixed layer */}

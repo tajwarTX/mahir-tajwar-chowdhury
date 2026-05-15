@@ -62,7 +62,7 @@ const App = () => {
 
   return (
     <Router>
-      <main className="relative w-full h-full bg-black">
+      <main className="relative w-full h-full overflow-x-hidden bg-black">
         <LocationWatcher setLoading={setLoading} />
 
         <div className="fixed inset-0 pointer-events-none z-[15] bg-[radial-gradient(circle,transparent_40%,rgba(0,0,0,0.8)_100%)]" />
