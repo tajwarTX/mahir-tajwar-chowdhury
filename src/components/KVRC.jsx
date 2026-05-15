@@ -1,7 +1,7 @@
 import React, { forwardRef, Suspense } from 'react';
 import * as THREE from 'three';
 import { useGLTF, Clone } from '@react-three/drei';
-import MODEL_PATH from '../assets/3d/k-vrc.glb';
+import MODEL_PATH from '../assets/3d_models/k-vrc.glb';
 
 
 const KVRCModel = ({ ...props }) => {

@@ -3,10 +3,10 @@ import React, { Suspense, useRef, useState, useEffect } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { ScrollControls, Scroll, useScroll, PerspectiveCamera, Environment, ContactShadows, Bvh, Preload, PerformanceMonitor, AdaptiveDpr, AdaptiveEvents, useProgress } from '@react-three/drei';
 import * as THREE from 'three';
-import KVRC from '../models/KVRC';
+import KVRC from '../components/KVRC';
 import { motion, AnimatePresence } from 'framer-motion';
 import ScrollLetterRevealDelayed from '../components/ScrollLetterRevealDelayed';
-import scrolldown from '../assets/scrolldown.gif';
+import scrolldown from '../assets/miscellaneous/scrolldown.gif';
 
 const ProjectLoader = ({ progress }) => {
   return (

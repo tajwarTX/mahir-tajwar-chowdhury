@@ -4,10 +4,10 @@ import IntroBlock from "../components/IntroBlock";
 import { Canvas } from "@react-three/fiber";
 import * as THREE from "three";
 import { PerformanceMonitor, AdaptiveDpr, AdaptiveEvents, Bvh, Preload, Float } from "@react-three/drei";
-import Island from "../models/Island";
+import Island from "../components/Island";
 import CameraController from "../components/CameraController";
-import scrollDown from "../assets/scrolldown.gif";
-import scrollSide from "../assets/scrollside.gif";
+import scrollDown from "../assets/miscellaneous/scrolldown.gif";
+import scrollSide from "../assets/miscellaneous/scrollside.gif";
 import ScrollLetterRevealDelayed from "../components/ScrollLetterRevealDelayed";
 
 const BASE_POSITION = { x: -2, y: -0, z: -63 };

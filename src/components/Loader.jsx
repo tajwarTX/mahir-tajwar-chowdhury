@@ -1,7 +1,7 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import loaderGif from "../assets/loading.gif";
+import loaderGif from "../assets/miscellaneous/loading.gif";
 import { useProgress } from "@react-three/drei";
 
 const Loader = ({ onFinish, isInitial }) => {

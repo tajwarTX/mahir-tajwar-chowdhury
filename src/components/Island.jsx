@@ -3,7 +3,7 @@ import { useGLTF, Center, Billboard, Text } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";
 import * as THREE from "three";
-import islandscene from "../assets/3d/island.glb";
+import islandscene from "../assets/3d_models/island.glb";
 
 const dracoLoader = new DRACOLoader();
 dracoLoader.setDecoderPath("/draco/");

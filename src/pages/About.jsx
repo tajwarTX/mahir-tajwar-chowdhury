@@ -2,32 +2,32 @@
 import React, { useState, useEffect, useMemo, memo, lazy, Suspense, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useMotionValue, useSpring, useTransform, AnimatePresence, useInView } from 'framer-motion';
-import profileImg from "../assets/profile.jpg";
-import cadetImg from "../assets/Cadet Photo.jpg";
-import avatarImg from "../assets/Face.png";
+import profileImg from "../assets/photo/profile.jpg";
+import cadetImg from "../assets/photo/Cadet Photo.jpg";
+import avatarImg from "../assets/photo/Face.png";
 
 // Import all images from pics folder
-import pic1 from "../assets/pics/Bangladesh Robot Olympiad 2020.jpg";
-import pic2 from "../assets/pics/Bangladesh Robot Olympiad 2021.JPG";
-import pic3 from "../assets/pics/Bangladesh Robot Olympiad 2022.JPG";
-import pic4 from "../assets/pics/FPV Drone Simulation IRO 2022.JPG";
-import pic5 from "../assets/pics/Flying FPV Drone.JPG";
-import pic6 from "../assets/pics/International Robot Olympiad 2021 (1).JPG";
-import pic7 from "../assets/pics/International Robot Olympiad 2021 (2).jpg";
-import pic8 from "../assets/pics/International Robot Olympiad 2021.JPG";
-import pic9 from "../assets/pics/International Robot Olympiad 2022.jpg";
-import pic10 from "../assets/pics/International Robot Olympiad 2023 (1).jpg";
-import pic11 from "../assets/pics/International Robot Olympiad 2023 (2).jpg";
-import pic12 from "../assets/pics/International Robot Olympiad 2023.JPG";
-import pic13 from "../assets/pics/World Robot Olympiad 2023 (1).JPG";
-import pic14 from "../assets/pics/World Robot Olympiad 2023 (2).JPG";
-import pic15 from "../assets/pics/World Robot Olympiad 2023.JPG";
-import pic16 from "../assets/pics/World Robot Olympiad 2025.jpg";
+import pic1 from "../assets/gallery/Bangladesh Robot Olympiad 2020.jpg";
+import pic2 from "../assets/gallery/Bangladesh Robot Olympiad 2021.JPG";
+import pic3 from "../assets/gallery/Bangladesh Robot Olympiad 2022.JPG";
+import pic4 from "../assets/gallery/FPV Drone Simulation IRO 2022.JPG";
+import pic5 from "../assets/gallery/Flying FPV Drone.JPG";
+import pic6 from "../assets/gallery/International Robot Olympiad 2021 (1).JPG";
+import pic7 from "../assets/gallery/International Robot Olympiad 2021 (2).jpg";
+import pic8 from "../assets/gallery/International Robot Olympiad 2021.JPG";
+import pic9 from "../assets/gallery/International Robot Olympiad 2022.jpg";
+import pic10 from "../assets/gallery/International Robot Olympiad 2023 (1).jpg";
+import pic11 from "../assets/gallery/International Robot Olympiad 2023 (2).jpg";
+import pic12 from "../assets/gallery/International Robot Olympiad 2023.JPG";
+import pic13 from "../assets/gallery/World Robot Olympiad 2023 (1).JPG";
+import pic14 from "../assets/gallery/World Robot Olympiad 2023 (2).JPG";
+import pic15 from "../assets/gallery/World Robot Olympiad 2023.JPG";
+import pic16 from "../assets/gallery/World Robot Olympiad 2025.jpg";
 
 import ScrollLetterRevealDelayed from "../components/ScrollLetterRevealDelayed";
 
 // Lazy-load the heavy 3D slider to keep initial About page JS lightweight
-const ModelSlider = lazy(() => import('../components/3d/ModelSlider'));
+const ModelSlider = lazy(() => import('../components/ModelSlider'));
 
 // ─── Achievement Counter Component ─────────────────────────────────────────
 const AchievementItem = ({ value, suffix = "", label, sublabel }) => {
