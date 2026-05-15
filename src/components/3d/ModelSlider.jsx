@@ -16,12 +16,12 @@ const BAKED_OFFSET = 36;
 const DEBUG = false;
 
 const SLIDES_DATA = [
-  { index: '0000', title: 'WidowX MKII Arm', path: armModel, margin: 1, centerScale: 0.9428, edgeScale: 0.0149, position: [0, -1.5, 0], rotation: [0.5, -0.03, -0.15], edgePos: [0, -8.6, 0], edgeRot: [0.03, -3.052, 0.66], baseRotation: [0, -2.07, 0] },
+  { index: '0000', title: 'Robotic Arm', path: armModel, margin: 1, centerScale: 0.9428, edgeScale: 0.0149, position: [0, -1.5, 0], rotation: [0.5, -0.03, -0.15], edgePos: [0, -8.6, 0], edgeRot: [0.03, -3.052, 0.66], baseRotation: [0, -2.07, 0] },
   { index: '0001', title: 'FPV Racing Drone', path: droneModel, margin: 1, centerScale: 1.0899, edgeScale: 0, position: [0, 0.05, 0], rotation: [0.38, -0.49, 0], edgePos: [0, 0.1, 0], edgeRot: [0.3, 1.47, 0], baseRotation: [0, 0, 0] },
-  { index: '0002', title: 'Auto Robot', path: autoRobotModel, margin: 1, centerScale: 0.9467, edgeScale: 0, position: [1.75, 3.80, 3.20], rotation: [0.140, 0.510, 0.120], edgePos: [-15.00, -15.00, 1.50], edgeRot: [1.910, 3.680, -2.470], baseRotation: [-0.5, -0.27, -0.16] },
-  { index: '0003', title: 'Rocket', path: rocketModel, margin: 1, centerScale: 0.9821, edgeScale: 0.0207, position: [0, 0, 0], rotation: [0, 0, -0.56], edgePos: [0, 0, 0], edgeRot: [-0.05, 1.81, 2.05], baseRotation: [-1.57, -0.01, 1.38] },
-  { index: '0004', title: 'Line Follower Robot', path: lineFollowerModel, margin: 1, centerScale: 0.85, edgeScale: 0, position: [0, -0.75, 0], rotation: [0.62, -0.39, 0], edgePos: [1.3, 0, 0], edgeRot: [0.43, 1.43, 0], baseRotation: [0, 0, 0] },
-  { index: '0005', title: 'Humanoid Assembly', path: humanoidModel, margin: 1, centerScale: 0.9428, edgeScale: 0.0686, position: [0, 0, 0], rotation: [-0.15, 0.47, 0.21], edgePos: [0, 0, 0], edgeRot: [-0.03, -1.6, -0.36], baseRotation: [0, 0, 0] },
+  { index: '0002', title: 'Autonomous Robot', path: autoRobotModel, margin: 1, centerScale: 0.9467, edgeScale: 0, position: [1.75, 3.80, 3.20], rotation: [0.140, 0.510, 0.120], edgePos: [-15.00, -15.00, 1.50], edgeRot: [1.910, 3.680, -2.470], baseRotation: [-0.5, -0.27, -0.16] },
+  { index: '0003', title: 'Amateur Rocketry', path: rocketModel, margin: 1, centerScale: 0.9821, edgeScale: 0.0207, position: [0, 0, 0], rotation: [0, 0, -0.56], edgePos: [0, 0, 0], edgeRot: [-0.05, 1.81, 2.05], baseRotation: [-1.57, -0.01, 1.38] },
+  { index: '0004', title: 'Line Following Robot', path: lineFollowerModel, margin: 1, centerScale: 0.85, edgeScale: 0, position: [0, -0.75, 0], rotation: [0.62, -0.39, 0], edgePos: [1.3, 0, 0], edgeRot: [0.43, 1.43, 0], baseRotation: [0, 0, 0] },
+  { index: '0005', title: 'Humanoid Robot', path: humanoidModel, margin: 1, centerScale: 0.9428, edgeScale: 0.0686, position: [0, 0, 0], rotation: [-0.15, 0.47, 0.21], edgePos: [0, 0, 0], edgeRot: [-0.03, -1.6, -0.36], baseRotation: [0, 0, 0] },
 ];
 
 SLIDES_DATA.forEach(s => useGLTF.preload(s.path));
@@ -431,7 +431,7 @@ const SlideItem = memo(function SlideItem({ slide, index, velocityRef, debugData
         <WarpRect velocityRef={velocityRef} index={index} containerRef={containerRef} />
 
         {/* 3-D canvas — GPU-optimized settings */}
-        <div className="canvas-container" style={{ position:'absolute', top:'-100%', bottom:'-100%', left:'-50%', right:'-50%', zIndex:1, pointerEvents:'none' }}>
+        <div className="canvas-container will-change-transform" style={{ position:'absolute', top:'-100%', bottom:'-100%', left:'-50%', right:'-50%', zIndex:1, pointerEvents:'none', transform: 'translateZ(0)' }}>
           <Canvas camera={{ position:[0,0,3.5], fov:45 }}
             gl={{ antialias:false, powerPreference:'high-performance', alpha:true, stencil:false, depth:true }}
             dpr={[1,1]} frameloop="always">
@@ -580,12 +580,9 @@ export default function ModelSlider() {
   }, []);
 
   return (
-    <motion.div 
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 1.2, ease: "easeOut" }}
+    <div 
       className="w-full select-none" 
-      style={{ padding:'100px 0', position:'relative' }}
+      style={{ padding:'100px 0', position:'relative', opacity: 1 }}
     >
       {DEBUG && (
         <div style={{ 
@@ -666,6 +663,6 @@ export default function ModelSlider() {
           <div key={s.index} style={{ height:'1px', flex:1, background:'rgba(255,255,255,0.12)' }} />
         ))}
       </div>
-    </motion.div>
+    </div>
   );
 }
