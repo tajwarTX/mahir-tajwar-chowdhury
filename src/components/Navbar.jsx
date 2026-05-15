@@ -6,7 +6,7 @@ const Navbar = () => {
   return (
     <>
 
-      <div className="fixed top-5 left-6 z-50">
+      <div className="fixed top-5 left-6 z-[2000]">
         <NavLink to="/">
           <img
             src={logo}
