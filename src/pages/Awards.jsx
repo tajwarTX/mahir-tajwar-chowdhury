@@ -24,6 +24,20 @@ import BdRO2023_Tech from "../assets/certificates/nationals/Bangladesh Robot Oly
 import WRO2023_Nat from "../assets/certificates/nationals/World Robot Olympiad 2023 - National Round - Technical Medal -- Future Engineers Category (Senior Group).jpg";
 import WRO2025_Nat from "../assets/certificates/nationals/World Robot Olympiad 2025 - National Round - Bronze Medal  --  Robomission Category (Senior Group).jpg";
 
+// Others
+import MCC_Robotics from "../assets/certificates/others/Cadet Achiebement Award of outstanding permormance - MCC Robotics Club Exhibition.jpg";
+import MECA_Painting from "../assets/certificates/others/Cadet Achiebement Award of outstanding permormance - MECA Painting Exhibition.jpg";
+import BIF_2022 from "../assets/certificates/others/Certificate of Appreciation - Bangladesh Innovation Forum – 2022.jpg";
+import ICT_Div_2022 from "../assets/certificates/others/Certificate of Appreciation - Information and Communication Technology Division (ICT Div) – 2022.jpg";
+import NMST_2024 from "../assets/certificates/others/Certificate of Appreciation - National Museum of Science and Technology – 2024.jpg";
+import Creativity_2022 from "../assets/certificates/others/Champion Creativity Exhibition - 2022.jpg";
+import DUNMUN_2019 from "../assets/certificates/others/Dhaka University Model United Nations 2019 (DUNMUN) – Delegate of Chile.jpg";
+import Chitra_Mukul_1 from "../assets/certificates/others/Diploma in Preliminary \"Chitra Mukul\" 2011 – Grade A+.jpg";
+import Chitra_Mukul_2 from "../assets/certificates/others/Diploma in Preliminary 1st Year 1st Semester \"Chitra Mukul\" 2011 – Grade A+.jpg";
+import Chitra_Mukul_3 from "../assets/certificates/others/Diploma in Preliminary Final Semester \"Chitra Mukul\" 2011 – Grade A.jpg";
+import School_Of_Robotics_2022 from "../assets/certificates/others/Inter Cadet College Workshop on Robotics \"SCHOOL OF ROBOTICS\" - 2022.jpg";
+import ML_Python_2022 from "../assets/certificates/others/Machine Learning using Python (CADD CENTRE) – 2022.jpg";
+
 const awardsData = [
   // --- INTERNATIONALS ---
   {
@@ -163,6 +177,103 @@ const awardsData = [
     description: "BANGLADESH ROBOT OLYMPIAD - JUNIOR GROUP",
     image: BdRO2020_Bronze,
     type: "NATIONAL"
+  },
+  // --- OTHERS & WORKSHOPS ---
+  {
+    year: "2024",
+    title: "CERTIFICATE OF APPRECIATION",
+    org: "NATIONAL MUSEUM OF SCIENCE AND TECHNOLOGY",
+    description: "RECOGNITION FOR CONTRIBUTIONS TO SCIENCE AND TECHNOLOGY SECTOR",
+    image: NMST_2024,
+    type: "MISC"
+  },
+  {
+    year: "2022",
+    title: "MACHINE LEARNING USING PYTHON",
+    org: "CADD CENTRE",
+    description: "COURSE - CERTIFICATE OF COMPLETION",
+    image: ML_Python_2022,
+    type: "MISC"
+  },
+  {
+    year: "2022",
+    title: "SCHOOL OF ROBOTICS",
+    org: "CADET COLLEGES BANGLADESH \nBANGLADESH ROBOT OLYMPIAD",
+    description: "COURSE - INTER CADET COLLEGE ROBOTICS WORKSHOP",
+    image: School_Of_Robotics_2022,
+    type: "MISC"
+  },
+  {
+    year: "2022",
+    title: "CERTIFICATE OF APPRECIATION",
+    org: "BANGLADESH INNOVATION FORUM",
+    description: "APPRECIATION FOR VOLUNTARY CONTRIBUTIONS AND INNOVATIONS",
+    image: BIF_2022,
+    type: "MISC"
+  },
+  {
+    year: "2022",
+    title: "CERTIFICATE OF APPRECIATION",
+    org: "ICT DIVISION (The Government of Bangladesh)",
+    description: "RECOGNITION FROM THE INFORMATION AND COMMUNICATION TECHNOLOGY DIVISION Bangladesh",
+    image: ICT_Div_2022,
+    type: "MISC"
+  },
+  {
+    year: "2022",
+    title: "CHAMPION - CREATIVITY EXHIBITION",
+    org: "MIRZAPUR CADET COLLEGE",
+    description: "MCC CREATIVITY EXHIBITION COMPETITION",
+    image: Creativity_2022,
+    type: "MISC"
+  },
+  {
+    year: "2019",
+    title: "DELEGATE OF CHILE",
+    org: "DUNMUN (DHAKA UNIVERSITY)",
+    description: "WORLD TRADE ORGANIZATION - DHAKA UNIVERSITY MODEL UNITED NATIONS",
+    image: DUNMUN_2019,
+    type: "MISC"
+  },
+  {
+    year: "2022",
+    title: "CADET ACHIEVEMENT AWARD",
+    org: "MIRZAPUR CADET COLLEGE",
+    description: "OUTSTANDING PERFORMANCE - MCC ROBOTICS CLUB EXHIBITION",
+    image: MCC_Robotics,
+    type: "MISC"
+  },
+  {
+    year: "2022",
+    title: "CADET ACHIEVEMENT AWARD",
+    org: "MIRZAPUR CADET COLLEGE",
+    description: "OUTSTANDING PERFORMANCE - MECA PAINTING EXHIBITION",
+    image: MECA_Painting,
+    type: "MISC"
+  },
+  {
+    year: "2011",
+    title: "GRADE A FINAL SEMESTER",
+    org: "BMA CHILDREN’S CLUB",
+    description: "Diploma in Preliminary \"CHITRA MUKUL\"",
+    image: Chitra_Mukul_3,
+    type: "MISC"
+  },
+  {
+    year: "2011",
+    title: "GRADE A+ 1ST YEAR 2ND SEMESTER",
+    org: "BMA CHILDREN’S CLUB",
+    description: "Diploma in Preliminary \"CHITRA MUKUL\"",
+    image: Chitra_Mukul_1,
+    type: "MISC"
+  },
+  {
+    year: "2011",
+    title: "GRADE A+ 1ST YEAR 1ST SEMESTER",
+    org: "BMA CHILDREN’S CLUB",
+    description: "Diploma in Preliminary \"CHITRA MUKUL\"",
+    image: Chitra_Mukul_2,
+    type: "MISC"
   }
 ];
 
@@ -251,7 +362,7 @@ const AwardItem = React.memo(({ award, idx, onHover, onClick }) => {
            <span className="font-geist text-[9px] md:text-[10px] text-[#a600ff] font-bold uppercase tracking-[0.4em] mb-2">
              ISSUED BY
            </span>
-           <span className="font-geist text-[10px] md:text-[11px] text-white/70 uppercase tracking-widest text-right">
+           <span className="font-geist text-[10px] md:text-[11px] text-white/70 uppercase tracking-widest text-right whitespace-pre-wrap">
              {award.org}
            </span>
         </div>
