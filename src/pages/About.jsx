@@ -24,8 +24,6 @@ import pic14 from "../assets/gallery/World Robot Olympiad 2023 (2).JPG";
 import pic15 from "../assets/gallery/World Robot Olympiad 2023.JPG";
 import pic16 from "../assets/gallery/World Robot Olympiad 2025.jpg";
 
-import ScrollLetterRevealDelayed from "../components/ScrollLetterRevealDelayed";
-
 // Lazy-load the heavy 3D slider to keep initial About page JS lightweight
 const ModelSlider = lazy(() => import('../components/ModelSlider'));
 
@@ -33,6 +31,7 @@ const ModelSlider = lazy(() => import('../components/ModelSlider'));
 const AchievementItem = ({ value, suffix = "", label, sublabel }) => {
   const [count, setCount] = useState(0);
   const ref = useRef(null);
+  const hasAnimated = useRef(false);
 
   return (
     <motion.div
@@ -44,6 +43,8 @@ const AchievementItem = ({ value, suffix = "", label, sublabel }) => {
         transition: { duration: 0.6 }
       }}
       onViewportEnter={() => {
+        if (hasAnimated.current) return;
+        hasAnimated.current = true;
         let start = 0;
         const end = parseInt(value);
         if (start === end) return;
@@ -73,16 +74,6 @@ const AchievementItem = ({ value, suffix = "", label, sublabel }) => {
       </div>
     </motion.div>
   );
-};
-
-// ─── System Clock Component (Isolates 1s re-renders) ───────────────────────
-const SystemClock = () => {
-  const [time, setTime] = useState(new Date().toLocaleTimeString());
-  useEffect(() => {
-    const timer = setInterval(() => setTime(new Date().toLocaleTimeString()), 1000);
-    return () => clearInterval(timer);
-  }, []);
-  return <>{time}</>;
 };
 
 // ─── Lazy YouTube Component (Observer-based loading) ──────────────────────
@@ -120,8 +111,7 @@ const LazyYouTube = memo(({ src, title }) => {
   );
 });
 
-// ─── Tech Badge Component ──────────────────────────────────────────────────
-const TechBadge = ({ name, icon, color }) => {
+const TechBadge = memo(({ name, icon, color }) => {
   // Use Simple Icons for tech/engineering logos that Icons8 lacks
   const isSimpleIcon = [
     'kicad', 'mathworks', 'davinciresolve', 'ros', 'solidworks', 'altium', 'altiumdesigner', 'stmicroelectronics', 'c',
@@ -137,16 +127,18 @@ const TechBadge = ({ name, icon, color }) => {
         <img
           src={iconUrl}
           alt={name}
+          loading="lazy"
+          decoding="async"
           className="w-4 h-4 group-hover:scale-110 group-hover:brightness-0 group-hover:invert transition-transform object-contain"
         />
       )}
       <span className="font-geist text-[9px] font-semibold text-white/70 group-hover:text-white uppercase tracking-widest">{name}</span>
     </div>
   );
-};
+});
 
 const TechMarquee = ({ items, direction = "left", speed = 20 }) => (
-  <div className="flex overflow-visible select-none w-full group/marquee will-change-transform">
+  <div className="flex overflow-visible select-none w-full group/marquee">
     <div className={`flex shrink-0 items-center gap-4 w-max py-1 animate-marquee-${direction} group-hover/marquee:[animation-play-state:paused] will-change-transform`} style={{ animationDuration: `${speed}s`, transform: 'translateZ(0)' }}>
       {[...items, ...items, ...items, ...items].map(([name, icon, color], idx) => (
         <TechBadge key={idx} name={name} icon={icon} color={color} />
@@ -250,9 +242,10 @@ const shuffleArray = (array) => {
   return newArr;
 };
 
-const GALLERY_DATA = shuffleArray(RAW_GALLERY_DATA);
+// We will shuffle this inside the component to prevent HMR re-shuffles
+const GALLERY_DATA = RAW_GALLERY_DATA;
 
-const EngineeringGallery = memo(() => {
+const EngineeringGallery = memo(({ galleryData }) => {
   const [counter, setCounter] = useState(0);
   const [isNavHovered, setIsNavHovered] = useState(false);
   const [isPhotoHovered, setIsPhotoHovered] = useState(false);
@@ -265,7 +258,7 @@ const EngineeringGallery = memo(() => {
     return () => clearInterval(timer);
   }, [isNavHovered, isPhotoHovered]);
 
-  const activeGalleryIdx = counter % GALLERY_DATA.length;
+  const activeGalleryIdx = counter % galleryData.length;
 
   return (
     <div className="w-full relative group rounded-none">
@@ -278,19 +271,23 @@ const EngineeringGallery = memo(() => {
           backfaceVisibility: 'hidden'
         }}
       >
-        <AnimatePresence>
-          <motion.img
-            key={counter}
-            src={GALLERY_DATA[activeGalleryIdx].src}
-            alt={`Mahir Tajwar Chowdhury - ${GALLERY_DATA[activeGalleryIdx].title}`}
-            initial={{ opacity: 0, scale: 1 }}
-            animate={{ opacity: 1, scale: 1.05 }}
-            exit={{ opacity: 0 }}
-            transition={{ opacity: { duration: 0.8, ease: "easeInOut" }, scale: { duration: 4, ease: "linear" } }}
-            style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden', transform: 'translateZ(0)' }}
-            className="absolute inset-0 w-full h-full object-cover"
+        {galleryData.map((item, idx) => (
+          <img
+            key={idx}
+            src={item.src}
+            alt={`Mahir Tajwar Chowdhury - ${item.title}`}
+            style={{
+              opacity: activeGalleryIdx === idx ? 1 : 0,
+              transform: activeGalleryIdx === idx ? 'scale(1.05)' : 'scale(1)',
+              transition: 'opacity 0.8s ease-in-out, transform 4s linear',
+              backfaceVisibility: 'hidden',
+              WebkitBackfaceVisibility: 'hidden'
+            }}
+            className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+            loading="lazy"
+            decoding="async"
           />
-        </AnimatePresence>
+        ))}
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent pointer-events-none" />
         <div className="absolute inset-0 bg-gradient-to-r from-black/50 from-10% via-transparent via-50% to-transparent pointer-events-none" />
       </div>
@@ -320,10 +317,15 @@ const EngineeringGallery = memo(() => {
 
       <div className="absolute bottom-8 left-8 right-12 max-w-[50%] pointer-events-none z-[30]">
         <h3 className={`font-orbitron text-2xl md:text-4xl font-black uppercase tracking-tighter flex flex-col -space-y-[5px] md:-space-y-[10px] transition-colors duration-500 ${isNavHovered ? 'text-[#a600ff]' : 'text-white'}`}>
-          {GALLERY_DATA[activeGalleryIdx].title.split(' ').map((word, index) => (
-            <div key={`${counter}-${index}`}>
-              <ScrollLetterRevealDelayed text={word} duration={150} delay={0.1 + (index * 0.1)} />
-            </div>
+          {galleryData[activeGalleryIdx].title.split(' ').map((word, index) => (
+            <motion.div
+              key={`${counter}-${index}`}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.1 + index * 0.1 }}
+            >
+              {word}
+            </motion.div>
           ))}
         </h3>
       </div>
@@ -332,16 +334,27 @@ const EngineeringGallery = memo(() => {
 });
 
 const About = () => {
+  const [galleryData] = useState(() => shuffleArray(RAW_GALLERY_DATA));
+
   // Preload all gallery images on mount
   useEffect(() => {
-    GALLERY_DATA.forEach((img) => {
+    galleryData.forEach((img) => {
       const image = new Image();
       image.src = img.src;
     });
-  }, []);
+  }, [galleryData]);
 
   const containerRef = useRef(null);
   const [isHovered, setIsHovered] = useState(false);
+
+  useEffect(() => {
+    if (!document.getElementById('marquee-styles')) {
+      const style = document.createElement('style');
+      style.id = 'marquee-styles';
+      style.innerHTML = MARQUEE_STYLES;
+      document.head.appendChild(style);
+    }
+  }, []);
 
   // Magnetic Interaction Logic
   const mouseX = useMotionValue(0);
@@ -351,29 +364,37 @@ const About = () => {
   const rotateX = useTransform(springY, [-50, 50], [10, -10]);
   const rotateY = useTransform(springX, [-50, 50], [-10, 10]);
 
+  const rafRef = useRef(null);
+
   const handleMouseMove = (e) => {
     setIsHovered(true);
     const { clientX, clientY } = e;
-    const x = (clientX - window.innerWidth / 2) / 21; // magneticStrength: 21
-    const y = (clientY - window.innerHeight / 2) / 21;
-    mouseX.set(x);
-    mouseY.set(y);
+    if (rafRef.current) return;
+    
+    rafRef.current = requestAnimationFrame(() => {
+      const x = (clientX - window.innerWidth / 2) / 21; // magneticStrength: 21
+      const y = (clientY - window.innerHeight / 2) / 21;
+      mouseX.set(x);
+      mouseY.set(y);
+      rafRef.current = null;
+    });
   };
 
   const handleMouseLeave = () => {
     setIsHovered(false);
+    if (rafRef.current) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
     mouseX.set(0);
     mouseY.set(0);
   };
 
   const isHeroInView = useInView(containerRef, { margin: "-10% 0px -10% 0px" });
   const sliderRef = useRef(null);
-  const isSliderInView = useInView(sliderRef, { margin: "200px 0px 200px 0px" });
 
   return (
     <div ref={containerRef} className="w-full overflow-x-hidden bg-black selection:bg-[#a600ff] selection:text-white pb-12">
-      <style>{MARQUEE_STYLES}</style>
-
       {/* Background Decor — static fixed layer */}
       <div className="fixed inset-0 opacity-[0.05] pointer-events-none z-0">
         <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(#ffffff 1px, transparent 0)', backgroundSize: '40px 40px' }} />
@@ -436,6 +457,8 @@ const About = () => {
               <img
                 src={avatarImg}
                 alt="Avatar"
+                loading="lazy"
+                decoding="async"
                 className="w-full h-auto"
               />
             </motion.div>
@@ -485,8 +508,8 @@ const About = () => {
             </div>
 
             <h2 className="font-orbitron text-4xl md:text-5xl font-black text-white uppercase tracking-tighter leading-[0.9]">
-              <ScrollLetterRevealDelayed text="Mahir " duration={100} delay={0} className="inline" />
-              <ScrollLetterRevealDelayed text="Tajwar" duration={100} delay={0.1} className="inline text-transparent bg-clip-text bg-gradient-to-r from-[#a600ff] to-[#ff00e5]" />
+              <span className="inline">Mahir </span>
+              <span className="inline text-transparent bg-clip-text bg-gradient-to-r from-[#a600ff] to-[#ff00e5]">Tajwar</span>
             </h2>
 
             <div className="flex items-center gap-4 opacity-60">
@@ -495,28 +518,13 @@ const About = () => {
 
             <div className="space-y-5 border-t border-white/10 pt-8">
               <div className="font-geist text-white/90 text-base leading-relaxed">
-                <ScrollLetterRevealDelayed
-                  text="I am a multidisciplinary roboticist and engineer. My work focuses on the intersection of hardware logic and autonomous systems."
-                  duration={100}
-                  delay={0.3}
-                  className="block"
-                />
+                <span className="block">I am a multidisciplinary roboticist and engineer. My work focuses on the intersection of hardware logic and autonomous systems.</span>
               </div>
               <div className="font-geist text-white/50 text-sm leading-loose uppercase tracking-wide">
-                <ScrollLetterRevealDelayed
-                  text="As an International Robot Olympiad (IRO) Gold Medalist, I am dedicated to perfecting autonomous interactions. My background from Mirzapur Cadet College has shaped my precision-driven approach to engineering."
-                  duration={100}
-                  delay={0.6}
-                  className="block"
-                />
+                <span className="block">As an International Robot Olympiad (IRO) Gold Medalist, I am dedicated to perfecting autonomous interactions. My background from Mirzapur Cadet College has shaped my precision-driven approach to engineering.</span>
               </div>
               <div className="font-geist text-white/30 text-sm leading-loose uppercase tracking-wide">
-                <ScrollLetterRevealDelayed
-                  text="With a relentless focus on the future, I aim to continue developing robotic solutions that are not only technologically superior but also redefine how we interact with autonomous machines in our daily lives."
-                  duration={100}
-                  delay={0.8}
-                  className="block"
-                />
+                <span className="block">With a relentless focus on the future, I aim to continue developing robotic solutions that are not only technologically superior but also redefine how we interact with autonomous machines in our daily lives.</span>
               </div>
             </div>
           </div>
@@ -535,6 +543,8 @@ const About = () => {
               <img
                 src={profileImg}
                 alt="Mahir Tajwar Chowdhury"
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover grayscale brightness-75 group-hover:grayscale-0 group-hover:brightness-100 transition-all duration-700"
               />
             </div>
@@ -543,7 +553,7 @@ const About = () => {
       </section>
 
       {/* ── Model Slider ────────────────────────────────────────────────── */}
-      <section ref={sliderRef} className="relative mt-40 z-10 will-change-transform transform-gpu">
+      <section className="relative mt-40 z-10">
         <div className="absolute -top-10 left-[12.25%] flex items-end">
           {/* Visual Layer (Behind Models) */}
           <div className="z-0 flex items-end pointer-events-none">
@@ -606,7 +616,7 @@ const About = () => {
           </h2>
         </div>
 
-        <div style={{ position: 'relative', contain: 'layout style' }}>
+        <div style={{ position: 'relative', contain: 'layout style paint' }}>
           <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '120px', background: 'linear-gradient(to right, #000, transparent)', zIndex: 10, pointerEvents: 'none' }} />
           <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: '120px', background: 'linear-gradient(to left, #000, transparent)', zIndex: 10, pointerEvents: 'none' }} />
 
@@ -622,7 +632,7 @@ const About = () => {
       {/* ── Engineering Gallery Section ─────────────────────────── */}
       <section className="relative mt-40 flex items-center overflow-hidden z-10">
         <div className="w-full max-w-7xl mx-auto px-[12.25%]">
-          <EngineeringGallery />
+          <EngineeringGallery galleryData={galleryData} />
         </div>
       </section>
 
@@ -649,6 +659,8 @@ const About = () => {
               <img
                 src={cadetImg}
                 alt="Cadet Mahir Tajwar"
+                loading="lazy"
+                decoding="async"
                 className="w-full h-full object-cover grayscale brightness-75 group-hover:grayscale-0 group-hover:brightness-100 transition-all duration-700"
               />
             </div>
@@ -663,28 +675,13 @@ const About = () => {
 
               <div className="space-y-5 border-t border-white/10 pt-8">
                 <div className="font-geist text-white/90 text-base leading-relaxed">
-                  <ScrollLetterRevealDelayed
-                    text="My time at Mirzapur Cadet College profoundly shaped my discipline, leadership, and creative vision."
-                    duration={100}
-                    delay={0.3}
-                    className="block"
-                  />
+                  <span className="block">My time at Mirzapur Cadet College profoundly shaped my discipline, leadership, and creative vision.</span>
                 </div>
                 <div className="font-geist text-white/50 text-sm leading-loose uppercase tracking-wide">
-                  <ScrollLetterRevealDelayed
-                    text="Beyond rigorous academics, it provided a platform to lead student government, pioneer technical initiatives, and direct cinematography for the college."
-                    duration={100}
-                    delay={0.6}
-                    className="block"
-                  />
+                  <span className="block">Beyond rigorous academics, it provided a platform to lead student government, pioneer technical initiatives, and direct cinematography for the college.</span>
                 </div>
                 <div className="font-geist text-white/30 text-sm leading-loose uppercase tracking-wide">
-                  <ScrollLetterRevealDelayed
-                    text="The precision and leadership skills I developed within these walls are the bedrock of my approach to robotics and engineering today."
-                    duration={100}
-                    delay={0.8}
-                    className="block"
-                  />
+                  <span className="block">The precision and leadership skills I developed within these walls are the bedrock of my approach to robotics and engineering today.</span>
                 </div>
               </div>
             </div>

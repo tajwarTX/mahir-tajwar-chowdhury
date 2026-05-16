@@ -8,7 +8,7 @@ import Island from "../components/Island";
 import CameraController from "../components/CameraController";
 import scrollDown from "../assets/miscellaneous/scrolldown.gif";
 import scrollSide from "../assets/miscellaneous/scrollside.gif";
-import ScrollLetterRevealDelayed from "../components/ScrollLetterRevealDelayed";
+
 
 const BASE_POSITION = { x: -2, y: -0, z: -63 };
 const MOBILE_POSITION = { x: -2, y: 24, z: -60 };
@@ -390,6 +390,8 @@ export default function Home() {
         <img
           src={scrollDown}
           alt="scroll down"
+          loading="lazy"
+          decoding="async"
           className="absolute bottom-8 left-1/2 -translate-x-1/2 w-20 pointer-events-none transition-opacity duration-700"
           style={{ opacity: showArrowScroll ? 0.3 : 0 }}
         />
@@ -399,32 +401,22 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-2 w-full max-w-7xl items-center gap-12">
           <div className="flex flex-col">
             <h2 className="text-[68px] md:text-[130px] lg:text-[160px] font-orbitron font-extrabold leading-[0.8] text-white uppercase tracking-tighter">
-              <ScrollLetterRevealDelayed text="WHO" duration={200} delay={0} />
+              WHO
               <br />
               <span className="text-[#a600ff] text-[75px] md:text-[145px] lg:text-[185px]">
-                <ScrollLetterRevealDelayed
-                  text="AM I ?"
-                  duration={200}
-                  delay={0.1}
-                />
+                AM I ?
               </span>
             </h2>
 
           </div>
           <div className="flex flex-col items-end text-right self-center space-y-6">
             <div className="max-w-md md:max-w-lg lg:max-w-xl">
-              <ScrollLetterRevealDelayed
-                text={"ELECTRICAL ENGINEERING STUDENT WITH A FOCUS ON ROBOTICS, CURRENTLY PURSUING MY BACHELOR’S DEGREE AT ROCHESTER\u00A0INSTITUTE\u00A0OF\u00A0TECHNOLOGY"}
-                duration={100}
-                delay={0.2}
-                className="block text-white text-base md:text-lg lg:text-xl font-geist font-medium uppercase tracking-[0.2em] leading-tight"
-              />
-              <ScrollLetterRevealDelayed
-                text="WITH A CREATIVE APPROACH AND A PASSION FOR ROBOTICS, I BUILD CIRCUITS, AUTONOMOUS ROBOTS , UAVS, DRONES, AND WORK ON PASSION PROJECTS THAT TURN ENGINEERING IDEAS INTO REAL WORKING SYSTEMS."
-                duration={100}
-                delay={0.3}
-                className="block text-white/40 text-[11px] md:text-xs lg:text-sm font-geist font-light uppercase tracking-widest leading-relaxed mt-4"
-              />
+              <span className="block text-white text-base md:text-lg lg:text-xl font-geist font-medium uppercase tracking-[0.2em] leading-tight">
+                ELECTRICAL ENGINEERING STUDENT WITH A FOCUS ON ROBOTICS, CURRENTLY PURSUING MY BACHELOR’S DEGREE AT ROCHESTER&nbsp;INSTITUTE&nbsp;OF&nbsp;TECHNOLOGY
+              </span>
+              <span className="block text-white/40 text-[11px] md:text-xs lg:text-sm font-geist font-light uppercase tracking-widest leading-relaxed mt-4">
+                WITH A CREATIVE APPROACH AND A PASSION FOR ROBOTICS, I BUILD CIRCUITS, AUTONOMOUS ROBOTS , UAVS, DRONES, AND WORK ON PASSION PROJECTS THAT TURN ENGINEERING IDEAS INTO REAL WORKING SYSTEMS.
+              </span>
               <div className="mt-12 flex flex-col items-end">
                 <span className="text-[#a600ff] text-2xl md:text-3xl font-orbitron font-bold">
                   (01)
@@ -442,36 +434,22 @@ export default function Home() {
         <div className="absolute left-6 md:left-24 max-w-lg z-20 top-1/2 -translate-y-[170%] md:-translate-y-[160%] flex flex-col space-y-4">
           <div className="flex flex-col gap-1">
             <h3 className="text-white text-3xl md:text-5xl font-orbitron font-black uppercase tracking-tighter leading-none border-none outline-none">
-              <ScrollLetterRevealDelayed
-                text="EXPLORE"
-                duration={200}
-                delay={0.1}
-              />
+              EXPLORE
               <br />
               <span className="text-[#a600ff]">
-                <ScrollLetterRevealDelayed
-                  text="MY WORLD"
-                  duration={200}
-                  delay={0.2}
-                />
+                MY WORLD
               </span>
             </h3>
           </div>
 
           <div className="space-y-1 max-w-sm lg:max-w-md">
-            <ScrollLetterRevealDelayed
-              text="FIND PROJECTS, MILESTONES, AND MY ENGINEERING LIFE STORY."
-              duration={100}
-              delay={0}
-              className="text-white text-sm md:text-base font-geist font-medium uppercase tracking-[0.2em] leading-relaxed"
-            />
+            <span className="text-white text-sm md:text-base font-geist font-medium uppercase tracking-[0.2em] leading-relaxed block">
+              FIND PROJECTS, MILESTONES, AND MY ENGINEERING LIFE STORY.
+            </span>
             <div className="space-y-2">
-              <ScrollLetterRevealDelayed
-                text="CLICK ANNOTATIONS TO START • DRAG TO ROTATE"
-                duration={100}
-                delay={0.1}
-                className="text-white/40 text-[10px] md:text-xs font-geist uppercase tracking-[0.3em] font-medium block whitespace-nowrap"
-              />
+              <span className="text-white/40 text-[10px] md:text-xs font-geist uppercase tracking-[0.3em] font-medium block whitespace-nowrap">
+                CLICK ANNOTATIONS TO START • DRAG TO ROTATE
+              </span>
             </div>
           </div>
         </div>
@@ -480,6 +458,8 @@ export default function Home() {
           <img
             src={scrollSide}
             alt="scroll side"
+            loading="lazy"
+            decoding="async"
             className="opacity-30 w-32"
           />
           <p className="font-geist text-[8px] md:text-[9px] text-white/10 uppercase tracking-[0.3em] whitespace-nowrap">
