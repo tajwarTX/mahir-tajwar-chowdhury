@@ -22,9 +22,13 @@ export default function CameraController({
       const ann = annotations.find((a) => a.id === activeAnnotation);
       if (!ann || !islandRef.current) return;
 
-      const targetLookAt = ann.lookAt ? new THREE.Vector3(...ann.lookAt) : new THREE.Vector3(...ann.localPosition);
+      const targetLookAt = ann.lookAt ? new THREE.Vector3(...ann.lookAt) : new THREE.Vector3(0, 0, 0); // Default to center if no lookAt
+      
       const worldTarget = targetLookAt.clone();
       islandRef.current.localToWorld(worldTarget);
+      
+      const targetCameraWorldPos = new THREE.Vector3(...ann.camera.position);
+      islandRef.current.localToWorld(targetCameraWorldPos);
 
       hasActiveAnnotation.current = true;
       isAnimating.current = true;
@@ -32,36 +36,10 @@ export default function CameraController({
       const tl = gsap.timeline();
       timelineRef.current = tl;
 
-      if (ann.model) {
-        tl.to(islandRef.current.position, {
-          x: ann.model.position[0],
-          y: ann.model.position[1],
-          z: ann.model.position[2],
-          duration: 1.2,
-          ease: "power2.inOut",
-        }, 0);
-
-        tl.to(islandRef.current.rotation, {
-          x: ann.model.rotation[0],
-          y: ann.model.rotation[1],
-          z: ann.model.rotation[2],
-          duration: 1.2,
-          ease: "power2.inOut",
-        }, 0);
-
-        tl.to(islandRef.current.scale, {
-          x: ann.model.scale,
-          y: ann.model.scale,
-          z: ann.model.scale,
-          duration: 1.2,
-          ease: "power2.inOut",
-        }, 0);
-      }
-
       tl.to(camera.position, {
-        x: ann.camera.position[0],
-        y: ann.camera.position[1],
-        z: ann.camera.position[2],
+        x: targetCameraWorldPos.x,
+        y: targetCameraWorldPos.y,
+        z: targetCameraWorldPos.z,
         duration: 1.5,
         ease: "power3.inOut",
       }, 0);
@@ -84,30 +62,7 @@ export default function CameraController({
       const tl = gsap.timeline();
       timelineRef.current = tl;
 
-      // Reset Island to base state
-      tl.to(islandRef.current.position, {
-        x: defaultCameraPosition[0] === 0 ? -2 : -2, // Using BASE_POSITION values manually or from props if available
-        y: 0,
-        z: -63,
-        duration: 1.2,
-        ease: "power2.inOut",
-      }, 0);
 
-      tl.to(islandRef.current.rotation, {
-        x: -8 * (Math.PI / 180),
-        y: 124 * (Math.PI / 180),
-        z: 0,
-        duration: 1.2,
-        ease: "power2.inOut",
-      }, 0);
-
-      tl.to(islandRef.current.scale, {
-        x: 1,
-        y: 1,
-        z: 1,
-        duration: 1.2,
-        ease: "power2.inOut",
-      }, 0);
 
       tl.to(camera.position, {
         x: defaultCameraPosition[0],
@@ -138,7 +93,9 @@ export default function CameraController({
 
   useFrame(() => {
     if (hasActiveAnnotation.current || isAnimating.current) {
-      camera.lookAt(lookAtTarget.current);
+      if (camera.position.distanceTo(lookAtTarget.current) > 1) {
+        camera.lookAt(lookAtTarget.current);
+      }
     }
   });
 

@@ -44,6 +44,7 @@ const Island = forwardRef(
         targetSpeed.current = MAX_ROTATION_SPEED;
       } else {
         targetSpeed.current = 0;
+        currentSpeed.current = 0;
       }
     }, [isIntersecting, baseRotationY, activeAnnotation, isAnnotationHovered]);
 
@@ -77,7 +78,7 @@ const Island = forwardRef(
       );
 
       if (!islandRef.current.userData.dragging) {
-        islandRef.current.rotation.y += delta * currentSpeed.current;
+        islandRef.current.rotation.y = (islandRef.current.rotation.y + delta * currentSpeed.current) % (Math.PI * 2);
       }
     });
 

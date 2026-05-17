@@ -36,9 +36,9 @@ const ANNOTATIONS = [
       scale: 0.73
     },
     camera: {
-      position: [-13.51, 71.51, -142.89]
+      position: [-67.22, -5.74, -19.56]
     },
-    lookAt: [-0.25, 96.88, 21.63]
+    lookAt: [0, 0, 0]
   },
   {
     id: 2,
@@ -53,9 +53,9 @@ const ANNOTATIONS = [
       scale: 1.72
     },
     camera: {
-      position: [237, 97.39, 144.2]
+      position: [35.47, 46.5, -66.73]
     },
-    lookAt: [-0.88, -11.47, -12.29]
+    lookAt: [0, 0, 0]
   },
   {
     id: 3,
@@ -69,7 +69,7 @@ const ANNOTATIONS = [
       scale: 2.23
     },
     camera: {
-      position: [26.96, 54.57, -290.76]
+      position: [-59.52, -28.19, 26.29]
     },
     lookAt: [0, 0, 0]
   },
@@ -85,7 +85,7 @@ const ANNOTATIONS = [
       scale: 4.4
     },
     camera: {
-      position: [-154.55, 86.65, 227.84]
+      position: [23.41, -28.62, 64.61]
     },
     lookAt: [0, 0, 0]
   },
@@ -102,7 +102,7 @@ const ANNOTATIONS = [
       scale: 1
     },
     camera: {
-      position: [44.79, 1.28, -107.35]
+      position: [-1.4, -5.88, -7.84]
     },
     lookAt: [0, 0, 0]
   },
@@ -118,10 +118,10 @@ const ANNOTATIONS = [
       scale: 1.67
     },
     camera: {
-      position: [15.54, 20.07, 95.69]
+      position: [-38.87, -29.31, 67.93]
     },
     lookAt: [0, 0, 0]
-  },
+  }
 ];
 
 
@@ -192,15 +192,19 @@ export default function Home() {
     BASE_POSITION.z,
   ]);
 
+  const timeoutRef = useRef(null);
+
   const handleAnnotationClick = useCallback((annotation) => {
     setActiveAnnotation(annotation.id);
 
-    setTimeout(() => setShowInfoPanel(true), 600);
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => setShowInfoPanel(true), 600);
   }, []);
 
   const resetCamera = useCallback(() => {
     setShowInfoPanel(false);
-    setTimeout(() => setActiveAnnotation(null), 300);
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    timeoutRef.current = setTimeout(() => setActiveAnnotation(null), 300);
   }, []);
 
   const goToAnnotation = useCallback(
@@ -217,7 +221,9 @@ export default function Home() {
       }
       setShowInfoPanel(false);
       setActiveAnnotation(ANNOTATIONS[nextIdx].id);
-      setTimeout(() => setShowInfoPanel(true), 600);
+      
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      timeoutRef.current = setTimeout(() => setShowInfoPanel(true), 600);
     },
     [activeAnnotation]
   );
@@ -397,55 +403,6 @@ export default function Home() {
           <p className="font-geist text-[8px] md:text-[9px] text-white/10 uppercase tracking-[0.3em] whitespace-nowrap">
             Dinner with cats / model by ediediedi - Sketchfab
           </p>
-        </div>
-
-        <div className="annotation-nav-sidebar">
-          {ANNOTATIONS.map((ann) => (
-            <button
-              key={ann.id}
-              onClick={() => handleAnnotationClick(ann)}
-              className={`annotation-nav-btn cursor-target group ${activeAnnotation === ann.id ? "active" : ""
-                }`}
-              title={ann.title}
-            >
-              <span className="annotation-nav-number">{ann.id}</span>
-              <span className="annotation-nav-title">
-                {ann.title.split('').map((char, index, array) => (
-                  <span
-                    key={index}
-                    style={{
-                      transitionDelay: `${(array.length - 1 - index) * 0.03}s`,
-                      display: 'inline-block'
-                    }}
-                  >
-                    {char === ' ' ? '\u00A0' : char}
-                  </span>
-                ))}
-              </span>
-            </button>
-          ))}
-          {activeAnnotation !== null && (
-            <button
-              onClick={resetCamera}
-              className="annotation-nav-btn reset-btn cursor-target"
-              title="Reset View"
-            >
-              <span className="annotation-nav-number">✕</span>
-              <span className="annotation-nav-title">
-                {"Reset View".split('').map((char, index, array) => (
-                  <span
-                    key={index}
-                    style={{
-                      transitionDelay: `${(array.length - 1 - index) * 0.03}s`,
-                      display: 'inline-block'
-                    }}
-                  >
-                    {char === ' ' ? '\u00A0' : char}
-                  </span>
-                ))}
-              </span>
-            </button>
-          )}
         </div>
 
         {activeAnn && (
