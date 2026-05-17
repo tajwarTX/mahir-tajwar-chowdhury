@@ -3,6 +3,8 @@ import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import * as THREE from "three";
 
+const SELECTED_CAMERA_POSITION = [50, 50, 50]; // Edit this to change the fixed camera position
+
 export default function CameraController({
   activeAnnotation,
   annotations,
@@ -26,15 +28,27 @@ export default function CameraController({
       
       const worldTarget = targetLookAt.clone();
       islandRef.current.localToWorld(worldTarget);
-      
+      // Use the individual camera position from the annotation data (treated as absolute world coordinates)
       const targetCameraWorldPos = new THREE.Vector3(...ann.camera.position);
-      islandRef.current.localToWorld(targetCameraWorldPos);
-
+      
       hasActiveAnnotation.current = true;
       isAnimating.current = true;
 
       const tl = gsap.timeline();
       timelineRef.current = tl;
+
+      // Reset Island rotation to a fixed "front" angle (0) using shortest path
+      const currentY = islandRef.current.rotation.y;
+      const targetY = 0; 
+      const diff = (targetY - currentY) % (Math.PI * 2);
+      const shortestDiff = ((diff + Math.PI * 3) % (Math.PI * 2)) - Math.PI;
+      const finalTargetY = currentY + shortestDiff;
+
+      tl.to(islandRef.current.rotation, {
+        y: finalTargetY,
+        duration: 1.5,
+        ease: "power3.inOut",
+      }, 0);
 
       tl.to(camera.position, {
         x: targetCameraWorldPos.x,
@@ -62,7 +76,7 @@ export default function CameraController({
       const tl = gsap.timeline();
       timelineRef.current = tl;
 
-
+      // Reset Island to base state (Removed as per request "Don't move the island")
 
       tl.to(camera.position, {
         x: defaultCameraPosition[0],

@@ -36,7 +36,7 @@ const ANNOTATIONS = [
       scale: 0.73
     },
     camera: {
-      position: [-67.22, -5.74, -19.56]
+      position: [-67.22, 34.26, -19.56]
     },
     lookAt: [0, 0, 0]
   },
@@ -53,7 +53,7 @@ const ANNOTATIONS = [
       scale: 1.72
     },
     camera: {
-      position: [35.47, 46.5, -66.73]
+      position: [35.47, 86.5, -66.73]
     },
     lookAt: [0, 0, 0]
   },
@@ -69,7 +69,7 @@ const ANNOTATIONS = [
       scale: 2.23
     },
     camera: {
-      position: [-59.52, -28.19, 26.29]
+      position: [-59.52, 11.81, 26.29]
     },
     lookAt: [0, 0, 0]
   },
@@ -85,7 +85,7 @@ const ANNOTATIONS = [
       scale: 4.4
     },
     camera: {
-      position: [23.41, -28.62, 64.61]
+      position: [23.41, 11.38, 64.61]
     },
     lookAt: [0, 0, 0]
   },
@@ -102,7 +102,7 @@ const ANNOTATIONS = [
       scale: 1
     },
     camera: {
-      position: [-1.4, -5.88, -7.84]
+      position: [-1.4, 34.12, -7.84]
     },
     lookAt: [0, 0, 0]
   },
@@ -118,7 +118,7 @@ const ANNOTATIONS = [
       scale: 1.67
     },
     camera: {
-      position: [-38.87, -29.31, 67.93]
+      position: [-38.87, 10.69, 67.93]
     },
     lookAt: [0, 0, 0]
   }
@@ -192,19 +192,15 @@ export default function Home() {
     BASE_POSITION.z,
   ]);
 
-  const timeoutRef = useRef(null);
-
   const handleAnnotationClick = useCallback((annotation) => {
     setActiveAnnotation(annotation.id);
 
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    timeoutRef.current = setTimeout(() => setShowInfoPanel(true), 600);
+    setTimeout(() => setShowInfoPanel(true), 600);
   }, []);
 
   const resetCamera = useCallback(() => {
     setShowInfoPanel(false);
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    timeoutRef.current = setTimeout(() => setActiveAnnotation(null), 300);
+    setTimeout(() => setActiveAnnotation(null), 300);
   }, []);
 
   const goToAnnotation = useCallback(
@@ -221,9 +217,7 @@ export default function Home() {
       }
       setShowInfoPanel(false);
       setActiveAnnotation(ANNOTATIONS[nextIdx].id);
-      
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-      timeoutRef.current = setTimeout(() => setShowInfoPanel(true), 600);
+      setTimeout(() => setShowInfoPanel(true), 600);
     },
     [activeAnnotation]
   );

@@ -44,7 +44,6 @@ const Island = forwardRef(
         targetSpeed.current = MAX_ROTATION_SPEED;
       } else {
         targetSpeed.current = 0;
-        currentSpeed.current = 0;
       }
     }, [isIntersecting, baseRotationY, activeAnnotation, isAnnotationHovered]);
 
