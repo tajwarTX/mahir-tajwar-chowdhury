@@ -1,5 +1,5 @@
 import React, { useRef, useMemo, forwardRef, useEffect } from "react";
-import { useGLTF, Center, Billboard, Text } from "@react-three/drei";
+import { useGLTF, Center, Billboard, Text, Html } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";
 import * as THREE from "three";
@@ -29,6 +29,8 @@ const Island = forwardRef(
     const targetSpeed = useRef(0);
     const baseRotationY = props.rotation ? props.rotation[1] : 0;
 
+    const [isAnnotationHovered, setIsAnnotationHovered] = React.useState(false);
+
     useEffect(() => {
       if (scene) {
         const box = new THREE.Box3().setFromObject(scene);
@@ -38,23 +40,12 @@ const Island = forwardRef(
     }, [scene]);
 
     useEffect(() => {
-      let rampTimeout;
-      if (isIntersecting && activeAnnotation === null) {
-        rampTimeout = setTimeout(() => {
-          targetSpeed.current = MAX_ROTATION_SPEED;
-        }, 1000);
-      } else if (activeAnnotation !== null) {
-        targetSpeed.current = 0;
-        currentSpeed.current = 0;
+      if (isIntersecting && activeAnnotation === null && !isAnnotationHovered) {
+        targetSpeed.current = MAX_ROTATION_SPEED;
       } else {
         targetSpeed.current = 0;
-        currentSpeed.current = 0;
-        if (islandRef.current) {
-          islandRef.current.rotation.y = baseRotationY;
-        }
       }
-      return () => clearTimeout(rampTimeout);
-    }, [isIntersecting, baseRotationY, activeAnnotation]);
+    }, [isIntersecting, baseRotationY, activeAnnotation, isAnnotationHovered]);
 
     const optimizedScene = useMemo(() => {
       scene.traverse((child) => {
@@ -73,15 +64,20 @@ const Island = forwardRef(
 
     useFrame((state, delta) => {
       if (!islandRef.current || !isIntersecting) return;
-      if (activeAnnotation === null) {
-        currentSpeed.current = THREE.MathUtils.lerp(
-          currentSpeed.current,
-          targetSpeed.current,
-          0.01
-        );
-        if (!islandRef.current.userData.dragging) {
-          islandRef.current.rotation.y += delta * currentSpeed.current;
-        }
+      
+      // Determine lerp factor based on whether we are accelerating or decelerating
+      // Higher values mean tighter ramps (faster transitions)
+      const isStopping = targetSpeed.current === 0;
+      const lerpFactor = isStopping ? 0.08 : 0.03; 
+
+      currentSpeed.current = THREE.MathUtils.lerp(
+        currentSpeed.current,
+        targetSpeed.current,
+        lerpFactor
+      );
+
+      if (!islandRef.current.userData.dragging) {
+        islandRef.current.rotation.y += delta * currentSpeed.current;
       }
     });
 
@@ -92,56 +88,63 @@ const Island = forwardRef(
       }
     };
 
+    const modelRef = useRef();
+
+    const renderedAnnotations = useMemo(() => {
+      if (!scene) return null;
+      return annotations.map((ann) => (
+        <Html
+          key={ann.id}
+          position={ann.localPosition}
+          distanceFactor={80}
+          center
+          occlude={[modelRef]}
+          style={{
+            transition: 'all 0.5s',
+            opacity: activeAnnotation === ann.id ? 0 : 1,
+            pointerEvents: activeAnnotation === ann.id ? 'none' : 'auto'
+          }}
+        >
+          <div 
+            className="annotation-marker-wrapper group"
+            style={{
+              transform: `scale(${ann.markerScale || 1})`
+            }}
+            onClick={(e) => {
+              e.stopPropagation();
+              onAnnotationClick(ann);
+            }}
+          >
+            <div className="annotation-label">
+              {ann.title}
+            </div>
+            <div 
+              className={`annotation-dot ${activeAnnotation === ann.id ? 'active' : ''} cursor-target`}
+              onMouseEnter={() => setIsAnnotationHovered(true)}
+              onMouseLeave={() => setIsAnnotationHovered(false)}
+            >
+              <div className="annotation-pulse-ring" />
+              <span>{ann.id}</span>
+            </div>
+            <div className="annotation-stem" />
+            <div className="annotation-anchor" />
+          </div>
+        </Html>
+      ));
+    }, [scene, annotations, activeAnnotation, isAnnotationHovered, onAnnotationClick]);
+
     return (
       <group ref={islandRef} position={position} {...props}>
         <Center>
           <primitive 
+            ref={modelRef}
             object={optimizedScene} 
             onClick={onModelClick}
           />
         </Center>
 
         <group name="annotations-container">
-          {annotations.map((ann) => (
-            <Billboard
-              key={ann.id}
-              position={ann.localPosition}
-              follow={true}
-            >
-              <mesh
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onAnnotationClick(ann);
-                }}
-                onPointerOver={() => {
-                  if (activeAnnotation !== ann.id) document.body.style.cursor = 'pointer';
-                }}
-                onPointerOut={() => {
-                  document.body.style.cursor = 'auto';
-                }}
-                visible={activeAnnotation !== ann.id}
-                scale={ann.markerScale ? ann.markerScale * 3.5 : 3.5}
-              >
-                <circleGeometry args={[1, 32]} />
-                <meshBasicMaterial 
-                  color="#a600ff" 
-                  transparent 
-                  opacity={0.8} 
-                  depthTest={false} 
-                />
-                <Text
-                  position={[0, 0, 0.1]}
-                  fontSize={0.8}
-                  color="white"
-                  anchorX="center"
-                  anchorY="middle"
-                  depthTest={false}
-                >
-                  {ann.id}
-                </Text>
-              </mesh>
-            </Billboard>
-          ))}
+          {renderedAnnotations}
         </group>
       </group>
     );

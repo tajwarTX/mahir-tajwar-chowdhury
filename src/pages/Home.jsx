@@ -92,7 +92,7 @@ const ANNOTATIONS = [
   {
     id: 5,
     localPosition: [-1.4, -5.88, -7.84],
-    markerScale: 1.15,
+    markerScale: 1.5,
     title: "Full Diorama",
     description:
       "The complete scene: a voxel masterpiece depicting a stranded pilot finding unexpected companionship. Made with MagicaVoxel and Blender by @ediediedi for the 'Robots are Coming' challenge.",
@@ -124,74 +124,6 @@ const ANNOTATIONS = [
   },
 ];
 
-const InfiniteScrollText = React.memo(({ text = "ROBOTICS • CREATIVE DEVELOPER • 3D DESIGNING • CINEMATIC • " }) => {
-  const canvasRef = useRef(null);
-  const containerRef = useRef(null);
-
-  useEffect(() => {
-    const initCanvas = () => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-
-      const fontSize = 100; // Halved to prevent canvas exceeding max GPU texture size
-      ctx.font = `800 ${fontSize}px "Orbitron", sans-serif`;
-
-      const metrics = ctx.measureText(text);
-      const textWidth = metrics.width;
-
-      canvas.width = textWidth;
-      canvas.height = fontSize * 1.5;
-
-      ctx.font = `800 ${fontSize}px "Orbitron", sans-serif`;
-      ctx.strokeStyle = 'white';
-      ctx.lineWidth = 2;
-      ctx.textAlign = 'left';
-      ctx.textBaseline = 'middle';
-      ctx.strokeText(text, 0, canvas.height / 2);
-
-      if (containerRef.current) {
-        containerRef.current.style.backgroundImage = `url(${canvas.toDataURL()})`;
-        containerRef.current.style.backgroundRepeat = 'repeat-x';
-        containerRef.current.style.backgroundSize = `auto 100%`;
-
-        // Calculate aspect ratio to set width properly based on the container height
-        // Since we scale to 100% height, width needs to be managed or just use background-position
-        containerRef.current.style.width = `100vw`; 
-        containerRef.current.style.setProperty('--scroll-amount', `-${textWidth * 2}px`); // Use 2x for smoother tiling if needed, or just textWidth
-      }
-    };
-
-    if (document.fonts) {
-
-      document.fonts.load('800 200px Orbitron').then(initCanvas).catch(initCanvas);
-    } else {
-      setTimeout(initCanvas, 500);
-    }
-  }, [text]);
-
-  return (
-    <div className="absolute left-0 top-[55%] md:top-[45%] w-full h-[150px] md:h-[300px] overflow-hidden pointer-events-none z-0 select-none">
-      <canvas ref={canvasRef} className="hidden" />
-      <div
-        ref={containerRef}
-        className="marquee-optimized h-full w-full"
-      />
-      <style>{`
-        .marquee-optimized {
-          animation: scrollCanvas 120s linear infinite;
-          background-repeat: repeat-x;
-          background-position: 0 center;
-          will-change: background-position;
-        }
-        @keyframes scrollCanvas {
-          from { background-position: 0 center; }
-          to { background-position: var(--scroll-amount, -2000px) center; }
-        }
-      `}</style>
-    </div>
-  );
-});
 
 function useDragRotation(targetRef, rotateSpeed = 0.005, isLocked = false) {
   const draggingRef = useRef(false);
@@ -463,7 +395,7 @@ export default function Home() {
             className="opacity-30 w-32"
           />
           <p className="font-geist text-[8px] md:text-[9px] text-white/10 uppercase tracking-[0.3em] whitespace-nowrap">
-            MODEL
+            Dinner with cats / model by ediediedi - Sketchfab
           </p>
         </div>
 
@@ -557,7 +489,22 @@ export default function Home() {
           </div>
         )}
 
-        <InfiniteScrollText />
+        <div className="absolute top-[43%] left-0 w-full z-0 pointer-events-none overflow-hidden" style={{ contain: 'paint' }}>
+          <div className="flex w-max animate-marquee-text">
+            <p 
+              className="font-orbitron text-[80px] md:text-[180px] text-transparent uppercase tracking-[0.05em] whitespace-nowrap pr-8"
+              style={{ WebkitTextStroke: '3px white', opacity: 0.3 }}
+            >
+              ROBOTICS • CREATIVE DEVELOPER • 3D DESIGNING • CINEMATIC • 
+            </p>
+            <p 
+              className="font-orbitron text-[80px] md:text-[180px] text-transparent uppercase tracking-[0.05em] whitespace-nowrap pr-8"
+              style={{ WebkitTextStroke: '3px white', opacity: 0.3 }}
+            >
+              ROBOTICS • CREATIVE DEVELOPER • 3D DESIGNING • CINEMATIC • 
+            </p>
+          </div>
+        </div>
 
         <Canvas
           ref={cameraRef}
@@ -588,10 +535,10 @@ export default function Home() {
                 initialRotationY={ISLAND_ROTATION[1]}
               />
               <Float
-                speed={activeAnnotation ? ([4, 5, 6].includes(activeAnnotation) ? 1.4 : 0.8) : 2} 
-                rotationIntensity={activeAnnotation ? ([4, 5, 6].includes(activeAnnotation) ? 0.3 : 0.1) : 0.5} 
-                floatIntensity={activeAnnotation ? ([4, 5, 6].includes(activeAnnotation) ? 0.6 : 0.3) : 0.5} 
-                floatingRange={[0, 1.5]} 
+                speed={activeAnnotation ? ([4, 5, 6].includes(activeAnnotation) ? 1.4 : 0.8) : 1.2} 
+                rotationIntensity={activeAnnotation ? ([4, 5, 6].includes(activeAnnotation) ? 0.3 : 0.1) : 0.3} 
+                floatIntensity={activeAnnotation ? ([4, 5, 6].includes(activeAnnotation) ? 0.6 : 0.3) : 0.2} 
+                floatingRange={[0, 0.8]} 
               >
                 <Island
                   ref={islandRef}

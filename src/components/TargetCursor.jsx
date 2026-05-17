@@ -136,28 +136,43 @@ const TargetCursor = ({
     };
 
     const tickerFn = () => {
-      if (!targetCornerPositionsRef.current || !cursorRef.current || !cornersRef.current) {
+      if (!cursorRef.current || !cornersRef.current || !activeTarget) {
         return;
       }
 
-      if (activeTarget && (!activeTarget.isConnected || activeTarget.offsetParent === null)) {
+      if (!activeTarget.isConnected || activeTarget.offsetParent === null) {
         leaveHandler();
         return;
       }
 
+      // Re-calculate target positions every frame to follow moving elements
+      const rect = activeTarget.getBoundingClientRect();
+      const { borderWidth, cornerSize } = constants;
+      targetCornerPositionsRef.current = [
+        { x: rect.left - borderWidth, y: rect.top - borderWidth },
+        { x: rect.right + borderWidth - cornerSize, y: rect.top - borderWidth },
+        { x: rect.right + borderWidth - cornerSize, y: rect.bottom + borderWidth - cornerSize },
+        { x: rect.left - borderWidth, y: rect.bottom + borderWidth - cornerSize }
+      ];
+
       const strength = activeStrengthRef.current;
       if (strength === 0) return;
+
       const cursorX = gsap.getProperty(cursorRef.current, 'x');
       const cursorY = gsap.getProperty(cursorRef.current, 'y');
       const corners = Array.from(cornersRef.current);
+
       corners.forEach((corner, i) => {
         const currentX = gsap.getProperty(corner, 'x');
         const currentY = gsap.getProperty(corner, 'y');
         const targetX = targetCornerPositionsRef.current[i].x - cursorX;
         const targetY = targetCornerPositionsRef.current[i].y - cursorY;
+        
         const finalX = currentX + (targetX - currentX) * strength;
         const finalY = currentY + (targetY - currentY) * strength;
+        
         const duration = strength >= 0.99 ? (parallaxOn ? 0.2 : 0) : 0.05;
+        
         gsap.to(corner, {
           x: finalX,
           y: finalY,
