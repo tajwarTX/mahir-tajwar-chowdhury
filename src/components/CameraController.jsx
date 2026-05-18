@@ -97,6 +97,14 @@ export default function CameraController({
         ease: "power3.inOut",
       }, 0);
 
+      tl.to(camera.rotation, {
+        x: 0,
+        y: 0,
+        z: 0,
+        duration: 1.5,
+        ease: "power3.inOut",
+      }, 0);
+
       const currentIslandPos = islandRef.current.position;
 
       tl.to(lookAtTarget.current, {
