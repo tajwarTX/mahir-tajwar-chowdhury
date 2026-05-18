@@ -145,7 +145,6 @@ const TargetCursor = ({
         return;
       }
 
-      // Re-calculate target positions every frame to follow moving elements
       const rect = activeTarget.getBoundingClientRect();
       const { borderWidth, cornerSize } = constants;
       targetCornerPositionsRef.current = [

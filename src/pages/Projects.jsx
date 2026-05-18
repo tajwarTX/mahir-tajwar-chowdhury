@@ -180,7 +180,7 @@ const HackerTerminal = () => {
         <span className="text-white/50 group-hover:text-white transition-colors duration-300">{item.type}</span>
       </div>
       
-      {/* Full Color Square Thumbnail -> Negative on hover */}
+
       <div className="flex-1 relative border border-white/10 overflow-hidden mb-3 bg-black">
         <img 
           src={`https://picsum.photos/seed/${item.id}/400/400`} 
@@ -391,7 +391,7 @@ const Scene = React.memo(({ setIsLocked }) => {
   const groupRef = useRef();
   const innerGroupRef = useRef();
 
-  // Starting Values
+
   const startX = -0.8;
   const startY = 0.05;
   const startZ = 1.30;
@@ -399,7 +399,7 @@ const Scene = React.memo(({ setIsLocked }) => {
   const startZPos = -2.8;
   const startXPos = 1.2;
 
-  // Final Target Values
+
   const endX = -0.17;
   const endY = -1.9;
   const endZ = 9;
@@ -472,7 +472,7 @@ const Projects = () => {
 
   return (
     <div className="w-full h-screen bg-transparent overflow-hidden relative">
-      {/* Blackout Overlay */}
+
       <AnimatePresence>
         {isLocked && (
           <motion.div
@@ -488,7 +488,7 @@ const Projects = () => {
         )}
       </AnimatePresence>
 
-      {/* Main Scene - Only unmount after blackout is complete */}
+
       {!isUnmounted && (
         <div className="w-full h-screen relative">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,107,0,0.02)_0%,transparent_70%)] pointer-events-none" />
@@ -507,8 +507,7 @@ const Projects = () => {
               <div className="mt-8 flex flex-col items-center gap-6">
                 <div className="h-[1px] w-24 bg-[#ff6b00]" />
                 <p className="font-geist text-white/70 text-[9px] md:text-[11px] uppercase tracking-[0.3em] font-medium leading-relaxed max-w-lg text-center">
-                  A CINEMATIC SHOWCASE OF INNOVATIVE DIGITAL EXPERIENCES, 
-                  3D SYSTEMS, AND ENGINEERING PROTOTYPES.
+                  DRONES, ROVERS, OLYMPIAD BOTS, AND THE STUFF I BUILD FOR FUN.
                 </p>
               </div>
             </div>

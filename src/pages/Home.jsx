@@ -452,13 +452,13 @@ export default function Home() {
               className="font-orbitron text-[80px] md:text-[180px] text-transparent uppercase tracking-[0.05em] whitespace-nowrap pr-8"
               style={{ WebkitTextStroke: '3px white', opacity: 0.3 }}
             >
-              ROBOTICS • CREATIVE DEVELOPER • 3D DESIGNING • CINEMATIC • 
+              ROBOTICS • CREATIVE DEVELOPER • 3D DESIGNING • EMBEDDED SYSTEMS • 
             </p>
             <p 
               className="font-orbitron text-[80px] md:text-[180px] text-transparent uppercase tracking-[0.05em] whitespace-nowrap pr-8"
               style={{ WebkitTextStroke: '3px white', opacity: 0.3 }}
             >
-              ROBOTICS • CREATIVE DEVELOPER • 3D DESIGNING • CINEMATIC • 
+              ROBOTICS • CREATIVE DEVELOPER • 3D DESIGNING • EMBEDDED SYSTEMS • 
             </p>
           </div>
         </div>

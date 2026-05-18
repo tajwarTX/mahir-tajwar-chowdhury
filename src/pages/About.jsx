@@ -703,7 +703,7 @@ const About = () => {
           </div>
         </div>
 
-        {/* Cinematic Videos Side-by-Side (Aligned with Photo) */}
+        {/* Videos */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-16 mt-12 pb-0">
           <LazyYouTube
             src="https://www.youtube.com/embed/M0EGckiSZTQ"

@@ -65,8 +65,6 @@ const Island = forwardRef(
     useFrame((state, delta) => {
       if (!islandRef.current || !isIntersecting) return;
       
-      // Determine lerp factor based on whether we are accelerating or decelerating
-      // Higher values mean tighter ramps (faster transitions)
       const isStopping = targetSpeed.current === 0;
       const lerpFactor = isStopping ? 0.08 : 0.03; 
 
