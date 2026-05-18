@@ -36,7 +36,8 @@ const ANNOTATIONS = [
       scale: 0.73
     },
     camera: {
-      position: [-67.22, 34.26, -19.56]
+      position: [-81.0, -18.0, -94.0],
+      rotation: [24.0, -117.0, 27.0]
     },
     lookAt: [0, 0, 0]
   },
@@ -53,7 +54,8 @@ const ANNOTATIONS = [
       scale: 1.72
     },
     camera: {
-      position: [35.47, 86.5, -66.73]
+      position: [45.0, 38.0, -134.0],
+      rotation: [53.0, 142.0, -57.0]
     },
     lookAt: [0, 0, 0]
   },
@@ -69,7 +71,8 @@ const ANNOTATIONS = [
       scale: 2.23
     },
     camera: {
-      position: [-59.52, 11.81, 26.29]
+      position: [-79.0, -20.0, -16.0],
+      rotation: [-18.0, -37.0, -6.0]
     },
     lookAt: [0, 0, 0]
   },
@@ -85,7 +88,8 @@ const ANNOTATIONS = [
       scale: 4.4
     },
     camera: {
-      position: [23.41, 11.38, 64.61]
+      position: [49.0, -2.0, 34.0],
+      rotation: [-29.0, 26.0, 10.0]
     },
     lookAt: [0, 0, 0]
   },
@@ -102,7 +106,8 @@ const ANNOTATIONS = [
       scale: 1
     },
     camera: {
-      position: [-1.4, 34.12, -7.84]
+      position: [-9.0, 17.0, -25.0],
+      rotation: [-31.0, -24.0, -11.0]
     },
     lookAt: [0, 0, 0]
   },
@@ -118,7 +123,8 @@ const ANNOTATIONS = [
       scale: 1.67
     },
     camera: {
-      position: [-38.87, 10.69, 67.93]
+      position: [-56.0, -18.0, 25.0],
+      rotation: [-29.0, -27.0, -10.0]
     },
     lookAt: [0, 0, 0]
   }
@@ -297,7 +303,7 @@ export default function Home() {
     };
   }, []);
 
-  // islandRotation moved outside
+
 
   const activeAnn = ANNOTATIONS.find((a) => a.id === activeAnnotation);
 
@@ -507,6 +513,8 @@ export default function Home() {
             <Preload all />
           </Suspense>
         </Canvas>
+
+
       </section>
     </div>
   );

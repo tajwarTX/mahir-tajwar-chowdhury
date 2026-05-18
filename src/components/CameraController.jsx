@@ -58,6 +58,17 @@ export default function CameraController({
         ease: "power3.inOut",
       }, 0);
 
+      if (ann.camera.rotation) {
+        const targetRot = ann.camera.rotation.map(d => (d * Math.PI) / 180);
+        tl.to(camera.rotation, {
+          x: targetRot[0],
+          y: targetRot[1],
+          z: targetRot[2],
+          duration: 1.5,
+          ease: "power3.inOut",
+        }, 0);
+      }
+
       tl.to(lookAtTarget.current, {
         x: worldTarget.x,
         y: worldTarget.y,
@@ -106,9 +117,13 @@ export default function CameraController({
   }, [activeAnnotation]);
 
   useFrame(() => {
-    if (hasActiveAnnotation.current || isAnimating.current) {
-      if (camera.position.distanceTo(lookAtTarget.current) > 1) {
-        camera.lookAt(lookAtTarget.current);
+    if (isAnimating.current) {
+      const ann = annotations.find((a) => a.id === activeAnnotation);
+      // Only lookAt if the annotation DOES NOT have a specific rotation!
+      if (ann && !ann.camera.rotation) {
+        if (camera.position.distanceTo(lookAtTarget.current) > 1) {
+          camera.lookAt(lookAtTarget.current);
+        }
       }
     }
   });
