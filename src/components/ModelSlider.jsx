@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { useGLTF, useAnimations, Environment, Bounds, Center } from '@react-three/drei';
 import Core from 'smooothy';
+import { gsap } from 'gsap';
 
 import armModel from '../assets/3d_models/robotic_arm.glb';
 import droneModel from '../assets/3d_models/fpv_racing_drone.glb';
@@ -45,7 +46,7 @@ const WARP_COLORS = [
 ];
 
 // ─── Velocity-warp background rectangle ───────────────────────────────────────
-function WarpRect({ velocityRef, index, containerRef }) {
+function WarpRect({ velocityRef, index, containerRef, titleRef, slideTitle }) {
   const clipId  = `warp-clip-${index}`;
   const pathRef = useRef(null);
 
@@ -99,16 +100,30 @@ function WarpRect({ velocityRef, index, containerRef }) {
       const c  = curve.current; // bow amount (always ≥ 0)
 
       // Calculate relative screen position for wake scaling
-      // Throttle getBoundingClientRect to every 3rd frame
-      if (frameCount.current++ % 3 === 0) {
-        cachedRect.current = containerRef.current?.getBoundingClientRect();
-      }
-      const rect = cachedRect.current;
+      // Use the pre-calculated factor from dataset to avoid layout thrashing
+      const distStr = containerRef.current?.dataset.dist || "1000";
+      const relXStr = containerRef.current?.dataset.relx || "1";
+      const dist = parseFloat(distStr);
+      const relX = parseFloat(relXStr);
+      
       let targetWakeScale = 1;
-      if (rect) {
-        const screenCenterX = window.innerWidth / 2;
-        const elementCenterX = rect.left + rect.width / 2;
-        const relX = (elementCenterX - screenCenterX) / (window.innerWidth / 2);
+      if (containerRef.current) {
+        // Animate title down and scale up when centered
+        if (titleRef && titleRef.current) {
+          const factor = Math.max(0, Math.min(1, dist / 250)); // transition over 250px
+          const ease = factor * factor * (3 - 2 * factor); // smoothstep
+          const yOffset = (1 - ease) * 55; // push down 55px
+          const scale = 1 + (1 - ease) * 0.35; // scale up slightly more
+          titleRef.current.style.transform = `translateY(${yOffset}px) scale(${scale})`;
+          const bgDiv = titleRef.current.children[0];
+          const monoSpan = titleRef.current.children[1];
+          const orbitronSpan = titleRef.current.children[2];
+          if (monoSpan && orbitronSpan && bgDiv) {
+            bgDiv.style.opacity = 1 - ease; // fades in at center
+            monoSpan.style.opacity = ease; // 1 at edges, 0 at center
+            orbitronSpan.style.opacity = 1 - ease; // 0 at edges, 1 at center
+          }
+        }
         
         // Only scale elements "entering" from the edges
         const vThreshold = Math.abs(v) > 2 ? v : 0;
@@ -287,16 +302,13 @@ function DynamicTransformWrapper({ children, containerRef, centerScale = 0.85, e
 
   useFrame((state) => {
     if (!ref.current || !containerRef.current) return;
-    // Throttle expensive getBoundingClientRect to every 2nd frame
-    if (frameSkip.current++ % 2 === 0) {
-      cachedRect.current = containerRef.current.getBoundingClientRect();
-    }
-    const rect = cachedRect.current;
-    if (!rect) return;
-    const dist = Math.abs(window.innerWidth / 2 - (rect.left + rect.width / 2));
-    let factor = Math.min(dist / (window.innerWidth / (1.5 * GLOBAL_SCALE)), 1);
-    if (factor < 0.05) factor = 0;
-    if (factor > 0.95) factor = 1;
+    
+    // Read pre-calculated factor from dataset to avoid layout thrashing
+    const factorStr = containerRef.current.dataset.factor || "1";
+    let factor = parseFloat(factorStr);
+    
+    const distStr = containerRef.current.dataset.dist || "1000";
+    const dist = parseFloat(distStr);
     containerRef.current.style.zIndex = Math.round(1000 - dist);
 
     const tScale = centerScale - factor * (centerScale - edgeScale);
@@ -361,20 +373,10 @@ function SlideContent({ slide, containerRef, debugData, robotDebug }) {
 
   useFrame(() => {
     if (!containerRef.current) return;
-    // Cache the canvas-container DOM lookup
-    if (!canvasDivRef.current) {
-      canvasDivRef.current = containerRef.current.querySelector('.canvas-container');
-    }
-    // Throttle getBoundingClientRect to every 2nd frame
-    if (frameSkip2.current++ % 2 === 0) {
-      cachedRect2.current = containerRef.current.getBoundingClientRect();
-    }
-    const rect = cachedRect2.current;
-    if (!rect) return;
-    const dist = Math.abs(window.innerWidth / 2 - (rect.left + rect.width / 2));
-    let factor = Math.min(dist / (window.innerWidth / (1.5 * GLOBAL_SCALE)), 1);
-    if (factor < 0.05) factor = 0;
-    if (factor > 0.95) factor = 1;
+    
+    // Read pre-calculated factor from dataset to avoid layout thrashing
+    const factorStr = containerRef.current.dataset.factor || "1";
+    let factor = parseFloat(factorStr);
 
     // Spotlight lighting - high contrast, deep blacks
     if (ambientRef.current) ambientRef.current.intensity = 0.5 - (0.5 - 0.1) * factor;
@@ -410,8 +412,15 @@ function SlideContent({ slide, containerRef, debugData, robotDebug }) {
 }
 
 // ─── Slide item (memoized to prevent re-renders from debug state) ─────────────
-const SlideItem = memo(function SlideItem({ slide, index, velocityRef, debugData, robotDebug }) {
+const SlideItem = memo(function SlideItem({ slide, index, velocityRef, debugData, robotDebug, slideRefs }) {
   const containerRef = useRef(null);
+  const titleRef = useRef(null);
+
+  useEffect(() => {
+    if (containerRef.current && slideRefs) {
+      slideRefs.current[index] = containerRef.current;
+    }
+  }, [index, slideRefs]);
 
   return (
     <div ref={containerRef} style={{
@@ -428,7 +437,7 @@ const SlideItem = memo(function SlideItem({ slide, index, velocityRef, debugData
 
       <div style={{ position:'relative', height:`calc(clamp(350px, 50vw, 550px) * ${GLOBAL_SCALE})`, width:'100%', display:'flex', alignItems:'center', justifyContent:'center', overflow:'visible' }}>
         {/* Morphing background rect */}
-        <WarpRect velocityRef={velocityRef} index={index} containerRef={containerRef} />
+        <WarpRect velocityRef={velocityRef} index={index} containerRef={containerRef} titleRef={titleRef} slideTitle={slide.title} />
 
         {/* 3-D canvas — GPU-optimized settings */}
         <div className="canvas-container will-change-transform" style={{ position:'absolute', top:'-100%', bottom:'-100%', left:'-50%', right:'-50%', zIndex:1, pointerEvents:'none', transform: 'translateZ(0)' }}>
@@ -441,7 +450,11 @@ const SlideItem = memo(function SlideItem({ slide, index, velocityRef, debugData
 
         {/* Title overlay - sitting on top layer */}
         <div style={{ position:'absolute', bottom:'calc(2rem * -1.2)', zIndex: 10, width:'100%', textAlign:'center', pointerEvents:'none' }}>
-          <span style={{ fontFamily:'monospace', fontSize:`calc(11px * ${GLOBAL_SCALE})`, color:'rgba(255,255,255,0.8)', textTransform:'uppercase' }}>"{slide.title}"</span>
+          <div ref={titleRef} style={{ display:'inline-block', position: 'relative', willChange: 'transform', transformOrigin: 'center center' }}>
+            <div style={{ position:'absolute', top:'50%', left:'50%', transform:'translate(-50%, -50%)', width:'180%', height:'350%', background:'radial-gradient(ellipse at center, rgba(0,0,0,1) 0%, rgba(0,0,0,0.4) 40%, transparent 70%)', opacity: 0, willChange:'opacity' }} />
+            <span style={{ display:'block', position:'relative', fontFamily:'monospace', fontSize:`calc(13px * ${GLOBAL_SCALE})`, color:'rgba(255,255,255,0.3)', textTransform:'uppercase', willChange: 'opacity' }}>"{slide.title}"</span>
+            <span style={{ display:'block', position:'absolute', top:'50%', left:'50%', transform:'translate(-50%, -50%)', fontFamily:'Orbitron, sans-serif', fontSize:`calc(13px * ${GLOBAL_SCALE})`, fontWeight:'400', letterSpacing:'0.1em', color:'#ffffff', textTransform:'uppercase', willChange: 'opacity', whiteSpace: 'nowrap', opacity: 0 }}>{slide.title}</span>
+          </div>
         </div>
       </div>
     </div>
@@ -451,7 +464,9 @@ const SlideItem = memo(function SlideItem({ slide, index, velocityRef, debugData
 // ─── Root slider ──────────────────────────────────────────────────────────────
 export default function ModelSlider() {
   const wrapperRef   = useRef(null);
+  const sliderRef    = useRef(null);
   const velocityRef  = useRef(0);
+  const inertiaRef   = useRef(0);
   const [robotDebug, setRobotDebug] = useState({
     centerScale: 0.9467,
     edgeScale: 0,
@@ -523,12 +538,15 @@ export default function ModelSlider() {
     };
   }, []);
 
+  const slideRefs = useRef([]);
+
   useEffect(() => {
     if (!wrapperRef.current) return;
     const slider = new Core(wrapperRef.current, {
       infinite: true, snap: false,
       dragSensitivity: 0.003, lerpFactor: 0.02, scrollInput: false,
     });
+    sliderRef.current = slider;
 
     // Explicitly block wheel and touch-scroll events from affecting the slider
     const blockScroll = (e) => {
@@ -544,28 +562,57 @@ export default function ModelSlider() {
     slider.target = -1;
     slider.current = -1;
 
-    let inertia = 0;
     const loop = () => {
-      if (slider.isDragging) { inertia = velocityRef.current * 0.001; }
+      if (slider.isDragging) { inertiaRef.current = velocityRef.current * 0.001; }
       else {
         velocityRef.current *= 0.82;
-        slider.target += inertia;
-        inertia *= 0.92;
-        if (Math.abs(inertia) < 0.01) {
-          const bias = Math.max(-0.2, Math.min(0.2, inertia * 5));
+        slider.target += inertiaRef.current;
+        inertiaRef.current *= 0.92;
+        if (Math.abs(inertiaRef.current) < 0.01) {
+          const bias = Math.max(-0.2, Math.min(0.2, inertiaRef.current * 5));
           const nearest = Math.round(slider.target + bias);
           slider.target += (nearest - slider.target) * 0.038;
-          inertia *= 0.8; 
+          inertiaRef.current *= 0.8;
           velocityRef.current *= 0.8;
         }
       }
       slider.update();
+
+      // READ PHASE: get all rects at once
+      const rects = slideRefs.current.map(el => el ? el.getBoundingClientRect() : null);
+      const screenCenterX = window.innerWidth / 2;
+
+      // WRITE PHASE: write data attributes and styles at once to avoid layout thrashing
+      rects.forEach((rect, i) => {
+        if (!rect) return;
+        const el = slideRefs.current[i];
+        
+        const elementCenterX = rect.left + rect.width / 2;
+        const dist = Math.abs(screenCenterX - elementCenterX);
+        const relX = (elementCenterX - screenCenterX) / screenCenterX;
+        
+        let factor = Math.min(dist / (window.innerWidth / (1.5 * GLOBAL_SCALE)), 1);
+        if (factor < 0.05) factor = 0;
+        if (factor > 0.95) factor = 1;
+        
+        // Use data attributes to pass the calculated factor to useFrame without reflows
+        el.dataset.factor = factor;
+        el.dataset.dist = dist;
+        el.dataset.relx = relX;
+        
+        // Also do the direct style writes here
+        el.style.zIndex = Math.round(1000 - dist);
+        
+        // Optional: you can move canvas grayscale here if canvasDiv is easy to find,
+        // but SlideContent can just read dataset.factor in useFrame without reflows.
+      });
+
       requestAnimationFrame(loop);
     };
 
     const observer = new IntersectionObserver(([entry]) => {
       if (!entry.isIntersecting) {
-        inertia = 0;
+        inertiaRef.current = 0;
         velocityRef.current = 0;
       }
     }, { threshold: 0.1 });
@@ -579,9 +626,31 @@ export default function ModelSlider() {
     };
   }, []);
 
+  const handlePrev = () => {
+    if (sliderRef.current) {
+      gsap.to(sliderRef.current, {
+        target: Math.round(sliderRef.current.target) + 1,
+        duration: 0.8,
+        ease: "power2.out",
+        overwrite: "auto"
+      });
+    }
+  };
+
+  const handleNext = () => {
+    if (sliderRef.current) {
+      gsap.to(sliderRef.current, {
+        target: Math.round(sliderRef.current.target) - 1,
+        duration: 0.8,
+        ease: "power2.out",
+        overwrite: "auto"
+      });
+    }
+  };
+
   return (
     <div 
-      className="w-full select-none" 
+      className="w-full select-none group/slider-container" 
       style={{ padding:'100px 0', position:'relative', opacity: 1 }}
     >
       {DEBUG && (
@@ -648,13 +717,23 @@ export default function ModelSlider() {
           50%  { background-position: 100% 50%; }
           100% { background-position: 0% 50%; }
         }
+        
+        /* Force hide native cursor inside the slider to prevent smooothy grab cursors */
+        .group\\/slider-container, 
+        .group\\/slider-container * {
+          cursor: none !important;
+        }
+        
+        /* Re-enable pointer events and custom cursor target on nav buttons */
+        .group\\/slider-container .cursor-target {
+          cursor: none !important;
+        }
       `}</style>
 
-
       <div ref={wrapperRef} data-slider
-        style={{ display:'flex', gap:0, margin:0, paddingLeft:`${BAKED_OFFSET}%` }}>
+        style={{ display:'flex', gap:0, margin:0, paddingLeft:`${BAKED_OFFSET}%`, cursor: 'none' }}>
         {SLIDES_DATA.map((slide, i) => (
-          <SlideItem key={slide.index} slide={slide} index={i} velocityRef={velocityRef} debugData={debugData[i]} robotDebug={robotDebug} />
+          <SlideItem key={slide.index} slide={slide} index={i} velocityRef={velocityRef} debugData={debugData[i]} robotDebug={robotDebug} slideRefs={slideRefs} />
         ))}
       </div>
 
@@ -662,6 +741,26 @@ export default function ModelSlider() {
         {SLIDES_DATA.map(s => (
           <div key={s.index} style={{ height:'1px', flex:1, background:'rgba(255,255,255,0.12)' }} />
         ))}
+      </div>
+
+      {/* Navigation Buttons (Under Slider) */}
+      <div className="absolute bottom-4 left-0 right-0 flex justify-center items-center gap-[220px] md:gap-[320px] z-[9999] pointer-events-auto">
+        <button
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={(e) => { e.stopPropagation(); handlePrev(); }}
+          className="group/nav-l w-10 h-10 md:w-12 md:h-12 rounded-full border border-white/30 flex items-center justify-center transition-all cursor-target relative overflow-hidden bg-white/10 hover:border-[#a600ff] hover:shadow-[0_0_20px_rgba(166,0,255,0.6)] hover:scale-110 pointer-events-auto"
+        >
+          <span className="absolute inset-0 bg-[#a600ff] translate-x-full group-hover/nav-l:translate-x-0 transition-transform duration-300 ease-out z-0" />
+          <span className="relative z-10 text-white font-bold text-sm md:text-base transition-colors duration-300">←</span>
+        </button>
+        <button
+          onPointerDown={(e) => e.stopPropagation()}
+          onClick={(e) => { e.stopPropagation(); handleNext(); }}
+          className="group/nav-r w-10 h-10 md:w-12 md:h-12 rounded-full border border-white/30 flex items-center justify-center transition-all cursor-target relative overflow-hidden bg-white/10 hover:border-[#a600ff] hover:shadow-[0_0_20px_rgba(166,0,255,0.6)] hover:scale-110 pointer-events-auto"
+        >
+          <span className="absolute inset-0 bg-[#a600ff] -translate-x-full group-hover/nav-r:translate-x-0 transition-transform duration-300 ease-out z-0" />
+          <span className="relative z-10 text-white font-bold text-sm md:text-base transition-colors duration-300">→</span>
+        </button>
       </div>
     </div>
   );

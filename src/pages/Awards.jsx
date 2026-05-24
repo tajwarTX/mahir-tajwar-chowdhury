@@ -523,12 +523,15 @@ export const Awards = () => {
           </div>
 
           {/* Stats Counter */}
-          <div className="flex flex-wrap md:flex-nowrap justify-center md:justify-end gap-6 md:gap-8 border-t md:border-t-0 pt-12 md:pt-0 w-full md:w-auto md:translate-y-3">
-             <StatItem label="Gold" value={stats.gold} color="#FFD700" isActive={activeFilter === 'gold'} onClick={() => toggleFilter('gold')} />
-             <StatItem label="Silver" value={stats.silver} color="#E5E7EB" isActive={activeFilter === 'silver'} onClick={() => toggleFilter('silver')} />
-             <StatItem label="Bronze" value={stats.bronze} color="#CD7F32" isActive={activeFilter === 'bronze'} onClick={() => toggleFilter('bronze')} />
-             <StatItem label="Technical" value={stats.technical} color="#a600ff" isActive={activeFilter === 'technical'} onClick={() => toggleFilter('technical')} />
-             <StatItem label="Misc" value={stats.misc} color="#ffffff" isActive={activeFilter === 'misc'} onClick={() => toggleFilter('misc')} />
+          <div className="flex flex-col items-center md:items-end w-full md:w-auto border-t md:border-t-0 pt-12 md:pt-0">
+            <span className="font-geist text-[10px] md:text-[11px] text-[#a600ff] font-bold uppercase tracking-[0.4em] mb-2 md:translate-y-1">FILTER BY</span>
+            <div className="flex flex-wrap md:flex-nowrap justify-center md:justify-end gap-6 md:gap-8 md:translate-y-3">
+               <StatItem label="Gold" value={stats.gold} color="#FFD700" isActive={activeFilter === 'gold'} onClick={() => toggleFilter('gold')} />
+               <StatItem label="Silver" value={stats.silver} color="#E5E7EB" isActive={activeFilter === 'silver'} onClick={() => toggleFilter('silver')} />
+               <StatItem label="Bronze" value={stats.bronze} color="#CD7F32" isActive={activeFilter === 'bronze'} onClick={() => toggleFilter('bronze')} />
+               <StatItem label="Technical" value={stats.technical} color="#a600ff" isActive={activeFilter === 'technical'} onClick={() => toggleFilter('technical')} />
+               <StatItem label="Misc" value={stats.misc} color="#ffffff" isActive={activeFilter === 'misc'} onClick={() => toggleFilter('misc')} />
+            </div>
           </div>
         </div>
 

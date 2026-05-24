@@ -75,12 +75,7 @@ const TargetCursor = ({
     });
 
     const createSpinTimeline = () => {
-      if (spinTl.current) {
-        spinTl.current.kill();
-      }
-      spinTl.current = gsap
-        .timeline({ repeat: -1 })
-        .to(cursor, { rotation: '+=360', duration: spinDuration, ease: 'none' });
+      // Rotation removed per user request
     };
 
     createSpinTimeline();
@@ -111,22 +106,6 @@ const TargetCursor = ({
       }
 
       resumeTimeout = setTimeout(() => {
-        if (!activeTarget && cursorRef.current && spinTl.current) {
-          const currentRotation = gsap.getProperty(cursorRef.current, 'rotation');
-          const normalizedRotation = currentRotation % 360;
-          spinTl.current.kill();
-          spinTl.current = gsap
-            .timeline({ repeat: -1 })
-            .to(cursorRef.current, { rotation: '+=360', duration: spinDuration, ease: 'none' });
-          gsap.to(cursorRef.current, {
-            rotation: normalizedRotation + 360,
-            duration: spinDuration * (1 - normalizedRotation / 360),
-            ease: 'none',
-            onComplete: () => {
-              spinTl.current?.restart();
-            }
-          });
-        }
         resumeTimeout = null;
       }, 50);
 
@@ -146,13 +125,38 @@ const TargetCursor = ({
       }
 
       const rect = activeTarget.getBoundingClientRect();
+      const style = window.getComputedStyle(activeTarget);
+      let rotation = 0; let scaleX = 1; let scaleY = 1;
+      if (style.transform && style.transform !== 'none') {
+        const matrix = style.transform.match(/^matrix\((.+)\)$/);
+        if (matrix) {
+          const values = matrix[1].split(',').map(parseFloat);
+          rotation = Math.atan2(values[1], values[0]);
+          scaleX = Math.sqrt(values[0]*values[0] + values[1]*values[1]);
+          scaleY = Math.sqrt(values[2]*values[2] + values[3]*values[3]);
+        }
+      }
+
       const { borderWidth, cornerSize } = constants;
-      targetCornerPositionsRef.current = [
-        { x: rect.left - borderWidth, y: rect.top - borderWidth },
-        { x: rect.right + borderWidth - cornerSize, y: rect.top - borderWidth },
-        { x: rect.right + borderWidth - cornerSize, y: rect.bottom + borderWidth - cornerSize },
-        { x: rect.left - borderWidth, y: rect.bottom + borderWidth - cornerSize }
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const hw = (activeTarget.offsetWidth * scaleX) / 2;
+      const hh = (activeTarget.offsetHeight * scaleY) / 2;
+
+      const local_corners = [
+        { x: -hw - borderWidth, y: -hh - borderWidth },
+        { x: hw + borderWidth - cornerSize, y: -hh - borderWidth },
+        { x: hw + borderWidth - cornerSize, y: hh + borderWidth - cornerSize },
+        { x: -hw - borderWidth, y: hh + borderWidth - cornerSize }
       ];
+
+      const cosRot = Math.cos(rotation);
+      const sinRot = Math.sin(rotation);
+
+      targetCornerPositionsRef.current = local_corners.map(c => ({
+        x: cx + c.x * cosRot - c.y * sinRot,
+        y: cy + c.x * sinRot + c.y * cosRot
+      }));
 
       const strength = activeStrengthRef.current;
       if (strength === 0) return;
@@ -160,12 +164,18 @@ const TargetCursor = ({
       const cursorX = gsap.getProperty(cursorRef.current, 'x');
       const cursorY = gsap.getProperty(cursorRef.current, 'y');
       const corners = Array.from(cornersRef.current);
+      const cosInv = Math.cos(-rotation);
+      const sinInv = Math.sin(-rotation);
 
       corners.forEach((corner, i) => {
         const currentX = gsap.getProperty(corner, 'x');
         const currentY = gsap.getProperty(corner, 'y');
-        const targetX = targetCornerPositionsRef.current[i].x - cursorX;
-        const targetY = targetCornerPositionsRef.current[i].y - cursorY;
+        
+        const dx_screen = targetCornerPositionsRef.current[i].x - cursorX;
+        const dy_screen = targetCornerPositionsRef.current[i].y - cursorY;
+        
+        const targetX = dx_screen * cosInv - dy_screen * sinInv;
+        const targetY = dx_screen * sinInv + dy_screen * cosInv;
         
         const finalX = currentX + (targetX - currentX) * strength;
         const finalY = currentY + (targetY - currentY) * strength;
@@ -184,7 +194,7 @@ const TargetCursor = ({
     tickerFnRef.current = tickerFn;
 
     const moveHandler = e => moveCursor(e.clientX, e.clientY);
-    window.addEventListener('mousemove', moveHandler);
+    window.addEventListener('pointermove', moveHandler);
 
     const scrollHandler = () => {
       if (!activeTarget || !cursorRef.current) return;
@@ -242,20 +252,45 @@ const TargetCursor = ({
       const corners = Array.from(cornersRef.current);
       corners.forEach(corner => gsap.killTweensOf(corner));
       gsap.killTweensOf(cursorRef.current, 'rotation');
-      spinTl.current?.pause();
-      gsap.set(cursorRef.current, { rotation: 0 });
+
+      const style = window.getComputedStyle(target);
+      let rotation = 0; let scaleX = 1; let scaleY = 1;
+      if (style.transform && style.transform !== 'none') {
+        const matrix = style.transform.match(/^matrix\((.+)\)$/);
+        if (matrix) {
+          const values = matrix[1].split(',').map(parseFloat);
+          rotation = Math.atan2(values[1], values[0]);
+          scaleX = Math.sqrt(values[0]*values[0] + values[1]*values[1]);
+          scaleY = Math.sqrt(values[2]*values[2] + values[3]*values[3]);
+        }
+      }
+      const rotationDeg = rotation * (180 / Math.PI);
+      gsap.set(cursorRef.current, { rotation: rotationDeg, overwrite: 'auto' });
 
       const rect = target.getBoundingClientRect();
       const { borderWidth, cornerSize } = constants;
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const hw = (target.offsetWidth * scaleX) / 2;
+      const hh = (target.offsetHeight * scaleY) / 2;
+      const local_corners = [
+        { x: -hw - borderWidth, y: -hh - borderWidth },
+        { x: hw + borderWidth - cornerSize, y: -hh - borderWidth },
+        { x: hw + borderWidth - cornerSize, y: hh + borderWidth - cornerSize },
+        { x: -hw - borderWidth, y: hh + borderWidth - cornerSize }
+      ];
+      const cosRot = Math.cos(rotation);
+      const sinRot = Math.sin(rotation);
+      
+      targetCornerPositionsRef.current = local_corners.map(c => ({
+        x: cx + c.x * cosRot - c.y * sinRot,
+        y: cy + c.x * sinRot + c.y * cosRot
+      }));
+
       const cursorX = gsap.getProperty(cursorRef.current, 'x');
       const cursorY = gsap.getProperty(cursorRef.current, 'y');
-
-      targetCornerPositionsRef.current = [
-        { x: rect.left - borderWidth, y: rect.top - borderWidth },
-        { x: rect.right + borderWidth - cornerSize, y: rect.top - borderWidth },
-        { x: rect.right + borderWidth - cornerSize, y: rect.bottom + borderWidth - cornerSize },
-        { x: rect.left - borderWidth, y: rect.bottom + borderWidth - cornerSize }
-      ];
+      const cosInv = Math.cos(-rotation);
+      const sinInv = Math.sin(-rotation);
 
       isActiveRef.current = true;
       gsap.ticker.add(tickerFnRef.current);
@@ -263,9 +298,12 @@ const TargetCursor = ({
       gsap.to(activeStrengthRef, { current: 1, duration: hoverDuration, ease: 'power2.out' });
 
       corners.forEach((corner, i) => {
+        const dx_screen = targetCornerPositionsRef.current[i].x - cursorX;
+        const dy_screen = targetCornerPositionsRef.current[i].y - cursorY;
+        
         gsap.to(corner, {
-          x: targetCornerPositionsRef.current[i].x - cursorX,
-          y: targetCornerPositionsRef.current[i].y - cursorY,
+          x: dx_screen * cosInv - dy_screen * sinInv,
+          y: dx_screen * sinInv + dy_screen * cosInv,
           duration: 0.08,
           ease: 'power2.out'
         });
@@ -284,7 +322,7 @@ const TargetCursor = ({
       if (tickerFnRef.current) {
         gsap.ticker.remove(tickerFnRef.current);
       }
-      window.removeEventListener('mousemove', moveHandler);
+      window.removeEventListener('pointermove', moveHandler);
       window.removeEventListener('mouseover', enterHandler);
       window.removeEventListener('scroll', scrollHandler);
       window.removeEventListener('mousedown', mouseDownHandler);
@@ -292,7 +330,7 @@ const TargetCursor = ({
       if (activeTarget) {
         cleanupTarget(activeTarget);
       }
-      spinTl.current?.kill();
+      if (spinTl.current) spinTl.current.kill();
       document.body.style.cursor = originalCursor;
       isActiveRef.current = false;
       targetCornerPositionsRef.current = null;
@@ -301,13 +339,7 @@ const TargetCursor = ({
   }, [targetSelector, spinDuration, moveCursor, constants, hideDefaultCursor, isMobile, hoverDuration, parallaxOn]);
 
   useEffect(() => {
-    if (isMobile || !cursorRef.current || !spinTl.current) return;
-    if (spinTl.current.isActive()) {
-      spinTl.current.kill();
-      spinTl.current = gsap
-        .timeline({ repeat: -1 })
-        .to(cursorRef.current, { rotation: '+=360', duration: spinDuration, ease: 'none' });
-    }
+    // Spin removed
   }, [spinDuration, isMobile]);
 
   if (isMobile) {

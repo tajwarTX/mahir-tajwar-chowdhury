@@ -1,6 +1,6 @@
 import React, { useRef, Suspense, useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import IntroBlock from "../components/IntroBlock";
+import HomeIntroBlock from "../components/HomeIntroBlock";
 import { Canvas } from "@react-three/fiber";
 import * as THREE from "three";
 import { PerformanceMonitor, AdaptiveDpr, AdaptiveEvents, Bvh, Preload, Float } from "@react-three/drei";
@@ -323,7 +323,7 @@ export default function Home() {
         </div>
 
         <div className="relative flex flex-col z-20 items-center">
-          <IntroBlock />
+          <HomeIntroBlock />
         </div>
         <img
           src={scrollDown}

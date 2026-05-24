@@ -6,6 +6,7 @@ import { AnimatePresence } from "framer-motion";
 import StaggeredMenu from "./components/StaggeredMenu";
 import Navbar from "./components/Navbar";
 const Home = lazy(() => import("./pages/Home"));
+const Home2 = lazy(() => import("./pages/Home2"));
 const About = lazy(() => import("./pages/About"));
 import Projects from "./pages/Projects";
 const Contact = lazy(() => import("./pages/Contact"));
@@ -17,6 +18,7 @@ import Loader from "./components/Loader";
 
 const menuItems = [
   { label: 'Home', ariaLabel: 'Go to home page', link: '/' },
+  { label: 'Home 2', ariaLabel: 'Go to home page 2', link: '/home2' },
   { label: 'About', ariaLabel: 'Learn more about me', link: '/about' },
   { label: 'Projects', ariaLabel: 'View my engineering projects', link: '/projects' },
   { label: 'Awards', ariaLabel: 'View my honors and awards', link: '/awards' },
@@ -46,6 +48,25 @@ const LocationWatcher = ({ setLoading }) => {
   return null;
 };
 
+const DitherWrapper = () => {
+  const location = useLocation();
+  if (location.pathname === '/home2') return null;
+  return (
+    <Dither
+      waveColor={[0.3, 0.1, 0.4]}
+      disableAnimation={false}
+      enableMouseInteraction={false}
+      mouseRadius={0}
+      colorNum={6}
+      waveAmplitude={0.3}
+      waveFrequency={3}
+      waveSpeed={0.05}
+    />
+  );
+};
+
+
+
 const App = () => {
   const [loading, setLoading] = useState(true);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
@@ -65,7 +86,7 @@ const App = () => {
       <main className="relative w-full h-full overflow-x-hidden bg-black">
         <LocationWatcher setLoading={setLoading} />
 
-        <div className="fixed inset-0 pointer-events-none z-[15] bg-[radial-gradient(circle,transparent_40%,rgba(0,0,0,0.8)_100%)]" />
+
 
         <AnimatePresence>
           {loading && (
@@ -99,16 +120,7 @@ const App = () => {
             willChange: 'opacity, transform' 
           }}
         >
-          <Dither
-            waveColor={[0.3, 0.1, 0.4]}
-            disableAnimation={false}
-            enableMouseInteraction={false}
-            mouseRadius={0}
-            colorNum={6}
-            waveAmplitude={0.3}
-            waveFrequency={3}
-            waveSpeed={0.05}
-          />
+          <DitherWrapper />
         </div>
 
         <div 
@@ -135,6 +147,7 @@ const App = () => {
             <Suspense fallback={null}>
               <Routes>
                 <Route path="/" element={<Home />} />
+                <Route path="/home2" element={<Home2 />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/projects" element={<Projects />} />
                 <Route path="/contact" element={<Contact />} />
