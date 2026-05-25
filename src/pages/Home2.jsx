@@ -112,8 +112,8 @@ export default function Home2() {
         />
 
         {/* Footer Section */}
-        <footer className="relative w-full z-20 overflow-hidden" style={{ background: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.3) 15%, rgba(0,0,0,0.7) 30%, rgba(0,0,0,0.9) 45%, #000 60%)' }}>
-          <div className="flex items-stretch min-h-[280px] md:min-h-[400px]">
+        <footer className="relative w-full z-20 overflow-hidden" style={{ background: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.02) 4%, rgba(0,0,0,0.06) 8%, rgba(0,0,0,0.12) 13%, rgba(0,0,0,0.2) 19%, rgba(0,0,0,0.28) 25%, rgba(0,0,0,0.38) 32%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0.62) 48%, rgba(0,0,0,0.73) 56%, rgba(0,0,0,0.83) 64%, rgba(0,0,0,0.91) 72%, rgba(0,0,0,0.97) 80%, #000 88%)' }}>
+          <div className="flex items-stretch min-h-[280px] md:min-h-[700px]">
             {/* Giant TX• Monogram - only bottom-clipped by parent overflow-hidden */}
             <div className="relative flex-shrink-0 w-[300px] md:w-[500px] select-none pointer-events-none">
               <div
@@ -129,11 +129,11 @@ export default function Home2() {
             </div>
 
             {/* Link Columns */}
-            <div className="absolute inset-0 flex items-start pointer-events-none" style={{ paddingTop: '10.4rem', paddingLeft: 'clamp(380px, 42vw, 640px)', paddingRight: '8rem', paddingBottom: '2.5rem' }}>
+            <div className="absolute inset-0 flex items-start pointer-events-none" style={{ paddingTop: '28.99rem', paddingLeft: 'clamp(380px, 42vw, 800px)', paddingRight: '8rem', paddingBottom: '2.5rem' }}>
               <div className="flex flex-1 items-start pointer-events-auto" style={{ gap: '0' }}>
 
                 {/* Nav Links + Social Links grouped close together */}
-                <div className="flex gap-16 md:gap-24">
+                <div className="flex gap-16 md:gap-52">
                   {/* Nav Links */}
                   <div className="flex flex-col items-start gap-1.5">
                     <a href="/" className="text-white/60 font-geist text-[11px] md:text-xs tracking-widest uppercase hover:text-white hover:opacity-100 hover:font-bold transition-all duration-200"><span className="cursor-target px-2 py-0.5">HOME</span></a>
@@ -156,7 +156,7 @@ export default function Home2() {
                 </div>
 
                 {/* Label - pushed to far right */}
-                <div className="flex flex-col items-start gap-1.5 ml-auto">
+                <div className="flex flex-col items-start gap-1.5 ml-96">
                   <span className="text-white/60 font-geist text-[11px] md:text-xs tracking-widest uppercase">PERSONAL</span>
                   <span className="text-white/60 font-geist text-[11px] md:text-xs tracking-widest uppercase">PORTFOLIO</span>
                   <span className="text-white/60 font-geist text-[11px] md:text-xs tracking-widest uppercase">WEBSITE 26&apos;</span>
