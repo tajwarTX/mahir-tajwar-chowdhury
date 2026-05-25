@@ -12,9 +12,16 @@ const Loader = ({ onFinish, isInitial }) => {
 
   useEffect(() => {
     const isProjectsRoute = typeof window !== 'undefined' && window.location.pathname === '/projects';
-    const minDuration = isInitial 
-      ? (isProjectsRoute ? 4000 : 3000) 
-      : 1200;
+    const isHome2Route = typeof window !== 'undefined' && window.location.pathname === '/home2';
+    
+    let minDuration;
+    if (isProjectsRoute) {
+      minDuration = isInitial ? 4000 : 1200;
+    } else if (isHome2Route) {
+      minDuration = isInitial ? 400 : 300; // Snappy load for Home2
+    } else {
+      minDuration = isInitial ? 3000 : 1200;
+    }
       
     const startTime = Date.now();
     let interval;
