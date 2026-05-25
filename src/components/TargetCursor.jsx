@@ -41,7 +41,8 @@ const TargetCursor = ({
       x,
       y,
       duration: 0.1,
-      ease: 'power3.out'
+      ease: 'power3.out',
+      overwrite: 'auto'
     });
   }, []);
 
@@ -75,7 +76,14 @@ const TargetCursor = ({
     });
 
     const createSpinTimeline = () => {
-      // Rotation removed per user request
+      if (spinTl.current) spinTl.current.kill();
+      spinTl.current = gsap.to(cursor, {
+        rotation: "+=360",
+        duration: spinDuration,
+        ease: 'none',
+        repeat: -1,
+        overwrite: 'auto'
+      });
     };
 
     createSpinTimeline();
@@ -107,6 +115,8 @@ const TargetCursor = ({
 
       resumeTimeout = setTimeout(() => {
         resumeTimeout = null;
+        // Restart the spinning timeline from the current arbitrary rotation angle
+        createSpinTimeline();
       }, 50);
 
       if (targetToCleanup) {
@@ -251,7 +261,8 @@ const TargetCursor = ({
       activeTarget = target;
       const corners = Array.from(cornersRef.current);
       corners.forEach(corner => gsap.killTweensOf(corner));
-      gsap.killTweensOf(cursorRef.current, 'rotation');
+      // Pause the spin while locked onto a hover target
+      if (spinTl.current) spinTl.current.pause();
 
       const style = window.getComputedStyle(target);
       let rotation = 0; let scaleX = 1; let scaleY = 1;
@@ -265,6 +276,7 @@ const TargetCursor = ({
         }
       }
       const rotationDeg = rotation * (180 / Math.PI);
+      // Snap cursor rotation to match the target element's rotation while hovered
       gsap.set(cursorRef.current, { rotation: rotationDeg, overwrite: 'auto' });
 
       const rect = target.getBoundingClientRect();
@@ -339,7 +351,10 @@ const TargetCursor = ({
   }, [targetSelector, spinDuration, moveCursor, constants, hideDefaultCursor, isMobile, hoverDuration, parallaxOn]);
 
   useEffect(() => {
-    // Spin removed
+    if (isMobile || !cursorRef.current) return;
+    if (spinTl.current) {
+      spinTl.current.duration(spinDuration);
+    }
   }, [spinDuration, isMobile]);
 
   if (isMobile) {

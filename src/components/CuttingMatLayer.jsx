@@ -6,26 +6,26 @@ const CuttingMatLayer = () => {
   // while absolute elements (angles, protractors) are positioned relative to the top-left or centers.
 
   return (
-    <div className="absolute top-0 left-0 w-full h-full z-0 pointer-events-none" style={{ backgroundColor: '#106653' }}>
+    <div className="absolute top-0 left-0 w-full h-full z-0 pointer-events-none" style={{ backgroundColor: '#0E4735' }}>
       <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
         <defs>
           {/* Minor Grid Pattern */}
           <pattern id="minorGrid" width="20" height="20" patternUnits="userSpaceOnUse">
-            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="1" />
+            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="rgba(255,255,255,0.02)" strokeWidth="1.8" />
           </pattern>
 
           {/* Major Grid Pattern */}
           <pattern id="majorGrid" width="100" height="100" patternUnits="userSpaceOnUse">
             <rect width="100" height="100" fill="url(#minorGrid)" />
-            <path d="M 100 0 L 0 0 0 100" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="1" />
+            <path d="M 100 0 L 0 0 0 100" fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="3" />
           </pattern>
           
           {/* Tick Pattern */}
           <pattern id="ticksX" width="100" height="10" patternUnits="userSpaceOnUse">
-            <path d="M 10 0 L 10 3 M 20 0 L 20 5 M 30 0 L 30 3 M 40 0 L 40 5 M 50 0 L 50 7 M 60 0 L 60 5 M 70 0 L 70 3 M 80 0 L 80 5 M 90 0 L 90 3" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="1" />
+            <path d="M 10 0 L 10 3 M 20 0 L 20 5 M 30 0 L 30 3 M 40 0 L 40 5 M 50 0 L 50 7 M 60 0 L 60 5 M 70 0 L 70 3 M 80 0 L 80 5 M 90 0 L 90 3" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="3" />
           </pattern>
           <pattern id="ticksY" width="10" height="100" patternUnits="userSpaceOnUse">
-            <path d="M 0 10 L 3 10 M 0 20 L 5 20 M 0 30 L 3 30 M 0 40 L 5 40 M 0 50 L 7 50 M 0 60 L 5 60 M 0 70 L 3 70 M 0 80 L 5 80 M 0 90 L 3 90" fill="none" stroke="rgba(255,255,255,0.4)" strokeWidth="1" />
+            <path d="M 0 10 L 3 10 M 0 20 L 5 20 M 0 30 L 3 30 M 0 40 L 5 40 M 0 50 L 7 50 M 0 60 L 5 60 M 0 70 L 3 70 M 0 80 L 5 80 M 0 90 L 3 90" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="3" />
           </pattern>
         </defs>
 
@@ -33,7 +33,7 @@ const CuttingMatLayer = () => {
         <rect width="100%" height="100%" fill="url(#majorGrid)" />
 
         {/* Borders and Numbering Group */}
-        <g stroke="rgba(255,255,255,0.2)" strokeWidth="1" fill="rgba(255,255,255,0.2)" fontFamily="monospace" fontSize="14">
+        <g stroke="none" fill="rgba(255,255,255,0.2)" fontFamily="monospace" fontSize="14">
           
           {/* Horizontal Rulers (Top, Middle, Bottom sections) */}
           <rect x="0" y="0" width="100%" height="10" fill="url(#ticksX)" stroke="none" />
@@ -63,15 +63,15 @@ const CuttingMatLayer = () => {
             const y = -Math.sin(rad) * 200;
             return (
               <g key={`deg-${deg}`}>
-                <line x1="0" y1="0" x2={x} y2={y} />
-                <text x={x + 5} y={y - 5} fill="rgba(255,255,255,0.3)" fontSize="10" stroke="none">{deg}°</text>
+                <line x1="0" y1="0" x2={x} y2={y} stroke="rgba(255,255,255,0.12)" strokeWidth="2.5" />
+                <text x={x + 5} y={y - 5} fill="rgba(255,255,255,0.2)" fontSize="10" stroke="none">{deg}°</text>
               </g>
             );
           })}
         </g>
 
         {/* Angle Projections from top-left (Origin) */}
-        <g stroke="rgba(255,255,255,0.15)" strokeWidth="1" strokeDasharray="10,5">
+        <g stroke="rgba(255,255,255,0.1)" strokeWidth="2.5" strokeDasharray="10,5">
           <line x1="0" y1="0" x2="3000" y2="3000" /> {/* 45 deg */}
           <text x="500" y="490" fill="rgba(255,255,255,0.2)" fontSize="24" stroke="none" transform="rotate(45, 500, 500)">45°</text>
           
@@ -83,7 +83,7 @@ const CuttingMatLayer = () => {
         </g>
 
         {/* Paper Layout Bounds */}
-        <g stroke="rgba(255,255,255,0.2)" strokeWidth="1" strokeDasharray="5,5" fill="none">
+        <g stroke="rgba(255,255,255,0.12)" strokeWidth="2.5" strokeDasharray="5,5" fill="none">
           {/* A4 Size approx in pixels (e.g., 210x297 mm -> 595x842 px) */}
           <rect x="200" y="200" width="595" height="842" />
           <text x="210" y="220" fill="rgba(255,255,255,0.2)" fontSize="14" stroke="none" fontWeight="bold">A4</text>

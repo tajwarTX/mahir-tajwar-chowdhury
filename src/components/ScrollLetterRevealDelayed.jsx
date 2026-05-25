@@ -6,36 +6,6 @@ const ScrollLetterRevealDelayed = ({ text, duration = 2000, delay = 800, classNa
   const timeoutRef = useRef(null);
   const reqRef = useRef(null);
 
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          timeoutRef.current = setTimeout(() => {
-            revealLettersRandomly();
-          }, delay);
-        } else {
-          clearTimeout(timeoutRef.current);
-          if (reqRef.current) cancelAnimationFrame(reqRef.current);
-          lettersRef.current.forEach(span => {
-            if (span) span.style.opacity = "0";
-          });
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    observer.observe(el);
-    return () => {
-      observer.disconnect();
-      clearTimeout(timeoutRef.current);
-      if (reqRef.current) cancelAnimationFrame(reqRef.current);
-    };
-
-  }, [text, duration, delay]);
-
   const revealLettersRandomly = () => {
     const delays = Array.from({ length: text.length }).map(() => Math.random() * duration);
     const startTime = performance.now();
@@ -63,6 +33,35 @@ const ScrollLetterRevealDelayed = ({ text, duration = 2000, delay = 800, classNa
     reqRef.current = requestAnimationFrame(tick);
   };
 
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          timeoutRef.current = setTimeout(() => {
+            revealLettersRandomly();
+          }, delay);
+        } else {
+          clearTimeout(timeoutRef.current);
+          if (reqRef.current) cancelAnimationFrame(reqRef.current);
+          lettersRef.current.forEach((span) => {
+            if (span) span.style.opacity = "0";
+          });
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(el);
+    return () => {
+      observer.disconnect();
+      clearTimeout(timeoutRef.current);
+      if (reqRef.current) cancelAnimationFrame(reqRef.current);
+    };
+  }, [text, duration, delay]);
+
   const letters = text.split("");
 
   return (
@@ -70,7 +69,9 @@ const ScrollLetterRevealDelayed = ({ text, duration = 2000, delay = 800, classNa
       {letters.map((letter, i) => (
         <span
           key={i}
-          ref={(el) => (lettersRef.current[i] = el)}
+          ref={(el) => {
+            lettersRef.current[i] = el;
+          }}
           style={{
             opacity: 0,
             transition: "opacity 0.3s ease",

@@ -2,8 +2,10 @@ import React, { useRef, useState, useEffect } from "react";
 import IntroBlock from "../components/IntroBlock";
 import NameTag from "../components/NameTag";
 import scrollDown from "../assets/miscellaneous/scrolldown.gif";
+import profileImg from "../assets/photo/profile.jpg";
 import CuttingMatLayer from "../components/CuttingMatLayer";
 import DigitalCaliper from "../components/DigitalCaliper";
+import WorkshopGrunge from "../components/WorkshopGrunge";
 
 export default function Home2() {
   const introRef = useRef(null);
@@ -40,9 +42,85 @@ export default function Home2() {
   }, []);
 
   return (
-    <div ref={scrollContainerRef} className="w-full relative h-screen overflow-y-auto overflow-x-hidden bg-[#106653]">
+    <div ref={scrollContainerRef} className="w-full relative h-screen overflow-y-auto overflow-x-hidden bg-[#0E4735]">
+      <style>
+        {`
+          /* Peeling Curled Sticker Effect - Static */
+          .curled-sticker::before, .curled-sticker::after {
+            content: "";
+            position: absolute;
+            z-index: -1;
+            bottom: 12px;
+            left: 8px;
+            width: 45%;
+            height: 20%;
+            box-shadow: 0 15px 12px rgba(0,0,0,0.3);
+            transform: rotate(-4deg);
+          }
+          .curled-sticker::after {
+            transform: rotate(4deg);
+            right: 8px;
+            left: auto;
+          }
+
+          /* Paper Tape Effect - Realistic Fiber/Matte */
+          .tape-piece {
+            position: absolute;
+            top: 13px;
+            left: -45px;
+            width: 200px;
+            height: 48px;
+            background: rgba(244, 240, 230, 0.94);
+            box-shadow: 
+              1px 2px 6px rgba(0,0,0,0.15),
+              inset 0 0 12px rgba(0,0,0,0.05);
+            transform: rotate(-40deg);
+            z-index: 100;
+            pointer-events: none;
+            /* Organic torn edges */
+            clip-path: polygon(
+              2% 0%, 5% 4%, 12% 1%, 18% 5%, 25% 2%, 35% 6%, 45% 1%, 55% 4%, 65% 2%, 75% 6%, 85% 1%, 92% 5%, 98% 0%,
+              101% 15%, 99% 30%, 101% 50%, 99% 70%, 101% 85%,
+              98% 100%, 92% 95%, 85% 99%, 75% 94%, 65% 98%, 55% 95%, 45% 99%, 35% 94%, 25% 98%, 15% 95%, 8% 99%, 2% 95%, 0% 100%,
+              -1% 85%, 1% 70%, -1% 50%, 1% 30%, -1% 15%
+            );
+          }
+          .tape-piece::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: 
+              url("data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paperFiber'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.6' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0, 0 0 0 0 0, 0 0 0 0 0, 0 0 0 -0.8 0.6'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23paperFiber)' opacity='0.3'/%3E%3C/svg%3E"),
+              linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%);
+            opacity: 0.5;
+            mix-blend-mode: multiply;
+          }
+
+          /* Fabric Wrinkles & Folds Overlay - Strengthened */
+          .fabric-texture::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: 50;
+            pointer-events: none;
+            background: 
+              linear-gradient(108deg, transparent 46%, rgba(0,0,0,0.15) 50%, rgba(255,255,255,0.22) 54%, transparent 58%),
+              linear-gradient(125deg, transparent 72%, rgba(0,0,0,0.2) 77%, transparent 82%),
+              url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='crumple'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.015' numOctaves='3' result='noise'/%3E%3CfeDiffuseLighting in='noise' lighting-color='%23ffffff' surfaceScale='5.5'%3E%3CfeDistantLight azimuth='45' elevation='40'/%3E%3C/feDiffuseLighting%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23crumple)' opacity='0.6'/%3E%3C/svg%3E");
+            mix-blend-mode: multiply;
+          }
+        `}
+      </style>
+
+      <svg style={{ position: 'absolute', width: 0, height: 0 }} aria-hidden="true">
+        <filter id="fabric-warp" x="-5%" y="-5%" width="110%" height="110%">
+          <feTurbulence type="fractalNoise" baseFrequency="0.012" numOctaves="1" result="noise" />
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G" />
+        </filter>
+      </svg>
       <div className="relative w-full min-h-max">
         <CuttingMatLayer />
+        <WorkshopGrunge />
         <DigitalCaliper containerRef={scrollContainerRef} />
         
         {/* Intro Section */}
@@ -51,7 +129,7 @@ export default function Home2() {
           className="relative w-full h-screen flex justify-center items-center flex-col pb-[5vh]"
         >
           <div className="relative flex flex-col z-0 items-center">
-            <NameTag />
+            <NameTag scrollRootRef={scrollContainerRef} />
           </div>
           <img
             src={scrollDown}
@@ -66,7 +144,7 @@ export default function Home2() {
         {/* About Section */}
         <section className="relative w-full min-h-screen flex items-center justify-center px-6 md:px-24 py-16 md:py-20 z-10 block">
           <div className="grid grid-cols-1 md:grid-cols-2 w-full max-w-7xl items-center gap-12">
-            <div className="flex flex-col">
+            <div className="flex flex-col gap-8 md:gap-10">
               <h2 className="text-[68px] md:text-[130px] lg:text-[160px] font-orbitron font-extrabold leading-[0.8] text-white uppercase tracking-tighter">
                 WHO
                 <br />
@@ -74,6 +152,28 @@ export default function Home2() {
                   AM I ?
                 </span>
               </h2>
+              <div 
+                className="curled-sticker relative w-full max-w-xs md:max-w-sm aspect-[3/4]"
+                style={{ transform: 'rotate(2deg)' }}
+              >
+                {/* Tape Piece */}
+                <div className="tape-piece" />
+                
+                <div className="fabric-texture w-full h-full overflow-hidden" 
+                     style={{ 
+                       borderRadius: '4px',
+                       filter: 'url(#fabric-warp)'
+                     }}>
+                  <img
+                    src={profileImg}
+                    alt="Mahir Tajwar Chowdhury"
+                    loading="lazy"
+                    decoding="async"
+                    className="w-full h-full object-cover object-top shadow-sm"
+                    style={{ borderRadius: '4px' }}
+                  />
+                </div>
+              </div>
             </div>
             <div className="flex flex-col items-end text-right self-center space-y-6">
               <div className="max-w-md md:max-w-lg lg:max-w-xl">
