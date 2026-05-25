@@ -27,6 +27,11 @@ export default function WorkshopGrunge() {
     const ctx = canvas.getContext('2d');
     ctx.scale(dpr, dpr);
 
+    // Run drawing asynchronously to prevent blocking the main thread (fixes loader freezing)
+    (async () => {
+      // Yield to the browser to ensure the DOM (and loaders) are fully painted first
+      await new Promise(r => setTimeout(r, 50));
+
     // ─── Utility: Seeded Deterministic Random ───
     // This ensures the scratches and smudges are exactly the same on every page load
     let seed = 987654321; // You can change this number to get a completely new random layout
@@ -100,6 +105,7 @@ export default function WorkshopGrunge() {
     // ═══════════════════════════════════════════════════════════════════
     const bladeCount = Math.floor(w * h / 250000); 
     for (let i = 0; i < bladeCount; i++) {
+      if (i % 50 === 0) await new Promise(r => setTimeout(r, 0));
       drawScratch(rand(0, w), rand(0, h), rand(40, 300), rand(0, Math.PI * 2), rand(0.15, 0.35), rand(0.8, 2.5), true);
     }
 
@@ -128,6 +134,7 @@ export default function WorkshopGrunge() {
     const smudgeCount = Math.floor(rand(25, 45)); 
 
     for (let i = 0; i < smudgeCount; i++) {
+      if (i % 5 === 0) await new Promise(r => setTimeout(r, 0));
       const cx = rand(0, w);
       // Generate standard vertical position
       let cy = rand(0, h * 0.75);
@@ -194,6 +201,7 @@ export default function WorkshopGrunge() {
     // 3. BROWN CHEMICAL STAINS
     // ═══════════════════════════════════════════════════════════════════
     const stainCount = Math.floor(rand(10, 20));
+    await new Promise(r => setTimeout(r, 0));
     for (let i = 0; i < stainCount; i++) {
       const cx = rand(0, w);
       const cy = rand(h * 0.05, h * 0.95);
@@ -240,6 +248,7 @@ export default function WorkshopGrunge() {
       ctx.restore();
     }
 
+    })(); // End of async rendering
   }, []); // Render once on mount
 
   return (
