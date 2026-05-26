@@ -20,6 +20,8 @@ export default function Home2() {
   const tiltWrapperRef = useRef(null);
 
   const [showArrowScroll, setShowArrowScroll] = useState(false);
+  const [sliderMounted, setSliderMounted] = useState(false);
+  const sliderMountedRef = useRef(false); // ref to avoid setState on every scroll frame
 
   // Scroll-driven 3D camera perspective tilt — instant, no delay
   useEffect(() => {
@@ -59,16 +61,15 @@ export default function Home2() {
 
           let tilt = 0;
           
-          if (progress <= 1.0 && progress > 0.8) {
-            // Rapid entrance tilt: start aggressively right as the section hits the screen bottom
-            tilt = ((1.0 - progress) / 0.2) * 40;
-          } else if (progress <= 0.8 && progress >= -0.4) {
+          if (progress < 0.7 && progress > 0.3) {
+            tilt = ((0.7 - progress) / 0.4) * 40;
+          } else if (progress <= 0.3 && progress >= -0.4) {
             tilt = 40;
           } else if (progress < -0.4 && progress > -0.5) {
             // Rapidly fade out tightly between 40% and 50% scrolled out
             tilt = ((progress + 0.5) / 0.1) * 40;
           }
-          tilt = Math.max(0, Math.min(40, Math.round(tilt * 100) / 100));
+          tilt = Math.max(0, Math.min(40, tilt));
 
           // 1. Perspective camera vanishing point locked to viewport center
           const centerY = scrollY + (cachedViewportH / 2);
@@ -80,12 +81,20 @@ export default function Home2() {
           tiltEl.style.transform = `rotateX(${tilt}deg)`;
 
           // 3. Counter-rotate the model slider so it sits completely flat to the screen!
-          // We translate it along its local Z (which points straight at the camera after counter-rotation)
-          // 400px ensures its bottom edge perfectly clears the tilted green mat coming up at the bottom.
-          // We scale by 0.77 (1400/1800) to optically cancel the zoom from moving it 400px closer to the 1800px perspective camera.
           projectsSection.style.transform = `rotateX(${-tilt}deg) translateZ(400px) scale(0.77)`;
           projectsSection.style.transformStyle = 'preserve-3d';
           projectsSection.style.transformOrigin = '50% 50%';
+
+          // 4. Only show the models when fully tilted
+          const modelOpacity = tilt >= 39.5 ? 1 : 0;
+          projectsSection.style.opacity = modelOpacity;
+
+          // 5. Mount ModelSlider for the first time only when fully tilted
+          // Once mounted keep it alive — never unmount (avoids WebGL reload cost)
+          if (tilt >= 39.5 && !sliderMountedRef.current) {
+            sliderMountedRef.current = true;
+            setSliderMounted(true);
+          }
           
           ticking = false;
         });
@@ -220,6 +229,7 @@ export default function Home2() {
             transformStyle: 'preserve-3d',
             transform: 'rotateX(0deg)',
             willChange: 'transform',
+            transition: 'transform 80ms linear',
           }}
         >
         <CuttingMatLayer />
@@ -328,10 +338,12 @@ export default function Home2() {
         </div>
 
         {/* ── SECTION 02 ── (Model Slider counter-rotates and floats completely flat) */}
-        <section ref={projectsSectionRef} className="relative z-10 w-full min-h-screen">
-          <Suspense fallback={<div style={{ height: '600px' }} />}>
-            <ModelSlider />
-          </Suspense>
+        <section ref={projectsSectionRef} className="relative z-10 w-full min-h-screen" style={{ opacity: 0, transition: 'opacity 0.3s ease' }}>
+          {sliderMounted && (
+            <Suspense fallback={<div style={{ height: '600px' }} />}>
+              <ModelSlider />
+            </Suspense>
+          )}
         </section>
 
       {/* ── SECTION 03 ── */}
