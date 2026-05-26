@@ -1,4 +1,5 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, lazy, Suspense } from "react";
+import { Link } from "react-router-dom";
 import IntroBlock from "../components/IntroBlock";
 import NameTag from "../components/NameTag";
 import scrollDown from "../assets/miscellaneous/scrolldown.gif";
@@ -6,6 +7,8 @@ import profileImg from "../assets/photo/profile.jpg";
 import CuttingMatLayer from "../components/CuttingMatLayer";
 import DigitalCaliper from "../components/DigitalCaliper";
 import WorkshopGrunge from "../components/WorkshopGrunge";
+
+const ModelSlider = lazy(() => import('../components/ModelSlider'));
 
 export default function Home2() {
   const introRef = useRef(null);
@@ -194,7 +197,38 @@ export default function Home2() {
         </section>
 
         {/* ── SECTION 02 ── */}
-        <section className="relative w-full min-h-screen z-10" />
+        <section className="relative mt-40 z-10 w-full min-h-screen">
+          <div className="absolute -top-10 left-[12.25%] flex items-end">
+            {/* Visual Layer (Behind Models) */}
+            <div className="z-0 flex items-end pointer-events-none">
+              <h2 className="font-orbitron text-3xl md:text-5xl font-black text-white uppercase tracking-tighter leading-none transition-colors">
+                Kind of <span className="text-[#a600ff]">projects</span> <br />
+                i worked on
+              </h2>
+              <div className="-ml-28 mb-[5px]">
+                <span className="font-geist text-[13px] md:text-sm opacity-50 lowercase tracking-[0.2em] font-light underline underline-offset-4 text-white">
+                  learn more &rarr;
+                </span>
+              </div>
+            </div>
+
+            {/* Interaction Layer (Invisible on top of Models) */}
+            <div className="absolute inset-0 z-[2000] pointer-events-none flex items-end">
+              <div className="invisible font-orbitron text-3xl md:text-5xl font-black uppercase tracking-tighter leading-none">
+                Kind of projects <br />
+                i worked on
+              </div>
+              <Link to="/projects" className="cursor-target inline-block -ml-28 mb-[5px] pointer-events-auto opacity-0">
+                <span className="font-geist text-[13px] md:text-sm lowercase tracking-[0.2em] font-light underline underline-offset-4">
+                  learn more &rarr;
+                </span>
+              </Link>
+            </div>
+          </div>
+          <Suspense fallback={<div style={{ height: '600px' }} />}>
+            <ModelSlider />
+          </Suspense>
+        </section>
 
         {/* ── SECTION 03 ── */}
         <section className="relative w-full min-h-screen z-10" />
