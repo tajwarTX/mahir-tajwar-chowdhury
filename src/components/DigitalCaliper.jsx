@@ -6,216 +6,257 @@ const DigitalCaliper = ({ containerRef }) => {
     container: containerRef,
   });
 
-  // The caliper translates from X=300 down to X=0 as user scrolls
-  const sliderX = useTransform(scrollYProgress, [0, 1], [300, 0]);
+  // Controls the linear separation of the jaws smoothly
+  const sliderX = useTransform(scrollYProgress, [0, 1], [250, 0]);
   
-  const [measurement, setMeasurement] = useState("87.30");
+  const [measurement, setMeasurement] = useState("62.5");
 
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
-    // We map the physical movement to an 87.3mm scale
-    const val = (1 - latest) * 87.3;
-    setMeasurement(val.toFixed(2));
+    // Maps scroll states dynamically to a standard metric scale (40px = 10mm -> 1mm = 4px)
+    // Max sliderX is 250px -> 250 / 4 = 62.5mm
+    const val = (1 - latest) * 62.5;
+    setMeasurement(val.toFixed(1));
   });
 
   return (
-    <div className="absolute top-[65%] left-[10%] z-[5] pointer-events-none origin-center transform rotate-0 scale-[0.6] md:scale-100">
-      {/* Significantly reduced drop shadow to look less floating */}
-      <svg width="900" height="350" viewBox="0 0 900 350" xmlns="http://www.w3.org/2000/svg" style={{ filter: 'drop-shadow(2px 4px 4px rgba(0,0,0,0.15))' }}>
+    // Re-applied unified CSS rotation so the whole parallel assembly tilts together elegantly
+    <div className="absolute top-[50%] left-[5%] z-[5] pointer-events-none origin-center transform rotate-[18deg] scale-[0.55] md:scale-95">
+      <svg width="1150" height="380" viewBox="0 0 1150 380" xmlns="http://www.w3.org/2000/svg" style={{ filter: 'drop-shadow(3px 5px 6px rgba(0,0,0,0.55))' }}>
         <defs>
-          <linearGradient id="metalBar" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#cbd6e0" />
-            <stop offset="35%" stopColor="#a7b4c2" />
-            <stop offset="100%" stopColor="#919eac" />
+          {/* TRUE NEUTRAL Black plastic carbon feel for scale and jaws */}
+          <linearGradient id="carbonPlastic" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#303030" />
+            <stop offset="20%" stopColor="#202020" />
+            <stop offset="80%" stopColor="#202020" />
+            <stop offset="100%" stopColor="#141414" />
           </linearGradient>
-          <linearGradient id="metalJaw" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#a2b0be" />
-            <stop offset="55%" stopColor="#7d8d9f" />
-            <stop offset="100%" stopColor="#aebbc8" />
-          </linearGradient>
-          <linearGradient id="metalSlider" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#cfd9e2" />
-            <stop offset="45%" stopColor="#a5b2bf" />
-            <stop offset="100%" stopColor="#8a98a8" />
-          </linearGradient>
-          <linearGradient id="plasticBlack" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#1a2230" />
-            <stop offset="100%" stopColor="#0a0f16" />
-          </linearGradient>
-          <linearGradient id="screenGlass" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#eef3ee" />
-            <stop offset="100%" stopColor="#d3ddd7" />
-          </linearGradient>
-          <pattern id="microBrushed" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(15)">
-            <line x1="0" y1="0" x2="0" y2="6" stroke="rgba(255,255,255,0.12)" strokeWidth="1" />
+
+          {/* Subtle diagonal micro-texture for carbon effect */}
+          <pattern id="carbonTexture" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <rect width="6" height="6" fill="url(#carbonPlastic)" />
+            <line x1="0" y1="0" x2="0" y2="6" stroke="#3d3d3d" strokeWidth="0.5" opacity="0.4" />
+            <line x1="3" y1="0" x2="3" y2="6" stroke="#141414" strokeWidth="0.5" opacity="0.4" />
           </pattern>
-          <filter id="softInner" x="-20%" y="-20%" width="140%" height="140%">
-            <feOffset dx="0" dy="1" />
-            <feGaussianBlur stdDeviation="1.4" result="blur" />
-            <feComposite in="blur" in2="SourceAlpha" operator="arithmetic" k2="-1" k3="1" result="innerShadow" />
-            <feColorMatrix
-              in="innerShadow"
-              type="matrix"
-              values="0 0 0 0 0
-                      0 0 0 0 0
-                      0 0 0 0 0
-                      0 0 0 0.38 0"
-            />
-            <feComposite in2="SourceGraphic" operator="over" />
-          </filter>
-          <pattern id="rulerTicks" width="10" height="20" patternUnits="userSpaceOnUse">
-            <line x1="0" y1="20" x2="0" y2="10" stroke="#1f2a36" strokeWidth="1" />
+          
+          <linearGradient id="matteBlackHousing" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#3a3a3a" />
+            <stop offset="30%" stopColor="#222222" />
+            <stop offset="100%" stopColor="#111111" />
+          </linearGradient>
+          
+          {/* Metallic gradient for the main measuring track insert */}
+          <linearGradient id="metallicScale" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#e5e5e5" />
+            <stop offset="15%" stopColor="#ffffff" />
+            <stop offset="80%" stopColor="#f5f5f5" />
+            <stop offset="100%" stopColor="#d4d4d4" />
+          </linearGradient>
+
+          {/* Machine-cut tick patterns */}
+          <pattern id="metricTicks" width="8" height="14" patternUnits="userSpaceOnUse">
+            <line x1="0" y1="14" x2="0" y2="4" stroke="#555555" strokeWidth="1" />
           </pattern>
-          <pattern id="rulerMajorTicks" width="50" height="20" patternUnits="userSpaceOnUse">
-            <line x1="0" y1="20" x2="0" y2="5" stroke="#1f2a36" strokeWidth="2" />
+          <pattern id="metricMajorTicks" width="40" height="14" patternUnits="userSpaceOnUse">
+            <line x1="0" y1="14" x2="0" y2="0" stroke="#111111" strokeWidth="1.8" />
           </pattern>
         </defs>
 
-        {/* --- FIXED PART --- */}
-        <g id="fixed-part">
-          {/* Fixed Upper Jaw */}
-          {/* Fixed Upper Jaw */}
-          <path d="M 100 130 L 100 90 L 115 60 L 130 60 L 130 130 Z" fill="#111a24" />
-          
-          {/* Fixed Lower Jaw */}
-          <path d="M 100 170 L 100 240 L 115 300 L 130 300 L 130 170 Z" fill="#111a24" />
-          
-          {/* Jaw Contact Faces (Darker accent) */}
-          {/* Jaw Contact Faces (Darker accent) */}
-          <rect x="126" y="60" width="4" height="70" fill="#cfd7de" />
-          <rect x="126" y="170" width="4" height="130" fill="#cfd7de" />
+        {/* --- DYNAMIC DEPTH PROBE ROD --- */}
+        <motion.g style={{ x: sliderX }}>
+          {/* 3D Under-Shadow */}
+          <rect x="300" y="130" width="570" height="8" fill="#080808" />
+          {/* Top Face */}
+          <rect x="300" y="126" width="570" height="8" fill="url(#carbonTexture)" stroke="#1c1c1c" strokeWidth="0.5" />
+          {/* Top Edge Highlight */}
+          <rect x="300" y="127" width="570" height="1.5" fill="#444444" opacity="0.6" />
+        </motion.g>
 
-          {/* Main Ruler Bar */}
-          <rect x="100" y="130" width="750" height="40" fill="#d8dfe6" rx="2" />
-          <rect x="100" y="156" width="750" height="14" fill="#aeb6be" rx="2" opacity="0.95" />
+        {/* --- FIXED SECTION (Main Scale Rule & Left Measuring Jaws) --- */}
+        <g id="fixed-assembly">
+          {/* Main Carbon Plastic Ruler Beam 3D Extrusion */}
+          <rect x="115" y="112" width="735" height="44" fill="#080808" rx="1" />
           
-          {/* Ruler Groove */}
-          {/* Ruler Groove */}
-          <rect x="130" y="145" width="700" height="10" fill="#c4ccd4" opacity="0.9" />
-
-          {/* Major Ticks */}
-          <rect x="130" y="130" width="700" height="20" fill="url(#rulerMajorTicks)" />
-          {/* Minor Ticks (Offset to prevent overlap) */}
-          <g transform="translate(0,0)">
-            <rect x="130" y="130" width="700" height="20" fill="url(#rulerTicks)" />
+          {/* Main Carbon Plastic Ruler Beam */}
+          <rect x="115" y="108" width="735" height="44" fill="url(#carbonTexture)" stroke="#1c1c1c" strokeWidth="0.5" rx="1" />
+          <rect x="116" y="109" width="733" height="2" fill="#444444" opacity="0.6" />
+          
+          {/* Precision Scale Sticker Insert Array / Measurement Scale */}
+          {/* Deep Groove Base representing the gap */}
+          <rect x="150" y="114" width="690" height="27" fill="#0c0c0c" rx="1" />
+          {/* Main Metallic Ruler Insert */}
+          <rect x="150" y="115" width="690" height="26" fill="url(#metallicScale)" stroke="#999999" strokeWidth="0.5"/>
+          
+          {/* Track Lighting & Inner Geometry */}
+          {/* Top highlight / metallic glare along the whole length */}
+          <rect x="151" y="116" width="688" height="8" fill="#ffffff" opacity="0.5" />
+          {/* Inner Drop Shadow cast downwards by the top carbon rim groove */}
+          <rect x="151" y="115" width="688" height="3" fill="#050505" opacity="0.15" />
+          <rect x="151" y="115" width="688" height="1" fill="#050505" opacity="0.3" />
+          {/* Bottom Inner Shadow to sink the bottom edge */}
+          <rect x="151" y="139" width="688" height="2" fill="#555555" opacity="0.3" />
+          
+          <rect x="160" y="127" width="670" height="14" fill="url(#metricTicks)" opacity="0.8" />
+          <rect x="160" y="127" width="670" height="14" fill="url(#metricMajorTicks)" />
+          
+          <g fill="#222222" fontFamily="sans-serif" fontSize="12" fontWeight="bold" opacity="0.85">
+            <text x="160" y="124" textAnchor="middle">0</text>
+            <text x="200" y="124" textAnchor="middle">10</text>
+            <text x="240" y="124" textAnchor="middle">20</text>
+            <text x="280" y="124" textAnchor="middle">30</text>
+            <text x="320" y="124" textAnchor="middle">40</text>
+            <text x="360" y="124" textAnchor="middle">50</text>
+            <text x="400" y="124" textAnchor="middle">60</text>
+            <text x="440" y="124" textAnchor="middle">70</text>
+            <text x="480" y="124" textAnchor="middle">80</text>
+            <text x="520" y="124" textAnchor="middle">90</text>
+            <text x="560" y="124" textAnchor="middle">100</text>
+            <text x="600" y="124" textAnchor="middle">110</text>
+            <text x="640" y="124" textAnchor="middle">120</text>
+            <text x="680" y="124" textAnchor="middle">130</text>
+            <text x="720" y="124" textAnchor="middle">140</text>
+            <text x="760" y="124" textAnchor="middle">150</text>
           </g>
 
-          <rect x="100" y="130" width="40" height="40" fill="#d8dfe6" rx="2" />
-          <rect x="100" y="156" width="40" height="14" fill="#aeb6be" rx="2" opacity="0.95" />
+          {/* FIXED UPPER JAW - bigger curve, shifted left */}
+          <path d="M 145 113 
+                   L 145 50 
+                   L 149 50 
+                   Q 165 75, 173 113 Z" fill="#080808" />
+          <path d="M 145 108 
+                   L 145 45 
+                   L 148 45 
+                   Q 164 70, 171 108 Z" fill="url(#carbonTexture)" stroke="#1c1c1c" strokeWidth="0.5" />
+          <path d="M 148 46 Q 163 72, 169 107" stroke="#444444" strokeWidth="1" opacity="0.6" fill="none" />
 
-          <g opacity="0.75">
-            <text x="130" y="144" fill="#0b0f14" fontFamily="ui-sans-serif, system-ui" fontSize="10" fontWeight="700">0</text>
-            <text x="180" y="144" fill="#0b0f14" fontFamily="ui-sans-serif, system-ui" fontSize="10" fontWeight="700">5</text>
-            <text x="230" y="144" fill="#0b0f14" fontFamily="ui-sans-serif, system-ui" fontSize="10" fontWeight="700">10</text>
-            <text x="280" y="144" fill="#0b0f14" fontFamily="ui-sans-serif, system-ui" fontSize="10" fontWeight="700">15</text>
-            <text x="330" y="144" fill="#0b0f14" fontFamily="ui-sans-serif, system-ui" fontSize="10" fontWeight="700">20</text>
-            <text x="380" y="144" fill="#0b0f14" fontFamily="ui-sans-serif, system-ui" fontSize="10" fontWeight="700">25</text>
-            <text x="430" y="144" fill="#0b0f14" fontFamily="ui-sans-serif, system-ui" fontSize="10" fontWeight="700">30</text>
-            <text x="480" y="144" fill="#0b0f14" fontFamily="ui-sans-serif, system-ui" fontSize="10" fontWeight="700">35</text>
-            <text x="530" y="144" fill="#0b0f14" fontFamily="ui-sans-serif, system-ui" fontSize="10" fontWeight="700">40</text>
-            <text x="580" y="144" fill="#0b0f14" fontFamily="ui-sans-serif, system-ui" fontSize="10" fontWeight="700">45</text>
-            <text x="630" y="144" fill="#0b0f14" fontFamily="ui-sans-serif, system-ui" fontSize="10" fontWeight="700">50</text>
-            <text x="680" y="144" fill="#0b0f14" fontFamily="ui-sans-serif, system-ui" fontSize="10" fontWeight="700">55</text>
-            <text x="730" y="144" fill="#0b0f14" fontFamily="ui-sans-serif, system-ui" fontSize="10" fontWeight="700">60</text>
-            <text x="780" y="144" fill="#0b0f14" fontFamily="ui-sans-serif, system-ui" fontSize="10" fontWeight="700">65</text>
-            <text x="830" y="144" fill="#0b0f14" fontFamily="ui-sans-serif, system-ui" fontSize="10" fontWeight="700">70</text>
-          </g>
-
-          <rect x="620" y="136" width="210" height="28" fill="#e3e8ed" rx="3" opacity="0.95" />
-          <text x="642" y="149" fill="#0b0f14" fontFamily="ui-sans-serif, system-ui" fontSize="10" fontWeight="800" opacity="0.85">ELECTRONIC</text>
-          <text x="642" y="161" fill="#0b0f14" fontFamily="ui-sans-serif, system-ui" fontSize="10" fontWeight="800" opacity="0.85">DIGITAL CALIPER</text>
-
-          {/* A more subtle highlight/shadow for depth on the fixed bar */}
-          <rect x="100" y="130" width="750" height="40" fill="none" stroke="rgba(0,0,0,0.18)" strokeWidth="1" rx="2" />
-
-          {/* Subtle highlights and shadows for jaws and body to enhance 3D effect */}
+          {/* FIXED LOWER JAW */}
+          <path d="M 160 157 
+                   L 160 275 
+                   L 155 275 
+                   Q 135 195, 115 175 
+                   L 115 157 Z" fill="#080808" />
+          <path d="M 160 152 
+                   L 160 270 
+                   L 155 270 
+                   Q 135 190, 115 170 
+                   L 115 152 Z" fill="url(#carbonTexture)" stroke="#1c1c1c" strokeWidth="0.5" />
+          <path d="M 115 170 Q 135 190, 155 270 L 152 270 Q 132 193, 113 170 Z" fill="#777777" opacity="0.2" />
         </g>
 
-        {/* --- MOVING PART --- */}
+        {/* --- SLIDING ASSEMBLY --- */}
         <motion.g style={{ x: sliderX }}>
           
-          {/* Moving Upper Jaw */}
-          <path d="M 130 130 L 130 60 L 145 60 L 160 90 L 160 130 Z" fill="#111a24" />
+          {/* MOVING UPPER JAW - bigger curve, shifted left */}
+          <path d="M 145 113 
+                   L 145 50 
+                   L 141 50 
+                   Q 125 75, 117 113 Z" fill="#080808" />
+          <path d="M 145 108 
+                   L 145 45 
+                   L 142 45 
+                   Q 126 70, 119 108 Z" fill="url(#carbonTexture)" stroke="#1c1c1c" strokeWidth="0.5" />
+          <path d="M 142 46 Q 127 72, 121 107" stroke="#444444" strokeWidth="1" opacity="0.6" fill="none" />
+
+          {/* BRIDGE CONNECTOR — bottom-right edge, jaw meets housing body */}
+          {/* 3D under-shadow */}
+          <rect x="145" y="95" width="16" height="18" fill="#050505" rx="1" />
+          {/* Main body */}
+          <rect x="145" y="92" width="16" height="18" fill="url(#carbonTexture)" stroke="#1c1c1c" strokeWidth="0.5" rx="1" />
+          {/* Top edge highlight */}
+          <rect x="146" y="93" width="14" height="1.5" fill="#555555" opacity="0.7" />
+          {/* Right edge highlight (butts into housing) */}
+          <rect x="159" y="93" width="2" height="17" fill="#555555" opacity="0.4" />
+
+          {/* MOVING LOWER JAW */}
+          <path d="M 160 157 
+                   L 160 275 
+                   L 165 275 
+                   Q 185 195, 205 175 
+                   L 205 157 Z" fill="#080808" />
+          <path d="M 160 152 
+                   L 160 270 
+                   L 165 270 
+                   Q 185 190, 205 170 
+                   L 205 152 Z" fill="url(#carbonTexture)" stroke="#1c1c1c" strokeWidth="0.5" />
+          <path d="M 205 170 Q 185 190, 165 270 L 168 270 Q 188 193, 207 170 Z" fill="#ffffff" opacity="0.05" />
+
+          {/* MAIN BLACK DIGITAL HOUSING BLOCK */}
+          {/* 3D Under-shadow Extrusion */}
+          <rect x="156" y="85" width="190" height="90" fill="#0a0a0a" rx="6" />
+          <rect x="156" y="80" width="190" height="90" fill="url(#matteBlackHousing)" rx="6" stroke="#151515" strokeWidth="1" />
+          {/* Top highlight for thick geometry */}
+          <path d="M 162 81 L 340 81" stroke="#555555" strokeWidth="1.5" strokeLinecap="round" opacity="0.8" />
           
-          {/* Moving Lower Jaw */}
-          <path d="M 130 170 L 130 300 L 145 300 L 160 240 L 160 170 Z" fill="#111a24" />
-
-          {/* Jaw Contact Faces */}
-          <rect x="130" y="60" width="4" height="70" fill="#cfd7de" />
-          <rect x="130" y="170" width="4" height="130" fill="#cfd7de" />
-
-          {/* Subtle highlights and shadows for moving jaw and body */}
-          <rect x="130" y="90" width="252" height="104" fill="none" stroke="rgba(255,255,255,0.04)" strokeWidth="1" rx="10" />
-          <rect x="130" y="90" width="252" height="104" fill="none" stroke="rgba(0,0,0,0.18)" strokeWidth="1" rx="10" transform="translate(0,1)" />
-
-          {/* Top Locking Screw */}
-
-          {/* Main Slider Body */}
-          <rect x="130" y="90" width="252" height="104" fill="url(#plasticBlack)" rx="10" />
-          <rect x="132" y="92" width="248" height="100" fill="#111a24" rx="9" opacity="0.65" />
-          <rect x="138" y="96" width="236" height="10" fill="#0b0f14" rx="6" opacity="0.9" />
-
-          {/* LCD Screen Border */}
-          <rect x="144" y="106" width="170" height="58" fill="#0b0f14" rx="4" />
-          {/* LCD Screen Background */}
-          {/* LCD Screen Background with subtle inner shadow */}
-          <rect x="150" y="112" width="158" height="46" fill="#c6d0cc" rx="2" />
-          <rect x="150" y="112" width="158" height="46" fill="none" stroke="rgba(0,0,0,0.24)" strokeWidth="1" rx="2" />
-
-          {/* Digital Text */}
-          <text 
-            x="272" 
-            y="136" 
-            fill="#0b0f14" 
-            fontFamily="'Digital-7 Mono', sans-serif" 
-            fontSize="40" 
-            fontWeight="normal" 
-            textAnchor="end"
-            dominantBaseline="middle"
-            style={{ fontVariantNumeric: 'tabular-nums' }}
-          >
-            {measurement}
-          </text>
-          {/* mm label inside screen */}
-          <text x="300" y="136" fill="#0b0f14" fontFamily="ui-sans-serif, system-ui" fontSize="10" fontWeight="800" dominantBaseline="middle" textAnchor="end">mm</text>
-
-          {/* Battery Cover / Indent */}
-          <rect x="320" y="96" width="56" height="98" fill="#0b0f14" rx="4" />
-          <rect x="324" y="100" width="48" height="90" fill="#111a24" rx="3" opacity="0.85" />
-          <g opacity="0.35">
-            <line x1="328" y1="104" x2="372" y2="104" stroke="#ffffff" strokeWidth="1" />
-            <line x1="328" y1="110" x2="372" y2="110" stroke="#ffffff" strokeWidth="1" />
-            <line x1="328" y1="116" x2="372" y2="116" stroke="#ffffff" strokeWidth="1" />
-            <line x1="328" y1="122" x2="372" y2="122" stroke="#ffffff" strokeWidth="1" />
-            <line x1="328" y1="128" x2="372" y2="128" stroke="#ffffff" strokeWidth="1" />
-            <line x1="328" y1="134" x2="372" y2="134" stroke="#ffffff" strokeWidth="1" />
-            <line x1="328" y1="140" x2="372" y2="140" stroke="#ffffff" strokeWidth="1" />
-            <line x1="328" y1="146" x2="372" y2="146" stroke="#ffffff" strokeWidth="1" />
-            <line x1="328" y1="152" x2="372" y2="152" stroke="#ffffff" strokeWidth="1" />
-            <line x1="328" y1="158" x2="372" y2="158" stroke="#ffffff" strokeWidth="1" />
-            <line x1="328" y1="164" x2="372" y2="164" stroke="#ffffff" strokeWidth="1" />
-            <line x1="328" y1="170" x2="372" y2="170" stroke="#ffffff" strokeWidth="1" />
-            <line x1="328" y1="176" x2="372" y2="176" stroke="#ffffff" strokeWidth="1" />
-            <line x1="328" y1="182" x2="372" y2="182" stroke="#ffffff" strokeWidth="1" />
+          {/* Display Window Rim Accent */}
+          <rect x="166" y="103" width="145" height="46" fill="#050505" rx="4" />
+          <rect x="166" y="102" width="145" height="46" fill="#111111" rx="4" stroke="#050505" strokeWidth="1" />
+          
+          {/* LCD Panel Glass Screen - 3D inner drop shadow & glass effects */}
+          {/* Deep inner bevel/gap */}
+          <rect x="171" y="106" width="135" height="38" fill="#0f0f0f" rx="3" />
+          {/* Main LCD background (classic pale greenish-grey) */}
+          <rect x="172" y="107" width="133" height="36" fill="#aab2a1" rx="2" />
+          {/* LCD inner shadow at top & left */}
+          <rect x="172" y="107" width="133" height="4" fill="#676d5e" rx="2" opacity="0.5" />
+          <rect x="172" y="107" width="4" height="36" fill="#676d5e" rx="2" opacity="0.3" />
+          
+          {/* Faint 'Ghost' 88.8 inactive hardware segments just behind the real text */}
+          <g fill="#8f9588" fontFamily="'Digital-7', 'DS-Digital', 'DSEG7 Classic', monospace" fontSize="36" fontWeight="bold">
+            <text x="250" y="136" textAnchor="end" letterSpacing="1">88</text>
+            <text x="250" y="136" textAnchor="start" letterSpacing="1">.8</text>
           </g>
 
-          {/* Buttons */}
-          {/* Buttons with subtle bevels */}
-          <text x="156" y="102" fill="#ffffff" fontFamily="ui-sans-serif, system-ui" fontSize="12" fontWeight="700" opacity="0.9">mm/inch</text>
-          <rect x="222" y="95" width="20" height="6" fill="#2ea7ff" rx="1.5" opacity="0.9" />
+          {/* Screen High-Contrast Active Segment Readout Typography */}
+          <g fill="#1a1c18" fontFamily="'Digital-7', 'DS-Digital', 'DSEG7 Classic', monospace" fontSize="36" fontWeight="bold" opacity="0.9">
+            {/* Integer part anchored to grow left from the decimal */}
+            <text x="250" y="136" textAnchor="end" letterSpacing="1">
+              {measurement.split('.')[0]}
+            </text>
+            {/* Decimal dot and fractional part anchored to stay fixed */}
+            <text x="250" y="136" textAnchor="start" letterSpacing="1">
+              .{measurement.split('.')[1]}
+            </text>
+          </g>
+          <text x="298" y="122" fill="#1a1c18" fontFamily="sans-serif" fontSize="10" fontWeight="800" textAnchor="end" opacity="0.9">mm</text>
 
-          <rect x="150" y="168" width="166" height="18" fill="#0b0f14" rx="3" opacity="0.9" />
+          {/* Faint Glass Glare Reflection over the screen */}
+          <path d="M 172 107 L 230 107 L 195 143 L 172 143 Z" fill="#ffffff" opacity="0.12" style={{ pointerEvents: 'none' }} />
 
-          <text x="178" y="180" fill="#ffffff" fontFamily="ui-sans-serif, system-ui" fontSize="9.5" fontWeight="800" dominantBaseline="middle" textAnchor="middle" opacity="0.92">OFF</text>
-          <rect x="193" y="176" width="20" height="6" fill="#e03a3a" rx="1.5" />
-          <text x="228" y="180" fill="#ffffff" fontFamily="ui-sans-serif, system-ui" fontSize="9.5" fontWeight="800" dominantBaseline="middle" textAnchor="middle" opacity="0.92">ON</text>
-          <rect x="263" y="176" width="20" height="6" fill="#f2d34b" rx="1.5" />
-          <text x="299" y="180" fill="#ffffff" fontFamily="ui-sans-serif, system-ui" fontSize="9.5" fontWeight="800" dominantBaseline="middle" textAnchor="middle" opacity="0.92">ZERO</text>
+          {/* Control Interface Branding & Graphics */}
+          <rect x="166" y="86" width="120" height="12" fill="#101010" rx="2" />
+          <text x="172" y="95" fill="#38bdf8" fontFamily="sans-serif" fontSize="8" fontWeight="800">mm/inch</text>
+          <rect x="235" y="88" width="14" height="8" fill="#0284c7" rx="1.5" />
 
-          {/* Bevel on the slider body (top edge) */}
-          <path d="M 130 90 L 382 90 L 380 92 L 132 92 Z" fill="rgba(255,255,255,0.06)" />
-          {/* Bevel on the slider body (bottom edge) */}
-          <path d="M 130 194 L 382 194 L 380 192 L 132 192 Z" fill="rgba(0,0,0,0.1)" />
+          {/* Base Instrument System Controls */}
+          {/* Buttons 3D Extrusion */}
+          <rect x="166" y="152" width="145" height="14" fill="#101010" rx="2" />
           
+          <text x="182" y="161" fill="#a0a0a0" fontFamily="sans-serif" fontSize="8" fontWeight="bold" textAnchor="middle">OFF</text>
+          <rect x="195" y="157" width="10" height="6" fill="#7f1d1d" rx="1" />
+          <rect x="195" y="155" width="10" height="6" fill="#ef4444" rx="1" />
+          
+          <text x="220" y="161" fill="#a0a0a0" fontFamily="sans-serif" fontSize="8" fontWeight="bold" textAnchor="middle">ON</text>
+          
+          <rect x="250" y="157" width="10" height="6" fill="#713f12" rx="1" />
+          <rect x="250" y="155" width="10" height="6" fill="#eab308" rx="1" />
+          
+          <text x="280" y="161" fill="#a0a0a0" fontFamily="sans-serif" fontSize="8" fontWeight="bold" textAnchor="middle">ZERO</text>
+
+          {/* MECHANICAL ANCILLARY THUMB HARDWARE */}
+          <path d="M 230 72 L 242 72 L 240 82 L 232 82 Z" fill="#111111" />
+          <path d="M 230 68 L 242 68 L 240 78 L 232 78 Z" fill="#555555" />
+          <rect x="226" y="65" width="20" height="5" rx="1" fill="#999999" />
+
+          <path d="M 300 174 C 300 212, 342 212, 342 174 Z" fill="#111111" />
+          <path d="M 300 170 C 300 208, 342 208, 342 170 Z" fill="#222222" />
+          <g stroke="#111111" strokeWidth="1.8">
+            <line x1="305" y1="170" x2="305" y2="190" />
+            <line x1="311" y1="170" x2="311" y2="196" />
+            <line x1="317" y1="170" x2="317" y2="199" />
+            <line x1="323" y1="170" x2="323" y2="199" />
+            <line x1="329" y1="170" x2="329" y2="196" />
+            <line x1="335" y1="170" x2="335" y2="190" />
+          </g>
+
         </motion.g>
       </svg>
     </div>

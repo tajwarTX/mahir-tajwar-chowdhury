@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect, lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
+import { useScroll, useTransform, useMotionValueEvent } from "framer-motion";
 import IntroBlock from "../components/IntroBlock";
 import NameTag from "../components/NameTag";
 import scrollDown from "../assets/miscellaneous/scrolldown.gif";
@@ -14,8 +15,92 @@ export default function Home2() {
   const introRef = useRef(null);
   const canvasSectionRef = useRef(null);
   const scrollContainerRef = useRef(null);
+  const projectsSectionRef = useRef(null);
+  const perspectiveRef = useRef(null);
+  const tiltWrapperRef = useRef(null);
 
   const [showArrowScroll, setShowArrowScroll] = useState(false);
+
+  // Scroll-driven 3D camera perspective tilt — instant, no delay
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    const projectsSection = projectsSectionRef.current;
+    const perspectiveEl = perspectiveRef.current;
+    const tiltEl = tiltWrapperRef.current;
+    if (!container || !projectsSection || !perspectiveEl || !tiltEl) return;
+
+    let ticking = false;
+    let cachedSectionTop = 0;
+    let cachedViewportH = 0;
+    let cachedSectionH = 0;
+
+    const updateMetrics = () => {
+      if (!container || !projectsSection) return;
+      cachedViewportH = container.clientHeight;
+      cachedSectionTop = projectsSection.offsetTop;
+      cachedSectionH = projectsSection.offsetHeight;
+    };
+
+    updateMetrics();
+    window.addEventListener('resize', updateMetrics);
+    
+    // Also update metrics after a small delay in case lazily loaded components shift layout
+    setTimeout(updateMetrics, 500);
+    setTimeout(updateMetrics, 1500);
+
+    const onScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const scrollY = container.scrollTop;
+          
+          // Calculate progress using cached un-transformed metrics
+          const sectionTopRelative = cachedSectionTop - scrollY;
+          const progress = sectionTopRelative / cachedViewportH;
+
+          let tilt = 0;
+          
+          if (progress <= 1.0 && progress > 0.8) {
+            // Rapid entrance tilt: start aggressively right as the section hits the screen bottom
+            tilt = ((1.0 - progress) / 0.2) * 40;
+          } else if (progress <= 0.8 && progress >= -0.4) {
+            tilt = 40;
+          } else if (progress < -0.4 && progress > -0.5) {
+            // Rapidly fade out tightly between 40% and 50% scrolled out
+            tilt = ((progress + 0.5) / 0.1) * 40;
+          }
+          tilt = Math.max(0, Math.min(40, Math.round(tilt * 100) / 100));
+
+          // 1. Perspective camera vanishing point locked to viewport center
+          const centerY = scrollY + (cachedViewportH / 2);
+          perspectiveEl.style.perspectiveOrigin = `50% ${centerY}px`;
+
+          // 2. Physical 3D pivot fixed geometrically to avoid spatial leaping
+          const pivotY = cachedSectionTop + (cachedSectionH / 2);
+          tiltEl.style.transformOrigin = `50% ${pivotY}px`;
+          tiltEl.style.transform = `rotateX(${tilt}deg)`;
+
+          // 3. Counter-rotate the model slider so it sits completely flat to the screen!
+          // We translate it along its local Z (which points straight at the camera after counter-rotation)
+          // 400px ensures its bottom edge perfectly clears the tilted green mat coming up at the bottom.
+          // We scale by 0.77 (1400/1800) to optically cancel the zoom from moving it 400px closer to the 1800px perspective camera.
+          projectsSection.style.transform = `rotateX(${-tilt}deg) translateZ(400px) scale(0.77)`;
+          projectsSection.style.transformStyle = 'preserve-3d';
+          projectsSection.style.transformOrigin = '50% 50%';
+          
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+    
+    container.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    return () => {
+      window.removeEventListener('resize', updateMetrics);
+      container.removeEventListener('scroll', onScroll);
+    };
+  }, []);
 
   useEffect(() => {
     let fadeTimeout;
@@ -121,7 +206,22 @@ export default function Home2() {
           <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G" />
         </filter>
       </svg>
-      <div className="relative w-full min-h-max">
+      <div 
+        ref={perspectiveRef}
+        className="relative w-full min-h-max"
+        style={{
+          perspective: '1800px',
+          perspectiveOrigin: '50% 50%',
+        }}
+      >
+        <div
+          ref={tiltWrapperRef}
+          style={{
+            transformStyle: 'preserve-3d',
+            transform: 'rotateX(0deg)',
+            willChange: 'transform',
+          }}
+        >
         <CuttingMatLayer />
         <WorkshopGrunge />
         <DigitalCaliper containerRef={scrollContainerRef} />
@@ -196,9 +296,9 @@ export default function Home2() {
           </div>
         </section>
 
-        {/* ── SECTION 02 ── */}
-        <section className="relative mt-40 z-10 w-full min-h-screen">
-          <div className="absolute -top-10 left-[12.25%] flex items-end">
+        {/* Text etched onto the 3D mat (tilts with the environment) */}
+        <div className="relative w-full z-10 pointer-events-none mt-40 -mb-20">
+          <div className="relative top-20 left-[12.25%] flex items-end inline-block">
             {/* Visual Layer (Behind Models) */}
             <div className="z-0 flex items-end pointer-events-none">
               <h2 className="font-orbitron text-3xl md:text-5xl font-black text-white uppercase tracking-tighter leading-none transition-colors">
@@ -225,25 +325,29 @@ export default function Home2() {
               </Link>
             </div>
           </div>
+        </div>
+
+        {/* ── SECTION 02 ── (Model Slider counter-rotates and floats completely flat) */}
+        <section ref={projectsSectionRef} className="relative z-10 w-full min-h-screen">
           <Suspense fallback={<div style={{ height: '600px' }} />}>
             <ModelSlider />
           </Suspense>
         </section>
 
-        {/* ── SECTION 03 ── */}
-        <section className="relative w-full min-h-screen z-10" />
+      {/* ── SECTION 03 ── */}
+      <section className="relative w-full min-h-screen z-10" />
 
-        {/* ── SECTION 04 ── */}
-        <section className="relative w-full min-h-screen z-10" />
+      {/* ── SECTION 04 ── */}
+      <section className="relative w-full min-h-screen z-10" />
 
-        {/* ── SECTION 05 ── */}
-        <section className="relative w-full min-h-screen z-10" />
+      {/* ── SECTION 05 ── */}
+      <section className="relative w-full min-h-screen z-10" />
 
-        {/* ── SECTION 06 ── */}
-        <section
-          ref={canvasSectionRef}
-          className="relative w-full min-h-screen z-10"
-        />
+      {/* ── SECTION 06 ── */}
+      <section
+        ref={canvasSectionRef}
+        className="relative w-full min-h-screen z-10"
+      />
 
         {/* Footer Section */}
         <footer className="relative w-full z-20 overflow-hidden" style={{ background: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.02) 4%, rgba(0,0,0,0.06) 8%, rgba(0,0,0,0.12) 13%, rgba(0,0,0,0.2) 19%, rgba(0,0,0,0.28) 25%, rgba(0,0,0,0.38) 32%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0.62) 48%, rgba(0,0,0,0.73) 56%, rgba(0,0,0,0.83) 64%, rgba(0,0,0,0.91) 72%, rgba(0,0,0,0.97) 80%, #000 88%)' }}>
@@ -300,6 +404,7 @@ export default function Home2() {
             </div>
           </div>
         </footer>
+        </div>{/* Close preserve-3d wrapper */}
       </div>
     </div>
   );

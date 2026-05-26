@@ -436,8 +436,7 @@ const SlideItem = memo(function SlideItem({ slide, index, velocityRef, debugData
       </div>
 
       <div style={{ position:'relative', height:`calc(clamp(350px, 50vw, 550px) * ${GLOBAL_SCALE})`, width:'100%', display:'flex', alignItems:'center', justifyContent:'center', overflow:'visible' }}>
-        {/* Morphing background rect */}
-        <WarpRect velocityRef={velocityRef} index={index} containerRef={containerRef} titleRef={titleRef} slideTitle={slide.title} />
+        {/* Background rectangles removed as requested */}
 
         {/* 3-D canvas — GPU-optimized settings */}
         <div className="canvas-container will-change-transform" style={{ position:'absolute', top:'-100%', bottom:'-100%', left:'-50%', right:'-50%', zIndex:1, pointerEvents:'none', transform: 'translateZ(0)' }}>
@@ -517,27 +516,6 @@ export default function ModelSlider() {
     alert('Copied all debug data!');
   };
 
-  useEffect(() => {
-    let lastX = 0, lastT = 0, dragging = false;
-    const onDown = (e) => { dragging = true; lastX = e.clientX; lastT = Date.now(); };
-    const onMove = (e) => {
-      if (!dragging) return;
-      const now = Date.now();
-      const dt  = Math.max(now - lastT, 1);
-      velocityRef.current = ((e.clientX - lastX) / dt) * 16;
-      lastX = e.clientX; lastT = now;
-    };
-    const onUp = () => { dragging = false; };
-    window.addEventListener('pointerdown', onDown);
-    window.addEventListener('pointermove', onMove);
-    window.addEventListener('pointerup',   onUp);
-    return () => {
-      window.removeEventListener('pointerdown', onDown);
-      window.removeEventListener('pointermove', onMove);
-      window.removeEventListener('pointerup',   onUp);
-    };
-  }, []);
-
   const slideRefs = useRef([]);
 
   useEffect(() => {
@@ -561,22 +539,19 @@ export default function ModelSlider() {
 
     slider.target = -1;
     slider.current = -1;
+    
+    let lastCurrent = -1;
 
     const loop = () => {
-      if (slider.isDragging) { inertiaRef.current = velocityRef.current * 0.001; }
-      else {
-        velocityRef.current *= 0.82;
-        slider.target += inertiaRef.current;
-        inertiaRef.current *= 0.92;
-        if (Math.abs(inertiaRef.current) < 0.01) {
-          const bias = Math.max(-0.2, Math.min(0.2, inertiaRef.current * 5));
-          const nearest = Math.round(slider.target + bias);
-          slider.target += (nearest - slider.target) * 0.038;
-          inertiaRef.current *= 0.8;
-          velocityRef.current *= 0.8;
-        }
-      }
+      // Let GSAP drive the target, just update the slider
       slider.update();
+
+      // Derive velocity automatically for the WarpRect liquid effect
+      // Since manual drag is disabled, this ensures buttons trigger warped bending!
+      const diff = slider.current - lastCurrent;
+      lastCurrent = slider.current;
+      velocityRef.current = diff * -1800; // Tuned for dramatic warp during GSAP travel
+
 
       // READ PHASE: get all rects at once
       const rects = slideRefs.current.map(el => el ? el.getBoundingClientRect() : null);
@@ -731,7 +706,7 @@ export default function ModelSlider() {
       `}</style>
 
       <div ref={wrapperRef} data-slider
-        style={{ display:'flex', gap:0, margin:0, paddingLeft:`${BAKED_OFFSET}%`, cursor: 'none' }}>
+        style={{ display:'flex', gap:0, margin:0, paddingLeft:`${BAKED_OFFSET}%`, cursor: 'none', pointerEvents: 'none' }}>
         {SLIDES_DATA.map((slide, i) => (
           <SlideItem key={slide.index} slide={slide} index={i} velocityRef={velocityRef} debugData={debugData[i]} robotDebug={robotDebug} slideRefs={slideRefs} />
         ))}
