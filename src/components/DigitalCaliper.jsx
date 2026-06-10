@@ -6,22 +6,26 @@ const DigitalCaliper = ({ containerRef }) => {
     container: containerRef,
   });
 
-  // Controls the linear separation of the jaws smoothly
   const sliderX = useTransform(scrollYProgress, [0, 1], [250, 0]);
   
-  const [measurement, setMeasurement] = useState("62.5");
+  const mainTextRef = React.useRef(null);
+  const decimalTextRef = React.useRef(null);
 
   useMotionValueEvent(scrollYProgress, "change", (latest) => {
     // Maps scroll states dynamically to a standard metric scale (40px = 10mm -> 1mm = 4px)
     // Max sliderX is 250px -> 250 / 4 = 62.5mm
     const val = (1 - latest) * 62.5;
-    setMeasurement(val.toFixed(1));
+    const strVal = val.toFixed(1);
+    const [main, dec] = strVal.split('.');
+    
+    if (mainTextRef.current) mainTextRef.current.textContent = main;
+    if (decimalTextRef.current) decimalTextRef.current.textContent = "." + dec;
   });
 
   return (
     // Re-applied unified CSS rotation so the whole parallel assembly tilts together elegantly
     <div className="absolute top-[50%] left-[5%] z-[5] pointer-events-none origin-center transform rotate-[18deg] scale-[0.55] md:scale-95">
-      <svg width="1150" height="380" viewBox="0 0 1150 380" xmlns="http://www.w3.org/2000/svg" style={{ filter: 'drop-shadow(3px 5px 6px rgba(0,0,0,0.55))' }}>
+      <svg width="1150" height="380" viewBox="0 0 1150 380" xmlns="http://www.w3.org/2000/svg">
         <defs>
           {/* TRUE NEUTRAL Black plastic carbon feel for scale and jaws */}
           <linearGradient id="carbonPlastic" x1="0" y1="0" x2="0" y2="1">
@@ -205,15 +209,14 @@ const DigitalCaliper = ({ containerRef }) => {
             <text x="250" y="136" textAnchor="start" letterSpacing="1">.8</text>
           </g>
 
-          {/* Screen High-Contrast Active Segment Readout Typography */}
           <g fill="#1a1c18" fontFamily="'Digital-7', 'DS-Digital', 'DSEG7 Classic', monospace" fontSize="36" fontWeight="bold" opacity="0.9">
             {/* Integer part anchored to grow left from the decimal */}
-            <text x="250" y="136" textAnchor="end" letterSpacing="1">
-              {measurement.split('.')[0]}
+            <text ref={mainTextRef} x="250" y="136" textAnchor="end" letterSpacing="1">
+              62
             </text>
             {/* Decimal dot and fractional part anchored to stay fixed */}
-            <text x="250" y="136" textAnchor="start" letterSpacing="1">
-              .{measurement.split('.')[1]}
+            <text ref={decimalTextRef} x="250" y="136" textAnchor="start" letterSpacing="1">
+              .5
             </text>
           </g>
           <text x="298" y="122" fill="#1a1c18" fontFamily="sans-serif" fontSize="10" fontWeight="800" textAnchor="end" opacity="0.9">mm</text>

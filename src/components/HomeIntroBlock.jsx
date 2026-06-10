@@ -59,8 +59,8 @@ const HomeIntroBlock = ({ className = "" }) => {
 
         <div className="absolute left-full ml-4 hidden md:block pointer-events-none">
           <div className="flex items-center gap-2 animate-pulse">
-            <div className="h-[1px] w-8 bg-[#a600ff]" />
-            <span className="font-geist text-[8.5px] uppercase tracking-[0.3em] text-[#a600ff] font-bold whitespace-nowrap">
+            <div className="h-[1px] w-8 bg-[#e1ff51]" />
+            <span className="font-geist text-[8.5px] uppercase tracking-[0.3em] text-[#e1ff51] font-bold whitespace-nowrap">
               TAP_TO_SWITCH_LANG
             </span>
           </div>
@@ -78,7 +78,7 @@ const HomeIntroBlock = ({ className = "" }) => {
             text={lastNames[lastIndex].text}
             duration={600}
             delay={0}
-            className={`block font-bold ${lastNames[lastIndex].font} text-[#a600ff]`}
+            className={`block font-bold ${lastNames[lastIndex].font} text-[#e1ff51]`}
             style={{ fontSize: 'clamp(1.5rem, 6vw, 3rem)' }}
           />
         </div>

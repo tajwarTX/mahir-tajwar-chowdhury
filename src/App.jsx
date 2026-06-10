@@ -137,8 +137,8 @@ const App = () => {
               menuButtonColor="#ffffff"
               openMenuButtonColor="#fff"
               changeMenuColorOnOpen={true}
-              colors={['#B19EEF', '#a600ff']}
-              accentColor="#a600ff"
+              colors={['#B19EEF', '#e1ff51']}
+              accentColor="#e1ff51"
               onMenuOpen={() => setMenuOpen(true)}
               onMenuClose={() => setMenuOpen(false)}
             />

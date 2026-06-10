@@ -123,13 +123,13 @@ const HackerTerminal = () => {
         { text: "C:\\> crunch 8 8 abcdef -o wordlist.txt", delay: 750, color: "white" },
         { text: "Generating wordlist... [OK]", delay: 900, color: "white" },
         { text: "C:\\> hydra -l root -P wordlist.txt ssh://vault.local", delay: 1050, color: "white" },
-        { text: "[AUTHENTICATED] root/********", delay: 1350, color: "#a600ff" },
+        { text: "[AUTHENTICATED] root/********", delay: 1350, color: "#e1ff51" },
         { text: "C:\\> msfconsole -q", delay: 1500, color: "white" },
         { text: "exploit -j", delay: 1650, color: "white" },
-        { text: "[*] Session opened", delay: 1800, color: "#a600ff" },
+        { text: "[*] Session opened", delay: 1800, color: "#e1ff51" },
         { text: "C:\\> decrypt --vault", delay: 1950, color: "white" },
-        { text: "Decrypting system blocks... 100%", delay: 2100, color: "#a600ff" },
-        { text: "[AUTHENTICATED] ACCESS GRANTED", delay: 2250, color: "#a600ff" },
+        { text: "Decrypting system blocks... 100%", delay: 2100, color: "#e1ff51" },
+        { text: "[AUTHENTICATED] ACCESS GRANTED", delay: 2250, color: "#e1ff51" },
         { text: "C:\\> tree /A /F", delay: 2550, color: "white" }
       ];
 
@@ -147,13 +147,13 @@ const HackerTerminal = () => {
     setStage(3);
     setLogs([]);
     const exitSequence = [
-      { text: ">>> EMERGENCY LOCKDOWN...", delay: 100, color: "#a600ff" },
+      { text: ">>> EMERGENCY LOCKDOWN...", delay: 100, color: "#e1ff51" },
       { text: ">>> SHUTTING DOWN CORE SYSTEMS...", delay: 300, color: "white" },
       { text: ">>> WIPING CACHE...", delay: 600, color: "white" },
       { text: ">>> OVERWRITING MEMORY SECTORS...", delay: 900, color: "white" },
-      { text: ">>> RE-ENCRYPTING VAULT...", delay: 1200, color: "#a600ff" },
+      { text: ">>> RE-ENCRYPTING VAULT...", delay: 1200, color: "#e1ff51" },
       { text: ">>> DESTROYING TRACES...", delay: 1500, color: "white" },
-      { text: "[+] SECURE LOGOUT COMPLETE.", delay: 2000, color: "#a600ff" },
+      { text: "[+] SECURE LOGOUT COMPLETE.", delay: 2000, color: "#e1ff51" },
       { text: ">>> CONNECTION TERMINATED.", delay: 2500, color: "white" }
     ];
 
@@ -171,12 +171,12 @@ const HackerTerminal = () => {
     <div 
       key={item.id} 
       onClick={() => { setSelectedProject(item); setStage(2); }}
-      className="aspect-square border border-white/20 p-3 flex flex-col hover:border-[#a600ff] hover:bg-[#a600ff]/10 cursor-pointer transition-colors duration-300 cursor-target group relative"
+      className="aspect-square border border-white/20 p-3 flex flex-col hover:border-[#e1ff51] hover:bg-[#e1ff51]/10 cursor-pointer transition-colors duration-300 cursor-target group relative"
     >
-      <div className="absolute top-0 right-0 w-2 h-2 bg-[#a600ff] opacity-0 group-hover:opacity-100 transition-opacity duration-300 m-2" />
+      <div className="absolute top-0 right-0 w-2 h-2 bg-[#e1ff51] opacity-0 group-hover:opacity-100 transition-opacity duration-300 m-2" />
       
       <div className="flex justify-between items-center font-bold pb-2 text-[10px] tracking-widest">
-        <span className="text-[#a600ff]">[{item.id}]</span>
+        <span className="text-[#e1ff51]">[{item.id}]</span>
         <span className="text-white/50 group-hover:text-white transition-colors duration-300">{item.type}</span>
       </div>
       
@@ -187,7 +187,7 @@ const HackerTerminal = () => {
           alt="preview" 
           className="w-full h-full object-cover group-hover:invert transition-all duration-1000 ease-out relative z-10"
         />
-        <div className="absolute inset-0 bg-[#a600ff] mix-blend-color opacity-0 group-hover:opacity-100 transition-opacity duration-1000 z-20 pointer-events-none" />
+        <div className="absolute inset-0 bg-[#e1ff51] mix-blend-color opacity-0 group-hover:opacity-100 transition-opacity duration-1000 z-20 pointer-events-none" />
       </div>
 
       <div className="flex flex-col gap-1">
@@ -237,16 +237,16 @@ const HackerTerminal = () => {
               <div className="overflow-hidden whitespace-nowrap text-white/20">{"=".repeat(200)}</div>
             </div>
 
-            <div className="flex-none w-full max-w-7xl mx-auto px-4 md:px-8 flex justify-between items-center mb-8 text-[#a600ff]">
+            <div className="flex-none w-full max-w-7xl mx-auto px-4 md:px-8 flex justify-between items-center mb-8 text-[#e1ff51]">
               <button 
                 onClick={() => setSortBy(prev => prev === 'name' ? 'date' : prev === 'date' ? 'type' : 'name')}
-                className="w-40 md:w-48 text-center bg-transparent text-[#a600ff] px-6 py-2 cursor-target uppercase tracking-widest font-bold border border-[#a600ff] hover:bg-[#a600ff] hover:text-white hover:shadow-[0_0_15px_rgba(166,0,255,0.4)] transition-all duration-300"
+                className="w-40 md:w-48 text-center bg-transparent text-[#e1ff51] px-6 py-2 cursor-target uppercase tracking-widest font-bold border border-[#e1ff51] hover:bg-[#e1ff51] hover:text-white hover:shadow-[0_0_15px_rgba(166,0,255,0.4)] transition-all duration-300"
               >
                 [ SORT: {sortBy} ]
               </button>
               <button 
                 onClick={handleExit}
-                className="w-40 md:w-48 text-center bg-transparent text-[#a600ff] px-6 py-2 cursor-target uppercase tracking-widest font-bold border border-[#a600ff] hover:bg-[#a600ff] hover:text-white hover:shadow-[0_0_15px_rgba(166,0,255,0.4)] transition-all duration-300"
+                className="w-40 md:w-48 text-center bg-transparent text-[#e1ff51] px-6 py-2 cursor-target uppercase tracking-widest font-bold border border-[#e1ff51] hover:bg-[#e1ff51] hover:text-white hover:shadow-[0_0_15px_rgba(166,0,255,0.4)] transition-all duration-300"
               >
                 [ RETURN HOME ]
               </button>
@@ -317,28 +317,28 @@ const HackerTerminal = () => {
               <div className="w-full max-w-7xl mx-auto px-4 md:px-8 flex flex-col md:flex-row gap-12 pb-16">
               
               <div className="w-full md:w-1/3 flex flex-col space-y-8 min-w-0">
-                <div className="border border-[#a600ff]/30 p-2 relative group cursor-target bg-black">
-                  <div className="absolute top-0 right-0 w-2 h-2 bg-[#a600ff] opacity-0 group-hover:opacity-100 transition-opacity duration-1000 m-2 z-10" />
+                <div className="border border-[#e1ff51]/30 p-2 relative group cursor-target bg-black">
+                  <div className="absolute top-0 right-0 w-2 h-2 bg-[#e1ff51] opacity-0 group-hover:opacity-100 transition-opacity duration-1000 m-2 z-10" />
                   <div className="aspect-square relative overflow-hidden bg-black">
                     <img 
                       src={`https://picsum.photos/seed/${selectedProject.id}/800/800`} 
                       className="w-full h-full object-cover transition-all duration-1000 ease-out group-hover:invert relative z-10" 
                       alt="detail" 
                     />
-                    <div className="absolute inset-0 bg-[#a600ff] mix-blend-color opacity-0 group-hover:opacity-100 transition-opacity duration-1000 z-20 pointer-events-none" />
+                    <div className="absolute inset-0 bg-[#e1ff51] mix-blend-color opacity-0 group-hover:opacity-100 transition-opacity duration-1000 z-20 pointer-events-none" />
                   </div>
                 </div>
                 
                 <div className="space-y-4 text-white/80 font-bold tracking-widest uppercase">
                   <div className="overflow-hidden whitespace-nowrap text-white/20 mb-2">{"-".repeat(100)}</div>
                   <div className="flex justify-between items-center">
-                    <span>ID_HASH:</span><span className="text-[#a600ff]">[{selectedProject.id}]</span>
+                    <span>ID_HASH:</span><span className="text-[#e1ff51]">[{selectedProject.id}]</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span>SECTOR:</span><span className="text-[#a600ff]">{selectedProject.type}</span>
+                    <span>SECTOR:</span><span className="text-[#e1ff51]">{selectedProject.type}</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span>COMPILED:</span><span className="text-[#a600ff]">{selectedProject.date}</span>
+                    <span>COMPILED:</span><span className="text-[#e1ff51]">{selectedProject.date}</span>
                   </div>
                   <div className="overflow-hidden whitespace-nowrap text-white/20 mt-2">{"-".repeat(100)}</div>
                 </div>
@@ -360,17 +360,17 @@ const HackerTerminal = () => {
                   </div>
                   <div className="flex flex-wrap gap-4 pl-6">
                     {selectedProject.tech.split(',').map((t, i) => (
-                      <span key={i} className="text-[#a600ff] uppercase tracking-widest bg-white/5 px-4 py-2 border border-white/10">
+                      <span key={i} className="text-[#e1ff51] uppercase tracking-widest bg-white/5 px-4 py-2 border border-white/10">
                         [{t.trim()}]
                       </span>
                     ))}
                   </div>
                 </div>
 
-                <div className="mt-auto pt-16 flex flex-col sm:flex-row gap-6 text-[#a600ff]">
+                <div className="mt-auto pt-16 flex flex-col sm:flex-row gap-6 text-[#e1ff51]">
                   <button 
                     onClick={() => setStage(1)} 
-                    className="flex-1 hover:bg-[#a600ff] hover:text-white px-6 py-4 cursor-target uppercase tracking-widest font-bold border border-[#a600ff] transition-colors duration-300"
+                    className="flex-1 hover:bg-[#e1ff51] hover:text-white px-6 py-4 cursor-target uppercase tracking-widest font-bold border border-[#e1ff51] transition-colors duration-300"
                   >
                     [ RETURN_TO_ARCHIVE ]
                   </button>

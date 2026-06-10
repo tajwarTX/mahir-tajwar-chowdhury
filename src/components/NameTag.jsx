@@ -233,7 +233,7 @@ export default function NameTag({ scrollRootRef }) {
         </filter>
       </svg>
 
-      <div className="mt-6 flex justify-center z-10">
+      <div className="flex justify-center items-center z-10 h-full w-full">
         <div 
           className="curled-sticker cursor-target transition-transform duration-500 ease-out hover:scale-[1.01] hover:rotate-[-2deg]"
           style={{ position: 'relative', display: 'inline-block', transform: 'rotate(-3deg)' }}
@@ -294,7 +294,7 @@ export default function NameTag({ scrollRootRef }) {
               right: '-60px',
               overflow: 'visible',
               pointerEvents: 'none',
-              opacity: 0.6,
+              opacity: 0.4,
             }}
             width="120"
             height="100"
@@ -330,6 +330,17 @@ export default function NameTag({ scrollRootRef }) {
             >
               tap to switch languages
             </text>
+
+            {/* Simulated Deep Cuts / Scratches on the text and arrow */}
+            <g pointerEvents="none">
+              {/* Deep cut through 'switch languages' text */}
+              <path d="M -40 102 L -5 112" stroke="#003B42" strokeWidth="2.5" />
+              <path d="M -40 102 L -5 112" stroke="rgba(0,0,0,0.6)" strokeWidth="1.5" />
+              <path d="M -39 103 L -4 113" stroke="rgba(255,255,255,0.4)" strokeWidth="0.8" />
+
+              {/* Smaller superficial white scratches */}
+              <path d="M -15 115 L 15 90" stroke="rgba(255,255,255,0.6)" strokeWidth="0.6" strokeLinecap="round" />
+            </g>
           </svg>
         </div>
       </div>

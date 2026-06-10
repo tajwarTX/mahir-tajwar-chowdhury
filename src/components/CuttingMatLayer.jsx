@@ -6,8 +6,17 @@ const CuttingMatLayer = () => {
   // while absolute elements (angles, protractors) are positioned relative to the top-left or centers.
 
   return (
-    <div className="absolute top-0 left-0 w-full h-full z-0 pointer-events-none" style={{ backgroundColor: '#0E4735' }}>
-      <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+    <div
+      className="absolute z-0 pointer-events-none"
+      style={{
+        backgroundColor: '#003B42',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+      }}
+    >
+      <svg width="100%" height="100%" style={{ overflow: 'visible' }} xmlns="http://www.w3.org/2000/svg">
         <defs>
           {/* Minor Grid Pattern */}
           <pattern id="minorGrid" width="20" height="20" patternUnits="userSpaceOnUse">
@@ -36,50 +45,52 @@ const CuttingMatLayer = () => {
         <g stroke="none" fill="rgba(255,255,255,0.2)" fontFamily="monospace" fontSize="14">
           
           {/* Horizontal Rulers (Top, Middle, Bottom sections) */}
-          <rect x="0" y="0" width="100%" height="10" fill="url(#ticksX)" stroke="none" />
+          <rect x="0" y="0" width="100vw" height="10" fill="url(#ticksX)" stroke="none" />
           
-          {Array.from({ length: 41 }).map((_, i) => (
+          {Array.from({ length: 40 }).map((_, i) => (
             <text key={`top-num-${i}`} x={i * 100 + 2} y="16">{i}</text>
           ))}
           
           {/* Vertical Rulers */}
           <rect x="0" y="0" width="10" height="100%" fill="url(#ticksY)" stroke="none" />
           
-          {Array.from({ length: 90 }).map((_, i) => (
+          {Array.from({ length: 150 }).map((_, i) => (
             <text key={`left-num-${i}`} x="2" y={i * 100 + 14}>{i}</text>
           ))}
         </g>
 
         {/* Protractor Arcs in Lower Left Corner of 2nd screen (~1800px down) */}
-        <g transform="translate(100, 1800) scale(1.5)" stroke="rgba(255,255,255,0.2)" fill="none">
-          <circle cx="0" cy="0" r="100" />
-          <circle cx="0" cy="0" r="150" />
-          <circle cx="0" cy="0" r="200" strokeDasharray="5,5" />
-          
-          {/* Radiating lines for 0-90 degrees */}
-          {[0, 15, 30, 45, 60, 75, 90].map(deg => {
-            const rad = (deg * Math.PI) / 180;
-            const x = Math.cos(rad) * 200;
-            const y = -Math.sin(rad) * 200;
-            return (
-              <g key={`deg-${deg}`}>
-                <line x1="0" y1="0" x2={x} y2={y} stroke="rgba(255,255,255,0.12)" strokeWidth="2.5" />
-                <text x={x + 5} y={y - 5} fill="rgba(255,255,255,0.2)" fontSize="10" stroke="none">{deg}°</text>
-              </g>
-            );
-          })}
-        </g>
+        <g>
+          <g transform="translate(100, 1800) scale(1.5)" stroke="rgba(255,255,255,0.2)" fill="none">
+            <circle cx="0" cy="0" r="100" />
+            <circle cx="0" cy="0" r="150" />
+            <circle cx="0" cy="0" r="200" strokeDasharray="5,5" />
+            
+            {/* Radiating lines for 0-90 degrees */}
+            {[0, 15, 30, 45, 60, 75, 90].map(deg => {
+              const rad = (deg * Math.PI) / 180;
+              const x = Math.cos(rad) * 200;
+              const y = -Math.sin(rad) * 200;
+              return (
+                <g key={`deg-${deg}`}>
+                  <line x1="0" y1="0" x2={x} y2={y} stroke="rgba(255,255,255,0.12)" strokeWidth="2.5" />
+                  <text x={x + 5} y={y - 5} fill="rgba(255,255,255,0.2)" fontSize="10" stroke="none">{deg}°</text>
+                </g>
+              );
+            })}
+          </g>
 
-        {/* Angle Projections from top-left (Origin) */}
-        <g stroke="rgba(255,255,255,0.1)" strokeWidth="2.5" strokeDasharray="10,5">
-          <line x1="0" y1="0" x2="3000" y2="3000" /> {/* 45 deg */}
-          <text x="500" y="490" fill="rgba(255,255,255,0.2)" fontSize="24" stroke="none" transform="rotate(45, 500, 500)">45°</text>
-          
-          <line x1="0" y1="0" x2="3000" y2="1732" /> {/* 30 deg */}
-          <text x="500" y="278" fill="rgba(255,255,255,0.2)" fontSize="24" stroke="none" transform="rotate(30, 500, 288)">30°</text>
+          {/* Angle Projections from top-left (Origin) */}
+          <g stroke="rgba(255,255,255,0.1)" strokeWidth="2.5" strokeDasharray="10,5">
+            <line x1="0" y1="0" x2="8000" y2="8000" /> {/* 45 deg */}
+            <text x="500" y="490" fill="rgba(255,255,255,0.2)" fontSize="24" stroke="none" transform="rotate(45, 500, 500)">45°</text>
+            
+            <line x1="0" y1="0" x2="8000" y2="4618" /> {/* 30 deg */}
+            <text x="500" y="278" fill="rgba(255,255,255,0.2)" fontSize="24" stroke="none" transform="rotate(30, 500, 288)">30°</text>
 
-          <line x1="0" y1="0" x2="1732" y2="3000" /> {/* 60 deg */}
-          <text x="288" y="490" fill="rgba(255,255,255,0.2)" fontSize="24" stroke="none" transform="rotate(60, 288, 500)">60°</text>
+            <line x1="0" y1="0" x2="4618" y2="8000" /> {/* 60 deg */}
+            <text x="288" y="490" fill="rgba(255,255,255,0.2)" fontSize="24" stroke="none" transform="rotate(60, 288, 500)">60°</text>
+          </g>
         </g>
 
         {/* Paper Layout Bounds */}

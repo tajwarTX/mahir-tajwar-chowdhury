@@ -1,127 +1,124 @@
 import React, { useRef, useState, useEffect, lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
-import { useScroll, useTransform, useMotionValueEvent } from "framer-motion";
+
 import IntroBlock from "../components/IntroBlock";
 import NameTag from "../components/NameTag";
 import scrollDown from "../assets/miscellaneous/scrolldown.gif";
 import profileImg from "../assets/photo/profile.jpg";
-import CuttingMatLayer from "../components/CuttingMatLayer";
+
 import DigitalCaliper from "../components/DigitalCaliper";
+import IPadKicad from "../components/IPadKicad";
 import WorkshopGrunge from "../components/WorkshopGrunge";
 
 const ModelSlider = lazy(() => import('../components/ModelSlider'));
+
 
 export default function Home2() {
   const introRef = useRef(null);
   const canvasSectionRef = useRef(null);
   const scrollContainerRef = useRef(null);
-  const projectsSectionRef = useRef(null);
-  const perspectiveRef = useRef(null);
-  const tiltWrapperRef = useRef(null);
-
+  const ipadWrapperRef = useRef(null);
+  const sliderApiRef = useRef(null);        // imperative handle for ModelSlider
+  const sliderSectionRef = useRef(null);    // the <section> wrapping ModelSlider
   const [showArrowScroll, setShowArrowScroll] = useState(false);
-  const [sliderMounted, setSliderMounted] = useState(false);
-  const sliderMountedRef = useRef(false); // ref to avoid setState on every scroll frame
+  const [showSliderArrow, setShowSliderArrow] = useState(false);
 
-  // Scroll-driven 3D camera perspective tilt — instant, no delay
+  // iPad scroll physics logic
+  const ipadPhysicsRef = useRef({ x: 180, y: 320, rot: 0 });
+
   useEffect(() => {
     const container = scrollContainerRef.current;
-    const projectsSection = projectsSectionRef.current;
-    const perspectiveEl = perspectiveRef.current;
-    const tiltEl = tiltWrapperRef.current;
-    if (!container || !projectsSection || !perspectiveEl || !tiltEl) return;
+    if (!container) return;
 
     let ticking = false;
-    let cachedSectionTop = 0;
-    let cachedViewportH = 0;
-    let cachedSectionH = 0;
+    const updateIpad = () => {
+      const el = ipadWrapperRef.current;
+      if (!el) { ticking = false; return; }
 
-    const updateMetrics = () => {
-      if (!container || !projectsSection) return;
-      cachedViewportH = container.clientHeight;
-      cachedSectionTop = projectsSection.offsetTop;
-      cachedSectionH = projectsSection.offsetHeight;
-    };
+      const vh = window.innerHeight;
+      const vw = window.innerWidth;
+      const scrollTop = container.scrollTop;
+      
+      // Section 1 is 0vh, Section 2 is 100vh.
+      // To animate as we scroll down into Section 3 (200vh), we watch progress from 1vh to 2vh.
+      const scrollPos = scrollTop - vh;
+      let progress = scrollPos / vh;
+      progress = Math.max(0, Math.min(1, progress));
 
-    updateMetrics();
-    window.addEventListener('resize', updateMetrics);
-    
-    // Also update metrics after a small delay in case lazily loaded components shift layout
-    setTimeout(updateMetrics, 500);
-    setTimeout(updateMetrics, 1500);
+      // Use a gentle Ease-Out curve to prevent high peak-velocities in the middle of the scroll
+      const ease = 1 - (1 - progress) * (1 - progress);
 
-    const onScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          const scrollY = container.scrollTop;
-          
-          // Calculate progress using cached un-transformed metrics
-          const sectionTopRelative = cachedSectionTop - scrollY;
-          const progress = sectionTopRelative / cachedViewportH;
+      const startX = 180; 
+      const startY = 320; 
+      const startRot = 0;
+      
+      const endX = 260 - (vw / 2);
+      const endY = (vh / 2) + 330;
+      const endRot = 16; 
 
-          let tilt = 0;
-          
-          if (progress < 0.7 && progress > 0.3) {
-            tilt = ((0.7 - progress) / 0.4) * 40;
-          } else if (progress <= 0.3 && progress >= -0.4) {
-            tilt = 40;
-          } else if (progress < -0.4 && progress > -0.5) {
-            // Rapidly fade out tightly between 40% and 50% scrolled out
-            tilt = ((progress + 0.5) / 0.1) * 40;
-          }
-          tilt = Math.max(0, Math.min(40, tilt));
+      // These are the scroll-target coordinates
+      const targetX = startX + (endX - startX) * ease;
+      const targetY = startY + (endY - startY) * ease;
+      const targetRot = startRot + (endRot - startRot) * ease;
 
-          // 1. Perspective camera vanishing point locked to viewport center
-          const centerY = scrollY + (cachedViewportH / 2);
-          perspectiveEl.style.perspectiveOrigin = `50% ${centerY}px`;
+      // High lerp = snaps to target quickly = feels heavy/grounded (no long coast after scroll stops)
+      const p = ipadPhysicsRef.current;
+      p.x += (targetX - p.x) * 0.1;
+      p.y += (targetY - p.y) * 0.1;
+      p.rot += (targetRot - p.rot) * 0.1;
 
-          // 2. Physical 3D pivot fixed geometrically to avoid spatial leaping
-          const pivotY = cachedSectionTop + (cachedSectionH / 2);
-          tiltEl.style.transformOrigin = `50% ${pivotY}px`;
-          tiltEl.style.transform = `rotateX(${tilt}deg)`;
-
-          // 3. Counter-rotate the model slider so it sits completely flat to the screen!
-          projectsSection.style.transform = `rotateX(${-tilt}deg) translateZ(400px) scale(0.77)`;
-          projectsSection.style.transformStyle = 'preserve-3d';
-          projectsSection.style.transformOrigin = '50% 50%';
-
-          // 4. Only show the models when fully tilted
-          const modelOpacity = tilt >= 39.5 ? 1 : 0;
-          projectsSection.style.opacity = modelOpacity;
-
-          // 5. Mount ModelSlider for the first time only when fully tilted
-          // Once mounted keep it alive — never unmount (avoids WebGL reload cost)
-          if (tilt >= 39.5 && !sliderMountedRef.current) {
-            sliderMountedRef.current = true;
-            setSliderMounted(true);
-          }
-          
-          ticking = false;
-        });
-        ticking = true;
+      el.style.transform = `translate3d(${p.x}px, ${p.y}px, 0) rotate(${p.rot}deg)`;
+      
+      // Keep physics ticking until momentum completely stops
+      if (Math.abs(p.x - targetX) > 0.5 || Math.abs(p.y - targetY) > 0.5 || Math.abs(p.rot - targetRot) > 0.1) {
+        requestAnimationFrame(updateIpad);
+      } else {
+        ticking = false;
       }
     };
-    
-    container.addEventListener('scroll', onScroll, { passive: true });
-    onScroll();
+
+    const handleScroll = () => {
+      // Always re-awaken the physics loop on scroll if it settled
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(updateIpad);
+      }
+    };
+
+    container.addEventListener('scroll', handleScroll, { passive: true });
+    window.addEventListener('resize', handleScroll);
+    updateIpad(); // initial position
 
     return () => {
-      window.removeEventListener('resize', updateMetrics);
-      container.removeEventListener('scroll', onScroll);
+      container.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleScroll);
     };
   }, []);
 
   useEffect(() => {
-    let fadeTimeout;
+    let fadeTimeout1;
+    let fadeTimeout2;
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          clearTimeout(fadeTimeout);
-          fadeTimeout = setTimeout(() => setShowArrowScroll(true), 800);
-        } else {
-          clearTimeout(fadeTimeout);
-          setShowArrowScroll(false);
-        }
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.target === introRef.current) {
+            if (entry.isIntersecting) {
+              clearTimeout(fadeTimeout1);
+              fadeTimeout1 = setTimeout(() => setShowArrowScroll(true), 800);
+            } else {
+              clearTimeout(fadeTimeout1);
+              setShowArrowScroll(false);
+            }
+          } else if (entry.target === sliderSectionRef.current) {
+            if (entry.isIntersecting) {
+              clearTimeout(fadeTimeout2);
+              fadeTimeout2 = setTimeout(() => setShowSliderArrow(true), 800);
+            } else {
+              clearTimeout(fadeTimeout2);
+              setShowSliderArrow(false);
+            }
+          }
+        });
       },
       { threshold: 0.1 }
     );
@@ -129,17 +126,229 @@ export default function Home2() {
     if (introRef.current) {
       observer.observe(introRef.current);
     }
+    if (sliderSectionRef.current) {
+      observer.observe(sliderSectionRef.current);
+    }
 
-    fadeTimeout = setTimeout(() => setShowArrowScroll(true), 1500);
+    fadeTimeout1 = setTimeout(() => setShowArrowScroll(true), 1500);
 
     return () => {
       observer.disconnect();
-      clearTimeout(fadeTimeout);
+      clearTimeout(fadeTimeout1);
+      clearTimeout(fadeTimeout2);
     };
   }, []);
 
+  // ── Scroll-hijack via overflow lock ──────────────────────────────────────────
+  // Strategy: when the slider section snaps into view, lock the container's
+  // overflow-y to 'hidden' so the browser CANNOT snap to the next section.
+  // We then drive the slider ourselves via window wheel/touch events.
+  // Once all models are shown (or we go back past model 0), unlock the container.
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    let lockTimeout;
+
+    const lockScroll = () => {
+      // Do NOT instantly change overflowY, because altering overflow violently aborts
+      // any native CSS 'snap-mandatory' smooth easing currently in progress. 
+      // We wait for the snap to finish math-perfectly using a scroll debounce later.
+    };
+    const unlockScroll = () => {
+      container.style.overflowY = 'auto';
+    };
+
+    const handleScrollSettle = () => {
+      clearTimeout(lockTimeout);
+      lockTimeout = setTimeout(() => {
+        if (isLocked) {
+          container.style.overflowY = 'hidden';
+          // Now perfectly snapped & physically cemented.
+        }
+      }, 150);
+    };
+    container.addEventListener('scroll', handleScrollSettle, { passive: true });
+
+    let isLocked = false;
+    let cooldown = false;
+    let accumulatedDelta = 0;
+    let wheelTimeout;
+    let touchStartY = 0;
+    let touchStartX = 0;
+    
+    let horizontalCooldown = false;
+    let horizontalTimeout;
+
+    const observerOptions = { root: container, threshold: 0.90 };
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && !isLocked) {
+          isLocked = true;
+          lockScroll();
+          
+          // CRUCIAL: Add a strict cooldown to absorb residual trackpad momentum 
+          // when sliding into the section natively, so they don't accidentally skip a model!
+          accumulatedDelta = 0;
+          cooldown = true;
+          setTimeout(() => { cooldown = false; }, 800);
+        }
+      });
+    }, observerOptions);
+
+    if (sliderSectionRef.current) {
+      observer.observe(sliderSectionRef.current);
+    }
+
+    const onWheel = (e) => {
+      if (!isLocked) return;
+      
+      // Ignore primarily horizontal scrolling and lock out vertical switching temporarily
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY) && Math.abs(e.deltaX) > 5) {
+        horizontalCooldown = true;
+        clearTimeout(horizontalTimeout);
+        horizontalTimeout = setTimeout(() => { horizontalCooldown = false; }, 300);
+        accumulatedDelta = 0;
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        return;
+      }
+
+      if (horizontalCooldown) return;
+
+      e.preventDefault(); // Stop native scroll bounce
+      const api = sliderApiRef.current;
+      if (!api) return;
+
+      if (cooldown) return;
+
+      accumulatedDelta += e.deltaY;
+      clearTimeout(wheelTimeout);
+      wheelTimeout = setTimeout(() => { accumulatedDelta = 0; }, 100);
+
+      // Require a very deliberate, heavy trackpad swipe to switch
+      if (Math.abs(accumulatedDelta) < 150) return;
+
+      const goingDown = accumulatedDelta > 0;
+      accumulatedDelta = 0;
+
+      const activeIdx = api.getActiveIndex();
+      const total = api.totalSlides;
+
+      if (goingDown) {
+        if (activeIdx >= total - 1) {
+          isLocked = false;
+          unlockScroll();
+          
+          // Double-rAF: wait for browser to fully re-enable overflow & repaint layout,
+          // then nudge just enough for CSS scroll-snap to take over smoothly.
+          requestAnimationFrame(() => requestAnimationFrame(() => {
+            container.scrollBy({ top: window.innerHeight * 0.15, behavior: 'smooth' });
+          }));
+          return;
+        }
+        cooldown = true;
+        setTimeout(() => { cooldown = false; }, 500);
+        api.goNext();
+      } else {
+        if (activeIdx <= 0) {
+          isLocked = false;
+          unlockScroll();
+
+          // Double-rAF: wait for browser to fully re-enable overflow & repaint layout,
+          // then nudge just enough for CSS scroll-snap to take over smoothly.
+          requestAnimationFrame(() => requestAnimationFrame(() => {
+            container.scrollBy({ top: -window.innerHeight * 0.15, behavior: 'smooth' });
+          }));
+          return;
+        }
+        cooldown = true;
+        setTimeout(() => { cooldown = false; }, 500);
+        api.goPrev();
+      }
+    };
+
+    // ── Touch support on window ──
+    const onTouchStart = (e) => { 
+      touchStartY = e.touches[0].clientY; 
+      touchStartX = e.touches[0].clientX;
+    };
+    const onTouchMove = (e) => {
+      if (!isLocked) return;
+
+      const dx = touchStartX - e.touches[0].clientX;
+      const dy = touchStartY - e.touches[0].clientY;
+      
+      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 10) {
+        horizontalCooldown = true;
+        clearTimeout(horizontalTimeout);
+        horizontalTimeout = setTimeout(() => { horizontalCooldown = false; }, 300);
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        return;
+      }
+
+      if (horizontalCooldown) return;
+
+      e.preventDefault(); // Stop native scroll panning
+      const api = sliderApiRef.current;
+      if (!api) return;
+
+      if (Math.abs(dy) < 50) return; // require stronger swipe
+
+      const goingDown = dy > 0;
+      const activeIdx = api.getActiveIndex();
+      const total = api.totalSlides;
+
+      if (goingDown) {
+        if (activeIdx >= total - 1) {
+          isLocked = false; 
+          unlockScroll(); 
+          requestAnimationFrame(() => requestAnimationFrame(() => {
+            container.scrollBy({ top: window.innerHeight * 0.15, behavior: 'smooth' });
+          }));
+          return; 
+        }
+        if (cooldown) return;
+        cooldown = true;
+        touchStartY = e.touches[0].clientY;
+        setTimeout(() => { cooldown = false; }, 500);
+        api.goNext();
+      } else {
+        if (activeIdx <= 0) { 
+          isLocked = false; 
+          unlockScroll(); 
+          requestAnimationFrame(() => requestAnimationFrame(() => {
+            container.scrollBy({ top: -window.innerHeight * 0.15, behavior: 'smooth' });
+          }));
+          return; 
+        }
+        if (cooldown) return;
+        cooldown = true;
+        touchStartY = e.touches[0].clientY;
+        setTimeout(() => { cooldown = false; }, 500);
+        api.goPrev();
+      }
+    };
+
+    window.addEventListener('wheel', onWheel, { passive: false, capture: true });
+    window.addEventListener('touchstart', onTouchStart, { passive: false, capture: true });
+    window.addEventListener('touchmove', onTouchMove, { passive: false, capture: true });
+
+    return () => {
+      observer.disconnect();
+      unlockScroll();
+      window.removeEventListener('wheel', onWheel, { capture: true });
+      window.removeEventListener('touchstart', onTouchStart, { capture: true });
+      window.removeEventListener('touchmove', onTouchMove, { capture: true });
+      container.removeEventListener('scroll', handleScrollSettle);
+      clearTimeout(lockTimeout);
+    };
+  }, []);
+
+
   return (
-    <div ref={scrollContainerRef} className="w-full relative h-screen overflow-y-auto overflow-x-hidden bg-[#0E4735]">
+    <div ref={scrollContainerRef} className="w-full relative h-screen overflow-y-auto overflow-x-hidden bg-[#003B42] snap-y snap-mandatory">
       <style>
         {`
           /* Peeling Curled Sticker Effect - Static */
@@ -215,31 +424,20 @@ export default function Home2() {
           <feDisplacementMap in="SourceGraphic" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="G" />
         </filter>
       </svg>
-      <div 
-        ref={perspectiveRef}
+      <div
         className="relative w-full min-h-max"
         style={{
-          perspective: '1800px',
-          perspectiveOrigin: '50% 50%',
+          backgroundColor: '#003B42',
+          overflow: 'visible',
         }}
       >
-        <div
-          ref={tiltWrapperRef}
-          style={{
-            transformStyle: 'preserve-3d',
-            transform: 'rotateX(0deg)',
-            willChange: 'transform',
-            transition: 'transform 80ms linear',
-          }}
-        >
-        <CuttingMatLayer />
         <WorkshopGrunge />
         <DigitalCaliper containerRef={scrollContainerRef} />
-        
+
         {/* Intro Section */}
         <section
           ref={introRef}
-          className="relative w-full h-screen flex justify-center items-center flex-col pb-[5vh]"
+          className="snap-section relative w-full h-screen flex justify-center items-center flex-col snap-start snap-always shrink-0"
         >
           <div className="relative flex flex-col z-0 items-center">
             <NameTag scrollRootRef={scrollContainerRef} />
@@ -255,28 +453,24 @@ export default function Home2() {
         </section>
 
         {/* About Section */}
-        <section className="relative w-full min-h-screen flex items-center justify-center px-6 md:px-24 py-16 md:py-20 z-10 block">
-          <div className="grid grid-cols-1 md:grid-cols-2 w-full max-w-7xl items-center gap-12">
+        <section className="snap-section relative w-full h-screen flex items-center justify-center px-6 md:px-24 py-4 z-10 block snap-start snap-always shrink-0">
+          <div ref={ipadWrapperRef} className="absolute bottom-0 right-0 z-0 pointer-events-none" style={{ transform: 'translate3d(180px, 320px, 0)', willChange: 'transform' }}>
+            <IPadKicad scrollRootRef={scrollContainerRef} />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 w-full max-w-7xl items-center gap-0 md:gap-1">
             <div className="flex flex-col gap-8 md:gap-10">
-              <h2 className="text-[68px] md:text-[130px] lg:text-[160px] font-orbitron font-extrabold leading-[0.8] text-white uppercase tracking-tighter">
-                WHO
-                <br />
-                <span className="text-[#000724] text-[75px] md:text-[145px] lg:text-[185px]">
-                  AM I ?
-                </span>
-              </h2>
-              <div 
+              <div
                 className="curled-sticker relative w-full max-w-xs md:max-w-sm aspect-[3/4]"
                 style={{ transform: 'rotate(2deg)' }}
               >
                 {/* Tape Piece */}
                 <div className="tape-piece" />
-                
-                <div className="fabric-texture w-full h-full overflow-hidden" 
-                     style={{ 
-                       borderRadius: '4px',
-                       filter: 'url(#fabric-warp)'
-                     }}>
+
+                <div className="fabric-texture w-full h-full overflow-hidden"
+                  style={{
+                    borderRadius: '4px',
+                    filter: 'url(#fabric-warp)'
+                  }}>
                   <img
                     src={profileImg}
                     alt="Mahir Tajwar Chowdhury"
@@ -288,7 +482,10 @@ export default function Home2() {
                 </div>
               </div>
             </div>
-            <div className="flex flex-col items-end text-right self-center space-y-6">
+            <div className="flex flex-col items-start text-left self-center space-y-6 -ml-20 md:-ml-28 lg:-ml-36">
+              <h2 className="font-orbitron text-4xl md:text-5xl lg:text-6xl font-black text-white uppercase tracking-tighter leading-[1.1] transition-colors relative z-0">
+                WHO <span className="text-[#e1ff51]">AM I ?</span>
+              </h2>
               <div className="max-w-md md:max-w-lg lg:max-w-xl">
                 <span className="block text-white text-base md:text-lg lg:text-xl font-geist font-medium uppercase tracking-[0.2em] leading-tight">
                   ELECTRICAL ENGINEERING STUDENT WITH A FOCUS ON ROBOTICS, CURRENTLY PURSUING MY BACHELOR’S DEGREE AT <span style={{ color: '#FF671F' }}>ROCHESTER&nbsp;INSTITUTE&nbsp;OF&nbsp;TECHNOLOGY</span>
@@ -296,8 +493,8 @@ export default function Home2() {
                 <span className="block text-white/40 text-[11px] md:text-xs lg:text-sm font-geist font-light uppercase tracking-widest leading-relaxed mt-4">
                   WITH A CREATIVE APPROACH AND A PASSION FOR ROBOTICS, I BUILD CIRCUITS, AUTONOMOUS ROBOTS, UAVS, DRONES, AND WORK ON PASSION PROJECTS THAT TURN ENGINEERING IDEAS INTO REAL WORKING SYSTEMS.
                 </span>
-                <div className="mt-12 flex flex-col items-end">
-                  <span className="text-[#000724] text-2xl md:text-3xl font-orbitron font-bold">
+                <div className="mt-12 flex flex-col items-start">
+                  <span className="text-[#e1ff51] text-2xl md:text-3xl font-orbitron font-bold">
                     (01)
                   </span>
                 </div>
@@ -306,63 +503,78 @@ export default function Home2() {
           </div>
         </section>
 
-        {/* Text etched onto the 3D mat (tilts with the environment) */}
-        <div className="relative w-full z-10 pointer-events-none mt-40 -mb-20">
-          <div className="relative top-20 left-[12.25%] flex items-end inline-block">
-            {/* Visual Layer (Behind Models) */}
-            <div className="z-0 flex items-end pointer-events-none">
-              <h2 className="font-orbitron text-3xl md:text-5xl font-black text-white uppercase tracking-tighter leading-none transition-colors">
-                Kind of <span className="text-[#a600ff]">projects</span> <br />
-                i worked on
-              </h2>
-              <div className="-ml-28 mb-[5px]">
-                <span className="font-geist text-[13px] md:text-sm opacity-50 lowercase tracking-[0.2em] font-light underline underline-offset-4 text-white">
-                  learn more &rarr;
-                </span>
-              </div>
+        {/* ── iPad + Bio Section ───────────────────────────────────────────── */}
+        <section className="snap-section relative w-full h-screen z-0 snap-start snap-always shrink-0 overflow-hidden">
+          {/* Text content pinned to the right */}
+          <div className="absolute right-4 md:right-8 lg:right-16 top-[40%] flex flex-col gap-8 max-w-md lg:max-w-lg z-10">
+
+            {/* Bio body — three-tier opacity exactly from About page */}
+            <div className="space-y-5 border-t border-white/10 pt-6">
+              <span className="block font-geist text-white text-base md:text-lg lg:text-xl font-medium uppercase tracking-[0.2em] leading-tight">
+                I am a multidisciplinary roboticist and engineer. My work focuses on the intersection of hardware logic and autonomous systems.
+              </span>
+              <span className="block font-geist text-white/50 text-[11px] md:text-xs lg:text-sm font-light uppercase tracking-widest leading-relaxed">
+                As an International Robot Olympiad (IRO) Gold Medalist, I am dedicated to perfecting autonomous interactions. My background from Mirzapur Cadet College has shaped my precision-driven approach to engineering.
+              </span>
+              <span className="block font-geist text-white/30 text-[11px] md:text-xs lg:text-sm font-light uppercase tracking-widest leading-relaxed">
+                With a relentless focus on the future, I aim to continue developing robotic solutions that redefine how we interact with autonomous machines.
+              </span>
             </div>
 
-            {/* Interaction Layer (Invisible on top of Models) */}
-            <div className="absolute inset-0 z-[2000] pointer-events-none flex items-end">
-              <div className="invisible font-orbitron text-3xl md:text-5xl font-black uppercase tracking-tighter leading-none">
-                Kind of projects <br />
-                i worked on
-              </div>
-              <Link to="/projects" className="cursor-target inline-block -ml-28 mb-[5px] pointer-events-auto opacity-0">
-                <span className="font-geist text-[13px] md:text-sm lowercase tracking-[0.2em] font-light underline underline-offset-4">
-                  learn more &rarr;
-                </span>
-              </Link>
+            {/* Section counter — same as Who Am I */}
+            <div className="flex flex-col items-start">
+              <span className="text-[#e1ff51] text-2xl md:text-3xl font-orbitron font-bold">(02)</span>
             </div>
           </div>
-        </div>
-
-        {/* ── SECTION 02 ── (Model Slider counter-rotates and floats completely flat) */}
-        <section ref={projectsSectionRef} className="relative z-10 w-full min-h-screen" style={{ opacity: 0, transition: 'opacity 0.3s ease' }}>
-          {sliderMounted && (
-            <Suspense fallback={<div style={{ height: '600px' }} />}>
-              <ModelSlider />
-            </Suspense>
-          )}
         </section>
 
-      {/* ── SECTION 03 ── */}
-      <section className="relative w-full min-h-screen z-10" />
+        {/* ── Model Slider ────────────────────────────────────────────────── */}
+        <section ref={sliderSectionRef} className="snap-section relative z-10 w-full h-screen snap-start snap-always shrink-0 flex flex-col items-center justify-center px-6 md:px-24 pb-12 md:pb-20">
 
-      {/* ── SECTION 04 ── */}
-      <section className="relative w-full min-h-screen z-10" />
+          <div className="flex flex-col items-start text-left mb-1 md:mb-2 w-full max-w-7xl pt-20 md:pt-28">
+            <h2 className="font-orbitron text-4xl md:text-5xl lg:text-6xl font-black text-white uppercase tracking-tighter leading-[1.1] transition-colors relative z-0">
+              Kind of <span className="text-[#e1ff51]">projects</span> <br />
+              i worked on
+            </h2>
+            <Link to="/projects" className="inline-block mt-6 font-geist text-[13px] md:text-sm lowercase tracking-[0.2em] text-[#e1ff51] opacity-70 hover:opacity-100 font-light underline underline-offset-8 transition-opacity cursor-target relative z-20">
+              explore work &rarr;
+            </Link>
+          </div>
 
-      {/* ── SECTION 05 ── */}
-      <section className="relative w-full min-h-screen z-10" />
+          <div className="w-full relative z-10 flex justify-center items-center -mt-48">
+            <Suspense fallback={<div style={{ height: '600px' }} />}>
+              <ModelSlider ref={sliderApiRef} />
+            </Suspense>
+          </div>
 
-      {/* ── SECTION 06 ── */}
-      <section
-        ref={canvasSectionRef}
-        className="relative w-full min-h-screen z-10"
-      />
+          <img
+            src={scrollDown}
+            alt="scroll down"
+            loading="lazy"
+            decoding="async"
+            className="absolute bottom-8 left-1/2 -translate-x-1/2 w-20 pointer-events-none transition-opacity duration-700"
+            style={{ opacity: showSliderArrow ? 0.3 : 0 }}
+          />
+
+        </section>
+
+        {/* ── SECTION 03 ── */}
+        <section className="snap-section relative w-full h-screen z-10 flex items-center justify-center snap-start snap-always shrink-0" />
+
+        {/* ── SECTION 04 ── */}
+        <section className="snap-section relative w-full h-screen z-10 flex items-center justify-center snap-start snap-always shrink-0" />
+
+        {/* ── SECTION 05 ── */}
+        <section className="snap-section relative w-full h-screen z-10 flex items-center justify-center snap-start snap-always shrink-0" />
+
+        {/* ── SECTION 06 ── */}
+        <section
+          ref={canvasSectionRef}
+          className="relative w-full h-screen z-10 flex items-center justify-center snap-start snap-always shrink-0"
+        />
 
         {/* Footer Section */}
-        <footer className="relative w-full z-20 overflow-hidden" style={{ background: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.02) 4%, rgba(0,0,0,0.06) 8%, rgba(0,0,0,0.12) 13%, rgba(0,0,0,0.2) 19%, rgba(0,0,0,0.28) 25%, rgba(0,0,0,0.38) 32%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0.62) 48%, rgba(0,0,0,0.73) 56%, rgba(0,0,0,0.83) 64%, rgba(0,0,0,0.91) 72%, rgba(0,0,0,0.97) 80%, #000 88%)' }}>
+        <footer className="relative w-full z-20 overflow-hidden snap-end shrink-0" style={{ background: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.02) 4%, rgba(0,0,0,0.06) 8%, rgba(0,0,0,0.12) 13%, rgba(0,0,0,0.2) 19%, rgba(0,0,0,0.28) 25%, rgba(0,0,0,0.38) 32%, rgba(0,0,0,0.5) 40%, rgba(0,0,0,0.62) 48%, rgba(0,0,0,0.73) 56%, rgba(0,0,0,0.83) 64%, rgba(0,0,0,0.91) 72%, rgba(0,0,0,0.97) 80%, #000 88%)' }}>
           <div className="flex items-stretch min-h-[280px] md:min-h-[700px]">
             {/* Giant TX• Monogram - only bottom-clipped by parent overflow-hidden */}
             <div className="relative flex-shrink-0 w-[300px] md:w-[500px] select-none pointer-events-none">
@@ -416,7 +628,6 @@ export default function Home2() {
             </div>
           </div>
         </footer>
-        </div>{/* Close preserve-3d wrapper */}
       </div>
     </div>
   );

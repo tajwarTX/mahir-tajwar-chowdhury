@@ -341,7 +341,7 @@ export default function Home() {
             <h2 className="text-[68px] md:text-[130px] lg:text-[160px] font-orbitron font-extrabold leading-[0.8] text-white uppercase tracking-tighter">
               WHO
               <br />
-              <span className="text-[#a600ff] text-[75px] md:text-[145px] lg:text-[185px]">
+              <span className="text-[#e1ff51] text-[75px] md:text-[145px] lg:text-[185px]">
                 AM I ?
               </span>
             </h2>
@@ -356,7 +356,7 @@ export default function Home() {
                 WITH A CREATIVE APPROACH AND A PASSION FOR ROBOTICS, I BUILD CIRCUITS, AUTONOMOUS ROBOTS , UAVS, DRONES, AND WORK ON PASSION PROJECTS THAT TURN ENGINEERING IDEAS INTO REAL WORKING SYSTEMS.
               </span>
               <div className="mt-12 flex flex-col items-end">
-                <span className="text-[#a600ff] text-2xl md:text-3xl font-orbitron font-bold">
+                <span className="text-[#e1ff51] text-2xl md:text-3xl font-orbitron font-bold">
                   (01)
                 </span>
               </div>
@@ -374,7 +374,7 @@ export default function Home() {
             <h3 className="text-white text-3xl md:text-5xl font-orbitron font-black uppercase tracking-tighter leading-none border-none outline-none">
               EXPLORE
               <br />
-              <span className="text-[#a600ff]">
+              <span className="text-[#e1ff51]">
                 MY WORLD
               </span>
             </h3>

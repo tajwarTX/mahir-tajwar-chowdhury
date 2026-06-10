@@ -83,7 +83,7 @@ body {
 .annotation-stem {
   width: 2px;
   height: 40px;
-  background: linear-gradient(to bottom, #a600ff, rgba(166, 0, 255, 0.2));
+  background: linear-gradient(to bottom, #e1ff51, rgba(166, 0, 255, 0.2));
   position: relative;
   z-index: 2;
   margin-top: -2px;
@@ -95,7 +95,7 @@ body {
   height: 8px;
   background: white;
   border-radius: 50%;
-  box-shadow: 0 0 10px #a600ff;
+  box-shadow: 0 0 10px #e1ff51;
   position: relative;
   z-index: 4;
   opacity: 0.8;
@@ -115,12 +115,12 @@ body {
 
 .annotation-marker-wrapper:hover .annotation-stem {
   height: 45px;
-  background: linear-gradient(to bottom, #a600ff, rgba(166, 0, 255, 0.4));
+  background: linear-gradient(to bottom, #e1ff51, rgba(166, 0, 255, 0.4));
 }
 
 .annotation-marker-wrapper:hover .annotation-anchor {
   opacity: 1;
-  box-shadow: 0 0 15px #a600ff;
+  box-shadow: 0 0 15px #e1ff51;
 }
 
 .annotation-pulse-ring {
@@ -215,7 +215,7 @@ body {
   font-family: "Orbitron", sans-serif;
   font-size: 15px;
   font-weight: 700;
-  color: #a600ff;
+  color: #e1ff51;
   width: 40px; 
   height: 40px; 
   display: flex;
@@ -279,7 +279,7 @@ body {
   font-family: "Orbitron", sans-serif;
   font-size: 11px;
   font-weight: 700;
-  color: #a600ff;
+  color: #e1ff51;
   background: rgba(166, 0, 255, 0.12);
   padding: 4px 12px;
   border-radius: 20px;

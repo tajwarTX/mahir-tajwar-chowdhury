@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useState, memo } from 'react';
-import { motion } from 'framer-motion';
+import React, { useEffect, useRef, useState, memo, Suspense, forwardRef, useImperativeHandle } from 'react';
+import { motion, useInView } from 'framer-motion';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { useGLTF, useAnimations, Environment, Bounds, Center } from '@react-three/drei';
+import { useGLTF, useAnimations, Environment, Bounds, Center, Preload } from '@react-three/drei';
 import Core from 'smooothy';
 import { gsap } from 'gsap';
 
@@ -17,8 +17,8 @@ const BAKED_OFFSET = 36;
 const DEBUG = false;
 
 const SLIDES_DATA = [
-  { index: '0000', title: 'Robotic Arm', path: armModel, margin: 1, centerScale: 0.9428, edgeScale: 0.0149, position: [0, -1.5, 0], rotation: [0.5, -0.03, -0.15], edgePos: [0, -8.6, 0], edgeRot: [0.03, -3.052, 0.66], baseRotation: [0, -2.07, 0] },
   { index: '0001', title: 'FPV Racing Drone', path: droneModel, margin: 1, centerScale: 1.0899, edgeScale: 0, position: [0, 0.05, 0], rotation: [0.38, -0.49, 0], edgePos: [0, 0.1, 0], edgeRot: [0.3, 1.47, 0], baseRotation: [0, 0, 0] },
+  { index: '0000', title: 'Robotic Arm', path: armModel, margin: 1, centerScale: 0.9428, edgeScale: 0.0149, position: [0, -1.5, 0], rotation: [0.5, -0.03, -0.15], edgePos: [0, -8.6, 0], edgeRot: [0.03, -3.052, 0.66], baseRotation: [0, -2.07, 0] },
   { index: '0002', title: 'Autonomous Robot', path: autoRobotModel, margin: 1, centerScale: 0.9467, edgeScale: 0, position: [1.75, 3.80, 3.20], rotation: [0.140, 0.510, 0.120], edgePos: [-15.00, -15.00, 1.50], edgeRot: [1.910, 3.680, -2.470], baseRotation: [-0.5, -0.27, -0.16] },
   { index: '0003', title: 'Amateur Rocketry', path: rocketModel, margin: 1, centerScale: 0.9821, edgeScale: 0.0207, position: [0, 0, 0], rotation: [0, 0, -0.56], edgePos: [0, 0, 0], edgeRot: [-0.05, 1.81, 2.05], baseRotation: [-1.57, -0.01, 1.38] },
   { index: '0004', title: 'Line Following Robot', path: lineFollowerModel, margin: 1, centerScale: 0.85, edgeScale: 0, position: [0, -0.75, 0], rotation: [0.62, -0.39, 0], edgePos: [1.3, 0, 0], edgeRot: [0.43, 1.43, 0], baseRotation: [0, 0, 0] },
@@ -39,14 +39,14 @@ const getCubic = (p0, p1, p2, p3, f) => {
 };
 
 const WARP_COLORS = [
-  ['#4c1d95', '#a600ff'], // Deep Violet to Bright Purple
+  ['#4c1d95', '#e1ff51'], // Deep Violet to Bright Purple
   ['#581c87', '#d946ef'], // Dark Purple to Fuchsia
   ['#2e1065', '#7c3aed'], // Rich Purple to Lavender
   ['#1e1b4b', '#6d28d9'], // Indigo Purple
 ];
 
 // ─── Velocity-warp background rectangle ───────────────────────────────────────
-function WarpRect({ velocityRef, index, containerRef, titleRef, slideTitle }) {
+function WarpRect({ velocityRef, index, containerRef, titleRef, slideTitle, isHome }) {
   const clipId  = `warp-clip-${index}`;
   const pathRef = useRef(null);
 
@@ -112,8 +112,10 @@ function WarpRect({ velocityRef, index, containerRef, titleRef, slideTitle }) {
         if (titleRef && titleRef.current) {
           const factor = Math.max(0, Math.min(1, dist / 250)); // transition over 250px
           const ease = factor * factor * (3 - 2 * factor); // smoothstep
-          const yOffset = (1 - ease) * 55; // push down 55px
-          const scale = 1 + (1 - ease) * 0.35; // scale up slightly more
+          const yOffBase = isHome ? 130 : 55; // Huge drop for Home2
+          const yOffset = (1 - ease) * yOffBase;
+          const sBase = isHome ? 1.0 : 0.35; // Massive scale for Home2
+          const scale = 1 + (1 - ease) * sBase;
           titleRef.current.style.transform = `translateY(${yOffset}px) scale(${scale})`;
           const bgDiv = titleRef.current.children[0];
           const monoSpan = titleRef.current.children[1];
@@ -322,26 +324,21 @@ function DynamicTransformWrapper({ children, containerRef, centerScale = 0.85, e
     const breathScale = float ? 1 + Math.sin(t * 0.45) * 0.03 : 1;
 
     // Edge float effect (active only at edges)
-    const floatY  = float ? Math.sin(t * 1.1) * 0.6 * factor : 0;
-    const tX  = float ? Math.cos(t * 0.5) * 0.25 * factor : 0;
-    const tZ  = float ? Math.sin(t * 0.6) * 0.25 * factor : 0;
-    const pY  = float ? Math.sin(t * 0.4) * 0.2 * factor : 0;
+    const floatY  = float ? Math.sin(t * 1.1) * 0.25 * factor : 0;
+    const tX  = float ? Math.cos(t * 0.5) * 0.1 * factor : 0;
+    const tZ  = float ? Math.sin(t * 0.6) * 0.1 * factor : 0;
+    const pY  = float ? Math.sin(t * 0.4) * 0.08 * factor : 0;
     
-    // Mouse follow effect — boosted if it's the rocket
-    const mouseMult = isRocket ? 0.6 : 0.12;
-    const mX  = -state.pointer.x * mouseMult * (1 - factor);
-    const mY  = -state.pointer.y * (mouseMult * 0.8) * (1 - factor);
-
     const finalScale = tScale * breathScale;
 
     if (!initialized.current) {
       ref.current.scale.set(finalScale, finalScale, finalScale);
-      ref.current.rotation.set(tRX + tX - mY, tRY + pY + mX, tRZ + tZ);
+      ref.current.rotation.set(tRX + tX, tRY + pY, tRZ + tZ);
       initialized.current = true;
     } else {
       ref.current.scale.lerp({ x: finalScale, y: finalScale, z: finalScale }, 0.1);
-      ref.current.rotation.x += (tRX + tX - mY - ref.current.rotation.x) * 0.1;
-      ref.current.rotation.y += (tRY + pY + mX - ref.current.rotation.y) * 0.1;
+      ref.current.rotation.x += (tRX + tX - ref.current.rotation.x) * 0.1;
+      ref.current.rotation.y += (tRY + pY - ref.current.rotation.y) * 0.1;
       ref.current.rotation.z += (tRZ + tZ - ref.current.rotation.z) * 0.1;
     }
     const tPX = centerPos[0] - factor * (centerPos[0] - edgePos[0]);
@@ -378,21 +375,20 @@ function SlideContent({ slide, containerRef, debugData, robotDebug }) {
     const factorStr = containerRef.current.dataset.factor || "1";
     let factor = parseFloat(factorStr);
 
-    // Spotlight lighting - high contrast, deep blacks
-    if (ambientRef.current) ambientRef.current.intensity = 0.5 - (0.5 - 0.1) * factor;
-    if (directRef.current)  directRef.current.intensity  = 4.5 * (1 - factor);
-
     // Spotlight grayscale filter
     if (canvasDivRef.current) {
-      canvasDivRef.current.style.filter = `grayscale(${factor})`;
+      canvasDivRef.current.style.filter = `grayscale(${factor * 0.5})`;
       canvasDivRef.current.style.opacity = 1 - (factor * 0.3);
     }
   });
 
   return (
     <>
-      <ambientLight ref={ambientRef} intensity={0.5} />
-      <directionalLight ref={directRef} position={[3,5,3]} intensity={4.5} />
+      {/* Removed Environment map to instantly kill gloss.
+          Using a very strong ambient light to flood the model evenly,
+          resulting in a flat, bright, matte aesthetic. */}
+      <ambientLight intensity={3.5} />
+      <directionalLight position={[5, 10, 5]} intensity={1.5} />
       <Bounds fit clip margin={margin}>
         <DynamicTransformWrapper containerRef={containerRef}
           centerScale={cScale} edgeScale={eScale}
@@ -406,15 +402,15 @@ function SlideContent({ slide, containerRef, debugData, robotDebug }) {
           </group>
         </DynamicTransformWrapper>
       </Bounds>
-      <Environment preset="city" />
     </>
   );
 }
 
 // ─── Slide item (memoized to prevent re-renders from debug state) ─────────────
-const SlideItem = memo(function SlideItem({ slide, index, velocityRef, debugData, robotDebug, slideRefs }) {
+const SlideItem = memo(function SlideItem({ slide, index, velocityRef, debugData, robotDebug, slideRefs, isHome }) {
   const containerRef = useRef(null);
   const titleRef = useRef(null);
+  const inView = useInView(containerRef, { margin: "300px" });
 
   useEffect(() => {
     if (containerRef.current && slideRefs) {
@@ -430,10 +426,6 @@ const SlideItem = memo(function SlideItem({ slide, index, velocityRef, debugData
       paddingRight: `calc(2rem * ${GLOBAL_SCALE})`,
       display: 'flex', flexDirection: 'column', position: 'relative',
     }}>
-      <div style={{ display:'flex', justifyContent:'space-between', marginBottom:`calc(2rem * ${GLOBAL_SCALE})` }}>
-        <span style={{ fontFamily:'monospace', fontSize:`calc(11px * ${GLOBAL_SCALE})`, color:'rgba(255,255,255,0.4)' }}>--</span>
-        <span style={{ fontFamily:'monospace', fontSize:`calc(11px * ${GLOBAL_SCALE})`, color:'rgba(255,255,255,0.8)' }}>{slide.index}</span>
-      </div>
 
       <div style={{ position:'relative', height:`calc(clamp(350px, 50vw, 550px) * ${GLOBAL_SCALE})`, width:'100%', display:'flex', alignItems:'center', justifyContent:'center', overflow:'visible' }}>
         {/* Background rectangles removed as requested */}
@@ -442,17 +434,21 @@ const SlideItem = memo(function SlideItem({ slide, index, velocityRef, debugData
         <div className="canvas-container will-change-transform" style={{ position:'absolute', top:'-100%', bottom:'-100%', left:'-50%', right:'-50%', zIndex:1, pointerEvents:'none', transform: 'translateZ(0)' }}>
           <Canvas camera={{ position:[0,0,3.5], fov:45 }}
             gl={{ antialias:false, powerPreference:'high-performance', alpha:true, stencil:false, depth:true }}
-            dpr={[1,1]} frameloop="always">
-            <SlideContent slide={slide} containerRef={containerRef} debugData={debugData} robotDebug={robotDebug} />
+            dpr={[1,1]} 
+            frameloop={inView ? "always" : "never"}
+            events={() => ({ enabled: false })}
+          >
+            <Suspense fallback={null}>
+              <SlideContent slide={slide} containerRef={containerRef} debugData={debugData} robotDebug={robotDebug} />
+              <Preload all />
+            </Suspense>
           </Canvas>
         </div>
 
-        {/* Title overlay - sitting on top layer */}
+        {/* Title overlay */}
         <div style={{ position:'absolute', bottom:'calc(2rem * -1.2)', zIndex: 10, width:'100%', textAlign:'center', pointerEvents:'none' }}>
-          <div ref={titleRef} style={{ display:'inline-block', position: 'relative', willChange: 'transform', transformOrigin: 'center center' }}>
-            <div style={{ position:'absolute', top:'50%', left:'50%', transform:'translate(-50%, -50%)', width:'180%', height:'350%', background:'radial-gradient(ellipse at center, rgba(0,0,0,1) 0%, rgba(0,0,0,0.4) 40%, transparent 70%)', opacity: 0, willChange:'opacity' }} />
-            <span style={{ display:'block', position:'relative', fontFamily:'monospace', fontSize:`calc(13px * ${GLOBAL_SCALE})`, color:'rgba(255,255,255,0.3)', textTransform:'uppercase', willChange: 'opacity' }}>"{slide.title}"</span>
-            <span style={{ display:'block', position:'absolute', top:'50%', left:'50%', transform:'translate(-50%, -50%)', fontFamily:'Orbitron, sans-serif', fontSize:`calc(13px * ${GLOBAL_SCALE})`, fontWeight:'400', letterSpacing:'0.1em', color:'#ffffff', textTransform:'uppercase', willChange: 'opacity', whiteSpace: 'nowrap', opacity: 0 }}>{slide.title}</span>
+          <div ref={titleRef} className="slide-title" style={{ display:'inline-block', position: 'relative', willChange: 'transform', transformOrigin: 'center center' }}>
+            <span style={{ display:'block', position:'relative', fontFamily:'monospace', fontSize:`calc(13px * ${GLOBAL_SCALE})`, color:'rgba(255,255,255,0.3)', textTransform:'uppercase', willChange: 'color' }}>"{slide.title}"</span>
           </div>
         </div>
       </div>
@@ -461,7 +457,7 @@ const SlideItem = memo(function SlideItem({ slide, index, velocityRef, debugData
 });
 
 // ─── Root slider ──────────────────────────────────────────────────────────────
-export default function ModelSlider() {
+const ModelSlider = forwardRef(function ModelSlider({ isHome = false }, ref) {
   const wrapperRef   = useRef(null);
   const sliderRef    = useRef(null);
   const velocityRef  = useRef(0);
@@ -495,9 +491,9 @@ export default function ModelSlider() {
   const [debugData, setDebugData] = useState(SLIDES_DATA.map(s => ({
     index: s.index,
     title: s.title,
-    centerScale: s.centerScale || 0.85,
-    edgeScale: s.edgeScale || 0.25,
-    yPos: s.position?.[1] || 0
+    centerScale: s.centerScale ?? 0.85,
+    edgeScale: s.edgeScale ?? 0.25,
+    yPos: s.position?.[1] ?? 0
   })));
 
   const handleDebugChange = (idx, field, val) => {
@@ -517,28 +513,61 @@ export default function ModelSlider() {
   };
 
   const slideRefs = useRef([]);
+  const activeIndexRef = useRef(0);
+  const totalSlides = SLIDES_DATA.length;
+
+  const handlePrev = () => {
+    console.log('[ModelSlider] handlePrev called, sliderRef:', sliderRef.current);
+    if (sliderRef.current) {
+      gsap.to(sliderRef.current, {
+        target: Math.round(sliderRef.current.target) + 1,
+        duration: 0.45,
+        ease: "power2.out",
+        overwrite: "auto"
+      });
+    }
+  };
+
+  const handleNext = () => {
+    console.log('[ModelSlider] handleNext called, sliderRef:', sliderRef.current);
+    if (sliderRef.current) {
+      gsap.to(sliderRef.current, {
+        target: Math.round(sliderRef.current.target) - 1,
+        duration: 0.45,
+        ease: "power2.out",
+        overwrite: "auto"
+      });
+    }
+  };
+
+  // Expose imperative API to parent (Home2)
+  useImperativeHandle(ref, () => ({
+    goNext: () => handleNext(),
+    goPrev: () => handlePrev(),
+    getActiveIndex: () => activeIndexRef.current,
+    totalSlides,
+    resetToFirst: () => {
+      if (sliderRef.current) {
+        gsap.to(sliderRef.current, {
+          target: 0,
+          duration: 0.35,
+          ease: "power2.out",
+          overwrite: "auto"
+        });
+      }
+    },
+  }));
 
   useEffect(() => {
     if (!wrapperRef.current) return;
     const slider = new Core(wrapperRef.current, {
-      infinite: true, snap: false,
-      dragSensitivity: 0.003, lerpFactor: 0.02, scrollInput: false,
+      infinite: true, snap: true,
+      dragSensitivity: 0, wheelMultiplier: 0, touchMultiplier: 0, lerpFactor: 0.02, scrollInput: false,
     });
     sliderRef.current = slider;
 
-    // Explicitly block wheel and touch-scroll events from affecting the slider
-    const blockScroll = (e) => {
-      // We don't preventDefault so the page can still scroll vertically if needed,
-      // but we stop propagation to ensure the slider's internal listeners (if any) don't trigger.
-      e.stopPropagation();
-    };
-    
-    const el = wrapperRef.current;
-    el.addEventListener('wheel', blockScroll, { passive: true, capture: true });
-    el.addEventListener('touchmove', blockScroll, { passive: true, capture: true });
-
-    slider.target = -1;
-    slider.current = -1;
+    slider.target = 0;
+    slider.current = 0;
     
     let lastCurrent = -1;
 
@@ -552,10 +581,13 @@ export default function ModelSlider() {
       lastCurrent = slider.current;
       velocityRef.current = diff * -1800; // Tuned for dramatic warp during GSAP travel
 
-
       // READ PHASE: get all rects at once
       const rects = slideRefs.current.map(el => el ? el.getBoundingClientRect() : null);
       const screenCenterX = window.innerWidth / 2;
+
+      // Track which slide is closest to center
+      let closestIndex = 0;
+      let closestDist = Infinity;
 
       // WRITE PHASE: write data attributes and styles at once to avoid layout thrashing
       rects.forEach((rect, i) => {
@@ -565,6 +597,11 @@ export default function ModelSlider() {
         const elementCenterX = rect.left + rect.width / 2;
         const dist = Math.abs(screenCenterX - elementCenterX);
         const relX = (elementCenterX - screenCenterX) / screenCenterX;
+
+        if (dist < closestDist) {
+          closestDist = dist;
+          closestIndex = i;
+        }
         
         let factor = Math.min(dist / (window.innerWidth / (1.5 * GLOBAL_SCALE)), 1);
         if (factor < 0.05) factor = 0;
@@ -578,9 +615,27 @@ export default function ModelSlider() {
         // Also do the direct style writes here
         el.style.zIndex = Math.round(1000 - dist);
         
-        // Optional: you can move canvas grayscale here if canvasDiv is easy to find,
-        // but SlideContent can just read dataset.factor in useFrame without reflows.
+        // Title Animation (Scale and Y-Offset)
+        const titleEl = el.querySelector('.slide-title');
+        if (titleEl) {
+          const tFactor = Math.max(0, Math.min(1, dist / 250));
+          const ease = tFactor * tFactor * (3 - 2 * tFactor);
+          const yOffBase = isHome ? 65 : 55;
+          const yOffset = (1 - ease) * yOffBase;
+          const sBase = isHome ? 1.4 : 0.35;
+          const scale = 1 + (1 - ease) * sBase;
+          titleEl.style.transform = `translateY(${yOffset}px) scale(${scale})`;
+          
+          const monoSpan = titleEl.children[0];
+          if (monoSpan) {
+            const currentOpacity = 1.0 - ease * 0.7;
+            monoSpan.style.color = `rgba(255,255,255,${currentOpacity})`;
+          }
+        }
+
       });
+
+      activeIndexRef.current = closestIndex;
 
       requestAnimationFrame(loop);
     };
@@ -601,7 +656,7 @@ export default function ModelSlider() {
     };
   }, []);
 
-  const handlePrev = () => {
+  const handlePrevOLD = () => {
     if (sliderRef.current) {
       gsap.to(sliderRef.current, {
         target: Math.round(sliderRef.current.target) + 1,
@@ -612,7 +667,7 @@ export default function ModelSlider() {
     }
   };
 
-  const handleNext = () => {
+  const handleNextOLD = () => {
     if (sliderRef.current) {
       gsap.to(sliderRef.current, {
         target: Math.round(sliderRef.current.target) - 1,
@@ -706,9 +761,9 @@ export default function ModelSlider() {
       `}</style>
 
       <div ref={wrapperRef} data-slider
-        style={{ display:'flex', gap:0, margin:0, paddingLeft:`${BAKED_OFFSET}%`, cursor: 'none', pointerEvents: 'none' }}>
+        style={{ display:'flex', gap:0, margin:0, paddingLeft: `calc(50% - (clamp(320px, 45vw, 550px) * ${GLOBAL_SCALE}) / 2)`, cursor: 'none', pointerEvents: 'none' }}>
         {SLIDES_DATA.map((slide, i) => (
-          <SlideItem key={slide.index} slide={slide} index={i} velocityRef={velocityRef} debugData={debugData[i]} robotDebug={robotDebug} slideRefs={slideRefs} />
+          <SlideItem key={slide.index} slide={slide} index={i} velocityRef={velocityRef} debugData={debugData[i]} robotDebug={robotDebug} slideRefs={slideRefs} isHome={isHome} />
         ))}
       </div>
 
@@ -718,25 +773,9 @@ export default function ModelSlider() {
         ))}
       </div>
 
-      {/* Navigation Buttons (Under Slider) */}
-      <div className="absolute bottom-4 left-0 right-0 flex justify-center items-center gap-[220px] md:gap-[320px] z-[9999] pointer-events-auto">
-        <button
-          onPointerDown={(e) => e.stopPropagation()}
-          onClick={(e) => { e.stopPropagation(); handlePrev(); }}
-          className="group/nav-l w-10 h-10 md:w-12 md:h-12 rounded-full border border-white/30 flex items-center justify-center transition-all cursor-target relative overflow-hidden bg-white/10 hover:border-[#a600ff] hover:shadow-[0_0_20px_rgba(166,0,255,0.6)] hover:scale-110 pointer-events-auto"
-        >
-          <span className="absolute inset-0 bg-[#a600ff] translate-x-full group-hover/nav-l:translate-x-0 transition-transform duration-300 ease-out z-0" />
-          <span className="relative z-10 text-white font-bold text-sm md:text-base transition-colors duration-300">←</span>
-        </button>
-        <button
-          onPointerDown={(e) => e.stopPropagation()}
-          onClick={(e) => { e.stopPropagation(); handleNext(); }}
-          className="group/nav-r w-10 h-10 md:w-12 md:h-12 rounded-full border border-white/30 flex items-center justify-center transition-all cursor-target relative overflow-hidden bg-white/10 hover:border-[#a600ff] hover:shadow-[0_0_20px_rgba(166,0,255,0.6)] hover:scale-110 pointer-events-auto"
-        >
-          <span className="absolute inset-0 bg-[#a600ff] -translate-x-full group-hover/nav-r:translate-x-0 transition-transform duration-300 ease-out z-0" />
-          <span className="relative z-10 text-white font-bold text-sm md:text-base transition-colors duration-300">→</span>
-        </button>
-      </div>
+
     </div>
   );
-}
+});
+
+export default ModelSlider;

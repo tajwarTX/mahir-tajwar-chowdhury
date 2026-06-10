@@ -157,7 +157,7 @@ export const StaggeredMenu = ({
               animate={{ y: "0%" }}
               exit={{ y: "-100%" }}
               transition={{ duration: 0.6, ease: [0.19, 1, 0.22, 1] }}
-              className="absolute inset-0 bg-[#a600ff]"
+              className="absolute inset-0 bg-[#e1ff51]"
             />
             <motion.div
               initial={{ y: "-100%" }}
@@ -188,11 +188,11 @@ export const StaggeredMenu = ({
                         className="relative flex items-center justify-center text-white no-underline transition-colors duration-200"
                       >
                         {displayItemNumbering && (
-                          <span className="absolute right-full mr-8 opacity-20 font-geist text-[10px] md:text-xs font-medium tracking-widest mt-1 md:mt-2 whitespace-nowrap pointer-events-none group-hover:text-[#a600ff] group-hover:opacity-100 transition-all duration-200">
+                          <span className="absolute right-full mr-8 opacity-20 font-geist text-[10px] md:text-xs font-medium tracking-widest mt-1 md:mt-2 whitespace-nowrap pointer-events-none group-hover:text-[#e1ff51] group-hover:opacity-100 transition-all duration-200">
                             (0{idx + 1})
                           </span>
                         )}
-                        <span className="cursor-target font-orbitron font-extrabold text-[1.8rem] md:text-[4.5rem] leading-[0.85] tracking-tighter uppercase inline-block px-3 py-2 hover:text-[#a600ff] transition-colors duration-200">
+                        <span className="cursor-target font-orbitron font-extrabold text-[1.8rem] md:text-[4.5rem] leading-[0.85] tracking-tighter uppercase inline-block px-3 py-2 hover:text-[#e1ff51] transition-colors duration-200">
                           {it.label}
                         </span>
                       </Link>
@@ -216,7 +216,7 @@ export const StaggeredMenu = ({
                           href={s.link}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="cursor-target text-white/60 hover:text-[#a600ff] font-geist text-[10px] md:text-[11px] uppercase tracking-widest transition-colors duration-200 px-2 py-0.5"
+                          className="cursor-target text-white/60 hover:text-[#e1ff51] font-geist text-[10px] md:text-[11px] uppercase tracking-widest transition-colors duration-200 px-2 py-0.5"
                         >
                           {s.label}
                         </a>

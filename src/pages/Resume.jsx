@@ -39,7 +39,7 @@ export const Resume = () => {
   };
 
   return (
-    <div className="w-full min-h-screen flex items-center justify-center bg-black px-6 md:px-24 py-20 md:py-32 overflow-hidden selection:bg-[#a600ff] selection:text-white">
+    <div className="w-full min-h-screen flex items-center justify-center bg-black px-6 md:px-24 py-20 md:py-32 overflow-hidden selection:bg-[#e1ff51] selection:text-white">
 
       <div className="absolute top-1/2 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[radial-gradient(circle_at_center,_rgba(166,0,255,0.15)_0%,_transparent_70%)] pointer-events-none" />
 
@@ -49,7 +49,7 @@ export const Resume = () => {
           <h1 className="font-orbitron text-[38px] md:text-[75px] lg:text-[90px] font-extrabold text-white uppercase leading-[0.9] lg:leading-[0.8] tracking-tighter">
             <ScrollLetterRevealDelayed text="GRAB MY" duration={200} delay={0} />
             <br />
-            <span className="text-[#a600ff]">
+            <span className="text-[#e1ff51]">
                <ScrollLetterRevealDelayed text="RESUME.PDF" duration={200} delay={0.1} />
             </span>
           </h1>
@@ -75,7 +75,7 @@ export const Resume = () => {
               >
                 <form onSubmit={handleSubmit} className="space-y-8">
                   <div className="space-y-2 group">
-                    <label className="block font-geist text-[10px] text-white/90 uppercase tracking-[0.4em] transition-colors duration-200 group-focus-within:text-[#a600ff]">
+                    <label className="block font-geist text-[10px] text-white/90 uppercase tracking-[0.4em] transition-colors duration-200 group-focus-within:text-[#e1ff51]">
                       FULL NAME
                     </label>
                     <input
@@ -84,12 +84,12 @@ export const Resume = () => {
                       value={formData.name}
                       placeholder="ENTER NAME"
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full bg-transparent border-b border-white/20 py-3 font-geist text-[15px] text-white uppercase tracking-[0.2em] focus:outline-none focus:border-[#a600ff] transition-all duration-300 placeholder:text-white/30"
+                      className="w-full bg-transparent border-b border-white/20 py-3 font-geist text-[15px] text-white uppercase tracking-[0.2em] focus:outline-none focus:border-[#e1ff51] transition-all duration-300 placeholder:text-white/30"
                     />
                   </div>
 
                   <div className="space-y-2 group">
-                    <label className="block font-geist text-[10px] text-white/90 uppercase tracking-[0.4em] transition-colors duration-200 group-focus-within:text-[#a600ff]">
+                    <label className="block font-geist text-[10px] text-white/90 uppercase tracking-[0.4em] transition-colors duration-200 group-focus-within:text-[#e1ff51]">
                       CONTACT EMAIL
                     </label>
                     <input
@@ -98,7 +98,7 @@ export const Resume = () => {
                       value={formData.email}
                       placeholder="ENTER VALID EMAIL ADDRESS"
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full bg-transparent border-b border-white/20 py-3 font-geist text-[15px] text-white tracking-[0.2em] focus:outline-none focus:border-[#a600ff] transition-all duration-300 placeholder:text-white/30"
+                      className="w-full bg-transparent border-b border-white/20 py-3 font-geist text-[15px] text-white tracking-[0.2em] focus:outline-none focus:border-[#e1ff51] transition-all duration-300 placeholder:text-white/30"
                     />
                   </div>
 
@@ -106,7 +106,7 @@ export const Resume = () => {
                     type="submit"
                     whileHover="hover"
                     initial="initial"
-                    className="relative w-full cursor-target border border-[#a600ff]/30 hover:border-[#a600ff] py-5 transition-all duration-300 active:scale-[0.98] mt-4 overflow-hidden group"
+                    className="relative w-full cursor-target border border-[#e1ff51]/30 hover:border-[#e1ff51] py-5 transition-all duration-300 active:scale-[0.98] mt-4 overflow-hidden group"
                   >
                     <motion.div
                       variants={{
@@ -114,9 +114,9 @@ export const Resume = () => {
                         hover: { x: 0 }
                       }}
                       transition={{ duration: 0.85, ease: [0.19, 1, 0.22, 1] }}
-                      className="absolute inset-0 bg-[#a600ff] z-0"
+                      className="absolute inset-0 bg-[#e1ff51] z-0"
                     />
-                    <span className="relative z-10 font-geist text-[11px] text-[#a600ff] group-hover:text-white uppercase tracking-[0.5em] font-bold transition-colors duration-300">
+                    <span className="relative z-10 font-geist text-[11px] text-[#e1ff51] group-hover:text-white uppercase tracking-[0.5em] font-bold transition-colors duration-300">
                       {isSubmitting ? "SENDING..." : "SEND REQUEST"}
                     </span>
                   </motion.button>
@@ -137,7 +137,7 @@ export const Resume = () => {
                   transition={{ delay: 0.2, duration: 0.5, ease: [0.19, 1, 0.22, 1] }}
                   className="mb-8"
                 >
-                  <svg className="w-20 h-20 text-[#a600ff]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <svg className="w-20 h-20 text-[#e1ff51]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                     <motion.path
                       initial={{ pathLength: 0 }}
                       animate={{ pathLength: 1 }}
@@ -155,7 +155,7 @@ export const Resume = () => {
                   transition={{ delay: 0.6, duration: 0.8 }}
                   className="font-orbitron text-2xl md:text-5xl font-bold text-white uppercase tracking-tighter mb-4"
                 >
-                  REQUEST <span className="text-[#a600ff]">RECEIVED</span>
+                  REQUEST <span className="text-[#e1ff51]">RECEIVED</span>
                 </motion.h2>
 
                 <motion.p 
@@ -174,7 +174,7 @@ export const Resume = () => {
                   onClick={() => {
                     navigate('/');
                   }}
-                  className="mt-16 px-8 py-4 cursor-target border border-[#a600ff]/30 hover:border-[#a600ff] bg-transparent hover:bg-[#a600ff]/5 font-geist text-[11px] text-[#a600ff] uppercase tracking-[0.4em] transition-all duration-300"
+                  className="mt-16 px-8 py-4 cursor-target border border-[#e1ff51]/30 hover:border-[#e1ff51] bg-transparent hover:bg-[#e1ff51]/5 font-geist text-[11px] text-[#e1ff51] uppercase tracking-[0.4em] transition-all duration-300"
                 >
                   RETURN TO HOME
                 </motion.button>

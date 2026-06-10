@@ -39,7 +39,7 @@ export const Contact = () => {
   };
 
   return (
-    <div className="w-full min-h-screen flex items-center justify-center bg-black px-6 md:px-24 py-20 md:py-32 overflow-hidden selection:bg-[#a600ff] selection:text-white">
+    <div className="w-full min-h-screen flex items-center justify-center bg-black px-6 md:px-24 py-20 md:py-32 overflow-hidden selection:bg-[#e1ff51] selection:text-white">
 
       <div className="absolute top-1/2 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[radial-gradient(circle_at_center,_rgba(166,0,255,0.15)_0%,_transparent_70%)] pointer-events-none" />
 
@@ -49,7 +49,7 @@ export const Contact = () => {
           <h1 className="font-orbitron text-[38px] md:text-[75px] lg:text-[90px] font-extrabold text-white uppercase leading-[0.9] lg:leading-[0.8] tracking-tighter">
             <ScrollLetterRevealDelayed text="GET" duration={200} delay={0} />
             <br />
-            <span className="text-[#a600ff]">
+            <span className="text-[#e1ff51]">
                <ScrollLetterRevealDelayed text="IN TOUCH" duration={200} delay={0.1} />
             </span>
           </h1>
@@ -67,7 +67,7 @@ export const Contact = () => {
               rel="noreferrer" 
               initial="initial"
               whileHover="hover"
-              className="relative w-14 h-14 flex items-center justify-center rounded-full border border-white/20 hover:border-[#a600ff] text-white/60 hover:text-white transition-colors duration-300 cursor-target overflow-hidden group"
+              className="relative w-14 h-14 flex items-center justify-center rounded-full border border-white/20 hover:border-[#e1ff51] text-white/60 hover:text-white transition-colors duration-300 cursor-target overflow-hidden group"
             >
               <motion.div
                 variants={{
@@ -75,7 +75,7 @@ export const Contact = () => {
                   hover: { y: 0 }
                 }}
                 transition={{ duration: 0.5, ease: [0.19, 1, 0.22, 1] }}
-                className="absolute inset-0 bg-[#a600ff] z-0 rounded-full"
+                className="absolute inset-0 bg-[#e1ff51] z-0 rounded-full"
               />
               <span className="relative z-10 flex items-center justify-center">
                 <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
@@ -87,7 +87,7 @@ export const Contact = () => {
               rel="noreferrer" 
               initial="initial"
               whileHover="hover"
-              className="relative w-14 h-14 flex items-center justify-center rounded-full border border-white/20 hover:border-[#a600ff] text-white/60 hover:text-white transition-colors duration-300 cursor-target overflow-hidden group"
+              className="relative w-14 h-14 flex items-center justify-center rounded-full border border-white/20 hover:border-[#e1ff51] text-white/60 hover:text-white transition-colors duration-300 cursor-target overflow-hidden group"
             >
               <motion.div
                 variants={{
@@ -95,7 +95,7 @@ export const Contact = () => {
                   hover: { y: 0 }
                 }}
                 transition={{ duration: 0.5, ease: [0.19, 1, 0.22, 1] }}
-                className="absolute inset-0 bg-[#a600ff] z-0 rounded-full"
+                className="absolute inset-0 bg-[#e1ff51] z-0 rounded-full"
               />
               <span className="relative z-10 flex items-center justify-center">
                 <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"></path><rect x="2" y="9" width="4" height="12"></rect><circle cx="4" cy="4" r="2"></circle></svg>
@@ -107,7 +107,7 @@ export const Contact = () => {
               rel="noreferrer" 
               initial="initial"
               whileHover="hover"
-              className="relative w-14 h-14 flex items-center justify-center rounded-full border border-white/20 hover:border-[#a600ff] text-white/60 hover:text-white transition-colors duration-300 cursor-target overflow-hidden group"
+              className="relative w-14 h-14 flex items-center justify-center rounded-full border border-white/20 hover:border-[#e1ff51] text-white/60 hover:text-white transition-colors duration-300 cursor-target overflow-hidden group"
             >
               <motion.div
                 variants={{
@@ -115,7 +115,7 @@ export const Contact = () => {
                   hover: { y: 0 }
                 }}
                 transition={{ duration: 0.5, ease: [0.19, 1, 0.22, 1] }}
-                className="absolute inset-0 bg-[#a600ff] z-0 rounded-full"
+                className="absolute inset-0 bg-[#e1ff51] z-0 rounded-full"
               />
               <span className="relative z-10 flex items-center justify-center">
                 <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33 2.78 2.78 0 0 0 1.94 2c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.33 29 29 0 0 0-.46-5.33z"></path><polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02"></polygon></svg>
@@ -127,7 +127,7 @@ export const Contact = () => {
               rel="noreferrer" 
               initial="initial"
               whileHover="hover"
-              className="relative w-14 h-14 flex items-center justify-center rounded-full border border-white/20 hover:border-[#a600ff] text-white/60 hover:text-white transition-colors duration-300 cursor-target overflow-hidden group"
+              className="relative w-14 h-14 flex items-center justify-center rounded-full border border-white/20 hover:border-[#e1ff51] text-white/60 hover:text-white transition-colors duration-300 cursor-target overflow-hidden group"
             >
               <motion.div
                 variants={{
@@ -135,7 +135,7 @@ export const Contact = () => {
                   hover: { y: 0 }
                 }}
                 transition={{ duration: 0.5, ease: [0.19, 1, 0.22, 1] }}
-                className="absolute inset-0 bg-[#a600ff] z-0 rounded-full"
+                className="absolute inset-0 bg-[#e1ff51] z-0 rounded-full"
               />
               <span className="relative z-10 flex items-center justify-center">
                 <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
@@ -147,7 +147,7 @@ export const Contact = () => {
               rel="noreferrer" 
               initial="initial"
               whileHover="hover"
-              className="relative w-14 h-14 flex items-center justify-center rounded-full border border-white/20 hover:border-[#a600ff] text-white/60 hover:text-white transition-colors duration-300 cursor-target overflow-hidden group"
+              className="relative w-14 h-14 flex items-center justify-center rounded-full border border-white/20 hover:border-[#e1ff51] text-white/60 hover:text-white transition-colors duration-300 cursor-target overflow-hidden group"
             >
               <motion.div
                 variants={{
@@ -155,7 +155,7 @@ export const Contact = () => {
                   hover: { y: 0 }
                 }}
                 transition={{ duration: 0.5, ease: [0.19, 1, 0.22, 1] }}
-                className="absolute inset-0 bg-[#a600ff] z-0 rounded-full"
+                className="absolute inset-0 bg-[#e1ff51] z-0 rounded-full"
               />
               <span className="relative z-10 flex items-center justify-center">
                 <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
@@ -178,7 +178,7 @@ export const Contact = () => {
               >
                 <form onSubmit={handleSubmit} className="space-y-8">
                   <div className="space-y-2 group">
-                    <label className="block font-geist text-[10px] text-white/90 uppercase tracking-[0.4em] transition-colors duration-200 group-focus-within:text-[#a600ff]">
+                    <label className="block font-geist text-[10px] text-white/90 uppercase tracking-[0.4em] transition-colors duration-200 group-focus-within:text-[#e1ff51]">
                       FULL NAME
                     </label>
                     <input
@@ -187,12 +187,12 @@ export const Contact = () => {
                       value={formData.name}
                       placeholder="ENTER NAME"
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      className="w-full bg-transparent border-b border-white/20 py-3 font-geist text-[15px] text-white uppercase tracking-[0.2em] focus:outline-none focus:border-[#a600ff] transition-all duration-300 placeholder:text-white/30"
+                      className="w-full bg-transparent border-b border-white/20 py-3 font-geist text-[15px] text-white uppercase tracking-[0.2em] focus:outline-none focus:border-[#e1ff51] transition-all duration-300 placeholder:text-white/30"
                     />
                   </div>
 
                   <div className="space-y-2 group">
-                    <label className="block font-geist text-[10px] text-white/90 uppercase tracking-[0.4em] transition-colors duration-200 group-focus-within:text-[#a600ff]">
+                    <label className="block font-geist text-[10px] text-white/90 uppercase tracking-[0.4em] transition-colors duration-200 group-focus-within:text-[#e1ff51]">
                       CONTACT EMAIL
                     </label>
                     <input
@@ -201,12 +201,12 @@ export const Contact = () => {
                       value={formData.email}
                       placeholder="ENTER VALID EMAIL ADDRESS"
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full bg-transparent border-b border-white/20 py-3 font-geist text-[15px] text-white tracking-[0.2em] focus:outline-none focus:border-[#a600ff] transition-all duration-300 placeholder:text-white/30"
+                      className="w-full bg-transparent border-b border-white/20 py-3 font-geist text-[15px] text-white tracking-[0.2em] focus:outline-none focus:border-[#e1ff51] transition-all duration-300 placeholder:text-white/30"
                     />
                   </div>
 
                   <div className="space-y-2 group">
-                    <label className="block font-geist text-[10px] text-white/90 uppercase tracking-[0.4em] transition-colors duration-200 group-focus-within:text-[#a600ff]">
+                    <label className="block font-geist text-[10px] text-white/90 uppercase tracking-[0.4em] transition-colors duration-200 group-focus-within:text-[#e1ff51]">
                       MESSAGE
                     </label>
                     <textarea
@@ -215,7 +215,7 @@ export const Contact = () => {
                       placeholder="ENTER YOUR MESSAGE"
                       rows={4}
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                      className="w-full bg-transparent border-b border-white/20 py-3 font-geist text-[15px] text-white tracking-[0.2em] focus:outline-none focus:border-[#a600ff] transition-all duration-300 placeholder:text-white/30 resize-none"
+                      className="w-full bg-transparent border-b border-white/20 py-3 font-geist text-[15px] text-white tracking-[0.2em] focus:outline-none focus:border-[#e1ff51] transition-all duration-300 placeholder:text-white/30 resize-none"
                     />
                   </div>
 
@@ -223,7 +223,7 @@ export const Contact = () => {
                     type="submit"
                     whileHover="hover"
                     initial="initial"
-                    className="relative w-full cursor-target border border-[#a600ff]/30 hover:border-[#a600ff] py-5 transition-all duration-300 active:scale-[0.98] mt-4 overflow-hidden group"
+                    className="relative w-full cursor-target border border-[#e1ff51]/30 hover:border-[#e1ff51] py-5 transition-all duration-300 active:scale-[0.98] mt-4 overflow-hidden group"
                   >
                     <motion.div
                       variants={{
@@ -231,9 +231,9 @@ export const Contact = () => {
                         hover: { x: 0 }
                       }}
                       transition={{ duration: 0.85, ease: [0.19, 1, 0.22, 1] }}
-                      className="absolute inset-0 bg-[#a600ff] z-0"
+                      className="absolute inset-0 bg-[#e1ff51] z-0"
                     />
-                    <span className="relative z-10 font-geist text-[11px] text-[#a600ff] group-hover:text-white uppercase tracking-[0.5em] font-bold transition-colors duration-300">
+                    <span className="relative z-10 font-geist text-[11px] text-[#e1ff51] group-hover:text-white uppercase tracking-[0.5em] font-bold transition-colors duration-300">
                       {isSubmitting ? "SENDING..." : "SEND MESSAGE"}
                     </span>
                   </motion.button>
@@ -254,7 +254,7 @@ export const Contact = () => {
                   transition={{ delay: 0.2, duration: 0.5, ease: [0.19, 1, 0.22, 1] }}
                   className="mb-8"
                 >
-                  <svg className="w-20 h-20 text-[#a600ff]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <svg className="w-20 h-20 text-[#e1ff51]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                     <motion.path
                       initial={{ pathLength: 0 }}
                       animate={{ pathLength: 1 }}
@@ -272,7 +272,7 @@ export const Contact = () => {
                   transition={{ delay: 0.6, duration: 0.8 }}
                   className="font-orbitron text-2xl md:text-5xl font-bold text-white uppercase tracking-tighter mb-4"
                 >
-                  MESSAGE <span className="text-[#a600ff]">SENT</span>
+                  MESSAGE <span className="text-[#e1ff51]">SENT</span>
                 </motion.h2>
 
                 <motion.p 
@@ -291,7 +291,7 @@ export const Contact = () => {
                   onClick={() => {
                     navigate('/');
                   }}
-                  className="mt-16 px-8 py-4 cursor-target border border-[#a600ff]/30 hover:border-[#a600ff] bg-transparent hover:bg-[#a600ff]/5 font-geist text-[11px] text-[#a600ff] uppercase tracking-[0.4em] transition-all duration-300"
+                  className="mt-16 px-8 py-4 cursor-target border border-[#e1ff51]/30 hover:border-[#e1ff51] bg-transparent hover:bg-[#e1ff51]/5 font-geist text-[11px] text-[#e1ff51] uppercase tracking-[0.4em] transition-all duration-300"
                 >
                   RETURN TO HOME
                 </motion.button>

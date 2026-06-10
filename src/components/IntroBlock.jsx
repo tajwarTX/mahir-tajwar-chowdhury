@@ -1,7 +1,7 @@
 import { useState } from "react";
 import ScrollLetterRevealDelayed from "./ScrollLetterRevealDelayed";
 
-const IntroBlock = ({ className = "", accent = "#a600ff", lastNameClassName = "" }) => {
+const IntroBlock = ({ className = "", accent = "#e1ff51", lastNameClassName = "" }) => {
   const firstNames = [
     { text: "MAHIR TAJWAR", font: "font-orbitron", dir: "ltr" },
     { text: "মাহির তাজওয়ার", font: "font-bangla", dir: "ltr" },

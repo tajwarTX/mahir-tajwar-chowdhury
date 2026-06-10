@@ -65,7 +65,7 @@ const AchievementItem = ({ value, suffix = "", label, sublabel }) => {
         </span>
       </div>
       <div className="mt-4 flex flex-col items-center">
-        <span className="font-orbitron text-[10px] md:text-xs text-[#a600ff] uppercase tracking-[0.3em] font-bold">
+        <span className="font-orbitron text-[10px] md:text-xs text-[#e1ff51] uppercase tracking-[0.3em] font-bold">
           {label}
         </span>
         <span className="font-geist text-[9px] md:text-[10px] text-white/40 uppercase tracking-widest mt-1">
@@ -122,7 +122,7 @@ const TechBadge = memo(({ name, icon, color }) => {
     : `https://img.icons8.com/color/48/${icon}.png`;
 
   return (
-    <div className="cursor-target flex items-center gap-2.5 bg-white/5 border border-white/10 px-5 py-2.5 rounded-full hover:bg-[#a600ff] hover:border-[#a600ff] transition-all duration-300 group">
+    <div className="cursor-target flex items-center gap-2.5 bg-white/5 border border-white/10 px-5 py-2.5 rounded-full hover:bg-[#e1ff51] hover:border-[#e1ff51] transition-all duration-300 group">
       {icon && (
         <img
           src={iconUrl}
@@ -301,7 +301,7 @@ const EngineeringGallery = memo(({ galleryData }) => {
           onClick={(e) => { e.stopPropagation(); setCounter(prev => prev - 1); }}
           className="group/nav-l w-10 h-10 md:w-12 md:h-12 rounded-full border border-white/10 flex items-center justify-center text-white text-lg transition-all cursor-target pointer-events-auto relative overflow-hidden"
         >
-          <span className="absolute inset-0 bg-[#a600ff] translate-x-full group-hover/nav-l:translate-x-0 transition-transform duration-300 ease-out z-0" />
+          <span className="absolute inset-0 bg-[#e1ff51] translate-x-full group-hover/nav-l:translate-x-0 transition-transform duration-300 ease-out z-0" />
           <span className="relative z-10">←</span>
         </button>
         <button
@@ -310,13 +310,13 @@ const EngineeringGallery = memo(({ galleryData }) => {
           onClick={(e) => { e.stopPropagation(); setCounter(prev => prev + 1); }}
           className="group/nav-r w-10 h-10 md:w-12 md:h-12 rounded-full border border-white/10 flex items-center justify-center text-white text-lg transition-all cursor-target pointer-events-auto relative overflow-hidden"
         >
-          <span className="absolute inset-0 bg-[#a600ff] -translate-x-full group-hover/nav-r:translate-x-0 transition-transform duration-300 ease-out z-0" />
+          <span className="absolute inset-0 bg-[#e1ff51] -translate-x-full group-hover/nav-r:translate-x-0 transition-transform duration-300 ease-out z-0" />
           <span className="relative z-10">→</span>
         </button>
       </div>
 
       <div className="absolute bottom-8 left-8 right-12 max-w-[50%] pointer-events-none z-[30]">
-        <h3 className={`font-orbitron text-2xl md:text-4xl font-black uppercase tracking-tighter flex flex-col -space-y-[5px] md:-space-y-[10px] transition-colors duration-500 ${isNavHovered ? 'text-[#a600ff]' : 'text-white'}`}>
+        <h3 className={`font-orbitron text-2xl md:text-4xl font-black uppercase tracking-tighter flex flex-col -space-y-[5px] md:-space-y-[10px] transition-colors duration-500 ${isNavHovered ? 'text-[#e1ff51]' : 'text-white'}`}>
           {galleryData[activeGalleryIdx].title.split(' ').map((word, index) => (
             <motion.div
               key={`${counter}-${index}`}
@@ -394,7 +394,7 @@ const About = () => {
   const sliderRef = useRef(null);
 
   return (
-    <div ref={containerRef} className="w-full overflow-x-hidden bg-black selection:bg-[#a600ff] selection:text-white pb-12">
+    <div ref={containerRef} className="w-full overflow-x-hidden bg-black selection:bg-[#e1ff51] selection:text-white pb-12">
       {/* Background Decor — static fixed layer */}
       <div className="fixed inset-0 opacity-[0.05] pointer-events-none z-0">
         <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(#ffffff 1px, transparent 0)', backgroundSize: '40px 40px' }} />
@@ -509,7 +509,7 @@ const About = () => {
 
             <h2 className="font-orbitron text-4xl md:text-5xl font-black text-white uppercase tracking-tighter leading-[0.9]">
               <span className="inline">Mahir </span>
-              <span className="inline text-transparent bg-clip-text bg-gradient-to-r from-[#a600ff] to-[#ff00e5]">Tajwar</span>
+              <span className="inline text-transparent bg-clip-text bg-gradient-to-r from-[#e1ff51] to-[#ff00e5]">Tajwar</span>
             </h2>
 
             <div className="flex items-center gap-4 opacity-60">
@@ -533,7 +533,7 @@ const About = () => {
           <div className="w-full md:w-5/12 relative group cursor-target max-w-md ml-auto">
             <div className="relative aspect-[3/4] overflow-hidden">
               <div className="absolute top-2 left-4 z-20">
-                <h2 className="font-orbitron text-4xl md:text-6xl font-black text-[#a600ff] group-hover:text-white leading-[0.6] tracking-tighter uppercase transition-colors duration-500 flex flex-col -space-y-[5px] md:-space-y-[10px]">
+                <h2 className="font-orbitron text-4xl md:text-6xl font-black text-[#e1ff51] group-hover:text-white leading-[0.6] tracking-tighter uppercase transition-colors duration-500 flex flex-col -space-y-[5px] md:-space-y-[10px]">
                   <span>A</span>
                   <span>PURE</span>
                   <span>ROBOCIST.</span>
@@ -558,7 +558,7 @@ const About = () => {
           {/* Visual Layer (Behind Models) */}
           <div className="z-0 flex items-end pointer-events-none">
             <h2 className="font-orbitron text-3xl md:text-5xl font-black text-white uppercase tracking-tighter leading-none transition-colors">
-              Kind of <span className="text-[#a600ff]">projects</span> <br />
+              Kind of <span className="text-[#e1ff51]">projects</span> <br />
               i worked on
             </h2>
             <div className="-ml-28 mb-[5px]">
@@ -612,7 +612,7 @@ const About = () => {
       <section className="relative mt-40 pb-[100px] z-10">
         <div className="absolute -top-20 right-[12.25%] z-20">
           <h2 className="font-orbitron text-3xl md:text-5xl font-black text-white uppercase tracking-tighter leading-none text-right">
-            Tech <span className="text-[#a600ff]">Stack</span>
+            Tech <span className="text-[#e1ff51]">Stack</span>
           </h2>
         </div>
 
@@ -649,7 +649,7 @@ const About = () => {
           <div className="w-full md:w-5/12 relative group cursor-target max-w-md">
             <div className="relative aspect-[3/4] overflow-hidden">
               <div className="absolute top-2 left-4 z-20">
-                <h2 className="font-orbitron text-4xl md:text-6xl font-black text-[#a600ff] group-hover:text-white leading-[0.6] tracking-tighter uppercase transition-colors duration-500 flex flex-col -space-y-[5px] md:-space-y-[10px]">
+                <h2 className="font-orbitron text-4xl md:text-6xl font-black text-[#e1ff51] group-hover:text-white leading-[0.6] tracking-tighter uppercase transition-colors duration-500 flex flex-col -space-y-[5px] md:-space-y-[10px]">
                   <span>CADET</span>
                   <span>NO</span>
                   <span>3056.</span>
@@ -670,7 +670,7 @@ const About = () => {
           <div className="w-full md:w-5/12 flex flex-col gap-8">
             <div className="flex flex-col gap-6">
               <h2 className="font-orbitron text-3xl md:text-5xl font-black text-white uppercase tracking-tighter">
-                Cadet <span className="text-[#a600ff]">Life</span>
+                Cadet <span className="text-[#e1ff51]">Life</span>
               </h2>
 
               <div className="space-y-5 border-t border-white/10 pt-8">
@@ -690,15 +690,15 @@ const About = () => {
 
         {/* Roles & Achievements Grid (Full Width) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 pb-8">
-          <div className="border-l-2 border-[#a600ff]/50 pl-6 hover:border-[#a600ff] transition-colors">
+          <div className="border-l-2 border-[#e1ff51]/50 pl-6 hover:border-[#e1ff51] transition-colors">
             <h3 className="font-orbitron text-lg font-bold text-white uppercase tracking-wide">Student Government</h3>
-            <p className="font-geist text-[#a600ff] text-xs tracking-[0.2em] mt-1 mb-3 uppercase">Mirzapur Cadet College • 2024–2025</p>
+            <p className="font-geist text-[#e1ff51] text-xs tracking-[0.2em] mt-1 mb-3 uppercase">Mirzapur Cadet College • 2024–2025</p>
             <p className="font-geist text-white/60 text-sm leading-relaxed uppercase tracking-wider">House Cultural Prefect <br /> Junior House Prefect</p>
           </div>
 
-          <div className="border-l-2 border-[#a600ff]/50 pl-6 hover:border-[#a600ff] transition-colors">
+          <div className="border-l-2 border-[#e1ff51]/50 pl-6 hover:border-[#e1ff51] transition-colors">
             <h3 className="font-orbitron text-lg font-bold text-white uppercase tracking-wide">MCC Robotics & Programming</h3>
-            <p className="font-geist text-[#a600ff] text-xs tracking-[0.2em] mt-1 mb-3 uppercase">Club • 2022–2025</p>
+            <p className="font-geist text-[#e1ff51] text-xs tracking-[0.2em] mt-1 mb-3 uppercase">Club • 2022–2025</p>
             <p className="font-geist text-white/60 text-sm leading-relaxed uppercase tracking-wider">President <br /> Founding Member</p>
           </div>
         </div>

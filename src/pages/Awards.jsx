@@ -312,7 +312,7 @@ const StatItem = ({ label, value, color, isActive, onClick }) => {
         {count < 10 ? `0${count}` : count}
       </span>
       <div className="mt-2 flex flex-col items-center md:items-end">
-        <span className="font-orbitron text-[10px] md:text-xs text-[#a600ff] uppercase tracking-[0.3em] font-bold">
+        <span className="font-orbitron text-[10px] md:text-xs text-[#e1ff51] uppercase tracking-[0.3em] font-bold">
           {label}
         </span>
         <span className="font-geist text-[9px] md:text-[10px] text-white/20 uppercase tracking-widest mt-1">
@@ -333,17 +333,17 @@ const AwardItem = React.memo(({ award, idx, onHover, onClick }) => {
       onMouseLeave={() => onHover(null)}
       onClick={() => onClick(award)}
       transition={{ duration: 0.6, delay: idx * 0.1, ease: [0.19, 1, 0.22, 1] }}
-      className="bg-transparent p-8 md:p-12 group hover:bg-[#a600ff]/[0.08] border-b border-white/5 transition-all duration-500 relative overflow-hidden last:border-none cursor-pointer"
+      className="bg-transparent p-8 md:p-12 group hover:bg-[#e1ff51]/[0.08] border-b border-white/5 transition-all duration-500 relative overflow-hidden last:border-none cursor-pointer"
     >
       {/* Hover Effect Line */}
       <motion.div 
-        className="absolute bottom-0 left-0 h-[2px] bg-[#a600ff] w-0 group-hover:w-full transition-all duration-700 ease-[cubic-bezier(0.19,1,0.22,1)]"
+        className="absolute bottom-0 left-0 h-[2px] bg-[#e1ff51] w-0 group-hover:w-full transition-all duration-700 ease-[cubic-bezier(0.19,1,0.22,1)]"
       />
       
       <div className="grid grid-cols-1 md:grid-cols-[120px_1fr_200px] items-start gap-8 md:gap-16">
         
         {/* Year */}
-        <div className="font-orbitron text-2xl md:text-3xl font-bold text-white/20 group-hover:text-[#a600ff] transition-colors duration-500">
+        <div className="font-orbitron text-2xl md:text-3xl font-bold text-white/20 group-hover:text-[#e1ff51] transition-colors duration-500">
           {award.year}
         </div>
 
@@ -359,7 +359,7 @@ const AwardItem = React.memo(({ award, idx, onHover, onClick }) => {
 
         {/* Organization */}
         <div className="md:text-right flex md:flex-col justify-between md:justify-start items-center md:items-end">
-           <span className="font-geist text-[9px] md:text-[10px] text-[#a600ff] font-bold uppercase tracking-[0.4em] mb-2">
+           <span className="font-geist text-[9px] md:text-[10px] text-[#e1ff51] font-bold uppercase tracking-[0.4em] mb-2">
              ISSUED BY
            </span>
            <span className="font-geist text-[10px] md:text-[11px] text-white/70 uppercase tracking-widest text-right whitespace-pre-wrap">
@@ -434,7 +434,7 @@ export const Awards = () => {
   return (
     <div 
       onMouseMove={handleMouseMove}
-      className="w-full min-h-screen bg-transparent px-6 md:px-24 py-32 md:py-48 overflow-hidden selection:bg-[#a600ff] selection:text-white relative"
+      className="w-full min-h-screen bg-transparent px-6 md:px-24 py-32 md:py-48 overflow-hidden selection:bg-[#e1ff51] selection:text-white relative"
     >
       
       {/* Fullscreen Certificate Modal */}
@@ -510,7 +510,7 @@ export const Awards = () => {
             <h1 className="font-orbitron text-[38px] md:text-[75px] lg:text-[100px] font-extrabold text-white uppercase leading-[0.9] lg:leading-[0.8] tracking-tighter">
               <ScrollLetterRevealDelayed text="HONORS &" duration={200} delay={0} />
               <br />
-              <span className="text-[#a600ff]">
+              <span className="text-[#e1ff51]">
                 <ScrollLetterRevealDelayed text="AWARDS" duration={200} delay={100} />
               </span>
             </h1>
@@ -524,12 +524,12 @@ export const Awards = () => {
 
           {/* Stats Counter */}
           <div className="flex flex-col items-center md:items-end w-full md:w-auto border-t md:border-t-0 pt-12 md:pt-0">
-            <span className="font-geist text-[10px] md:text-[11px] text-[#a600ff] font-bold uppercase tracking-[0.4em] mb-2 md:translate-y-1">FILTER BY</span>
+            <span className="font-geist text-[10px] md:text-[11px] text-[#e1ff51] font-bold uppercase tracking-[0.4em] mb-2 md:translate-y-1">FILTER BY</span>
             <div className="flex flex-wrap md:flex-nowrap justify-center md:justify-end gap-6 md:gap-8 md:translate-y-3">
                <StatItem label="Gold" value={stats.gold} color="#FFD700" isActive={activeFilter === 'gold'} onClick={() => toggleFilter('gold')} />
                <StatItem label="Silver" value={stats.silver} color="#E5E7EB" isActive={activeFilter === 'silver'} onClick={() => toggleFilter('silver')} />
                <StatItem label="Bronze" value={stats.bronze} color="#CD7F32" isActive={activeFilter === 'bronze'} onClick={() => toggleFilter('bronze')} />
-               <StatItem label="Technical" value={stats.technical} color="#a600ff" isActive={activeFilter === 'technical'} onClick={() => toggleFilter('technical')} />
+               <StatItem label="Technical" value={stats.technical} color="#e1ff51" isActive={activeFilter === 'technical'} onClick={() => toggleFilter('technical')} />
                <StatItem label="Misc" value={stats.misc} color="#ffffff" isActive={activeFilter === 'misc'} onClick={() => toggleFilter('misc')} />
             </div>
           </div>
